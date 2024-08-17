@@ -19,7 +19,6 @@ const ModalBitacoras = ({ visible, onClose }) => {
       setPdf(res[0]);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        // User canceled the picker
       } else {
         throw err;
       }

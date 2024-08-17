@@ -108,3 +108,24 @@ export const eliminarPersona = async(req, res) => {
         })
     }
 }
+/* Buscar Persona */
+export const buscarPersonaPorId = async (req, res) => {
+    try {
+        const { id_persona } = req.params;
+        let sql = `SELECT * FROM personas WHERE id_persona = ?`;
+        const [results] = await pool.query(sql, [id_persona]);
+
+        if (results.length > 0) {
+            res.status(200).json(results[0]);
+        } else {
+            res.status(404).json({
+                message: 'Persona no encontrada'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error
+        });
+    }
+};
+

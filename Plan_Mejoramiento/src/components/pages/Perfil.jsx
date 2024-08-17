@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import React, { useState } from "react";
 import Layout from "../Template/Layout";
 import PersonasModal from "../moleculas/Modal_personas";
-import Icon from "react-native-vector-icons/FontAwesome"; // Importa el conjunto de íconos que necesitas
+import Icon from "react-native-vector-icons/FontAwesome"; 
 
 const Perfil = () => {
   const [modalVisible, setModalVisible] = useState(false);
