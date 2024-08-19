@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home, Users ,BookMarked,BookUser ,Building2 ,GraduationCap  ,  FolderSearch2, BookPlus   } from "lucide-react";
 import Sidebar, { SidebarItem, SidebarAccordion } from "./components/Sidebar";
-import { LoginPage } from './pages/LoginPage';
+import { LoginPage } from '../src/components/pages/LoginPage';
 import { ProtectedRoute } from './configs/ProtectedRoute';
 import { Navbar2 } from './components/Navbar';
 
@@ -13,15 +13,15 @@ import { Navbar2 } from './components/Navbar';
 // las rutas de todos los modulos [tengo que crear la vista y ubicarlas en el sliderbar]
 //son los modulos de la base de datos pero vamos a dividir en secciones 
 
-const HomePage = lazy(() => import('./pages/HomePage'));
-const NominaPage = lazy(() => import('./pages/NominaPage'));
-const FichasPage = lazy(() => import('./pages/FichasPage'));
-const MatriculasPage = lazy(() => import('./pages/MatriculasPage'));
-const EmpresaPage = lazy(() => import('./pages/EmpresaPage'));
-const EtapaPracticaPage = lazy(() => import('./pages/EtapaPracticaPage'));
-const ReportesPage = lazy(() => import('./pages/ReportesPage'));
-const EstadisticasPage = lazy(() => import('./pages/EstadisticasPage'));
-const BitacorasPage = lazy(() => import('./pages/BitacorasPage'));
+const HomePage = lazy(() => import('./components/pages/HomePage'));
+const NominaPage = lazy(() => import('./components/pages/NominaPage'));
+const FichasPage = lazy(() => import('./components/pages/FichasPage'));
+const MatriculasPage = lazy(() => import('./components/pages/MatriculasPage'));
+const EmpresaPage = lazy(() => import('./components/pages/EmpresaPage'));
+const EtapaPracticaPage = lazy(() => import('./components/pages/EtapaPracticaPage'));
+const ReportesPage = lazy(() => import('./components/pages/ReportesPage'));
+const EstadisticasPage = lazy(() => import('./components/pages/EstadisticasPage'));
+const BitacorasPage = lazy(() => import('./components/pages/BitacorasPage'));
 
 
 export const App = () => {
