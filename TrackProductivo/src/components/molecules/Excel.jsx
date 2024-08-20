@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
+import v from '../../styles/Variables'
 
 const ExcelUploader = () => {
   const [data, setData] = useState([]);
@@ -52,11 +53,12 @@ const ExcelUploader = () => {
 
   return (
     <div>
+      <p className="my-2 text-gray-700">{fileName}</p>
       <label className="relative inline-block cursor-pointer">
-        <input 
-          type="file" 
-          accept=".xlsx, .xls" 
-          onChange={handleFileUpload} 
+        <input
+          type="file"
+          accept=".xlsx, .xls"
+          onChange={handleFileUpload}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         <span className="inline-block px-4 py-2 border shadow-lg rounded-xl">
@@ -65,14 +67,19 @@ const ExcelUploader = () => {
       </label>
 
       {file && (
-        <div className="mt-4">
-          <button 
-            onClick={downloadFile} 
-            className="px-2 py-1 bg-[#84CC16] text-white rounded-md"
+        <div className="mt-4 ml-40">
+          <button
+            /* onClick={}  */
+            className="px-2 py-1 bg-[#98e326] text-white rounded-lg"
           >
-            Descargar archivo
+            <v.descargar className='w-5 h-5' />
           </button>
-          <p className="mt-2 text-gray-700">Nombre del archivo: {fileName}</p>
+          <button
+            onClick={downloadFile}
+            className="px-2 py-1 ml-4 bg-[#70B22D] text-white rounded-lg"
+          >
+            <v.enviar className='w-5 h-5' />
+          </button>
         </div>
       )}
 

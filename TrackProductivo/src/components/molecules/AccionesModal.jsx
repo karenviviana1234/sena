@@ -5,11 +5,13 @@ import ModalNominas from "../templates/ModalNominas";
 function AccionesModal({ label, isOpen, onClose, onAccept }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} placement="top-center" width="90%">
-      <ModalContent className="w-full max-w-screen-sm"> {/* Ajustar el tamaño del modal */}
+      <ModalContent className="w-full max-w-screen-md">
         <ModalHeader></ModalHeader>
-        <ModalBody>
-          <label>{label}</label>
-          <ModalNominas />
+        <ModalBody className="relative overflow-hidden"> {/* Añadir relative y overflow-hidden */}
+          <div className="h-[600px] overflow-y-auto"> {/* Definir altura fija y barra de desplazamiento */}
+            <label>{label}</label>
+            <ModalNominas />
+          </div>
         </ModalBody>
         <ModalFooter>
           <Button className="bg-[#84CC16] text-white" onPress={onAccept}>

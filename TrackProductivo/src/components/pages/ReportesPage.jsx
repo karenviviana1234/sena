@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableHeader,
@@ -8,22 +9,10 @@ import {
   TableCell,
   Input,
   Button,
-  DropdownTrigger,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
   Chip,
-  User,
   Pagination,
   Modal,
 } from "@nextui-org/react";
-import { PlusIcon } from "../NextIU/atoms/plusicons";
-import { VerticalDotsIcon } from "../NextIU/atoms/verticalicons";
-import { SearchIcon } from "../NextIU/atoms/searchicons";
-import { ChevronDownIcon } from "../NextIU/atoms/icons";
-import { columns, users, statusOptions } from "../NextIU/molecules/data";
-import { capitalize } from "../NextIU/atoms/utils";
-import ModalNominas from "../templates/ModalNominas";
 import AccionesModal from "../molecules/AccionesModal";
 
 const statusColorMap = {
@@ -32,59 +21,62 @@ const statusColorMap = {
   Inactivo: "danger",
 };
 
-const INITIAL_VISIBLE_COLUMNS = [
-  "id",
-  "name",
-  "role",
-  "age",
-  "team",
-  "seguimiento1",
-  "seguimiento2",
-  "seguimiento3",
+const columns = [
+  { name: "Identificacion", uid: "identificacion", sortable: true },
+  { name: "Nombres", uid: "nombres", sortable: true },
+  { name: "Código", uid: "codigo", sortable: true },
+  { name: "Razón Social", uid: "razon_social", sortable: true },
+  { name: "Fecha", uid: "fecha" },
 ];
 
 export default function App() {
-  const [filterValue, setFilterValue] = React.useState("");
-  const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter, setStatusFilter] = React.useState(new Set(["all"]));
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "age",
+  const [data, setData] = useState([]);
+  const [filterValue, setFilterValue] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [sortDescriptor, setSortDescriptor] = useState({
+    column: "identificacion",
     direction: "ascending",
   });
-  const [page, setPage] = React.useState(1);
-  const [modalVisible, setModalVisible] = React.useState(false); // Estado para manejar la visibilidad del modal
-  const [selectedCellValue, setSelectedCellValue] = React.useState(""); // Estado para almacenar el valor de la celda
+  const [page, setPage] = useState(1);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCellValue, setSelectedCellValue] = useState("");
+  const [modalAccionesVisible, setModalAccionesVisible] = useState(false);
 
-  const [modalAccionesVisible, setModalAccionesVisible] = React.useState(false); // Estado para manejar la visibilidad del modal de acciones
+  useEffect(() => {
+    axios.get("http://localhost:3000/seguimientos/listar") // URL de tu API
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
 
-  const pages = Math.ceil(users.length / rowsPerPage);
+  useEffect(() => {
+    axios.get("http://localhost:3000/personas/listar") // URL de tu API
+      .then((response) => {
+        setData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
 
+
+  const pages = Math.ceil(data.length / rowsPerPage);
   const hasSearchFilter = Boolean(filterValue);
 
-  const headerColumns = React.useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
-    return columns.filter((column) => visibleColumns.has(column.uid));
-  }, [visibleColumns]);
-
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
+    let filteredUsers = [...data];
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase()),
-      );
-    }
-    if (statusFilter.size && !statusFilter.has("all")) {
-      filteredUsers = filteredUsers.filter((user) =>
-        statusFilter.has(user.status),
+        user.nombres.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
 
     return filteredUsers;
-  }, [users, filterValue, statusFilter]);
+  }, [data, filterValue]);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -103,53 +95,37 @@ export default function App() {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = React.useCallback((item, columnKey) => {
+    const cellValue = item[columnKey];
 
     switch (columnKey) {
-      case "name":
-        return (
-          <User
-            avatarProps={{ radius: "full", size: "sm", src: user.avatar }}
-            classNames={{
-              description: "text-default-500",
-            }}
-            description={user.email}
-            name={cellValue}
-          >
-            {user.email}
-          </User>
-        );
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize border-none gap-1 text-default-600"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="dot"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "seguimiento1":
-      case "seguimiento2":
-      case "seguimiento3":
+      case "nombres":
+        return cellValue;
+      case "razon_social":
+        return cellValue;
+      case "fecha":
         return (
           <Button
             size="sm"
             className="text-white bg-[#84CC16]"
             onClick={() => {
-              setModalAccionesVisible(true); // Muestra el modal de acciones
+              setSelectedCellValue(cellValue);
+              setModalVisible(true);
             }}
           >
             {cellValue}
           </Button>
+        );
+      case "status":
+        return (
+          <Chip
+            className="capitalize border-none gap-1 text-default-600"
+            color={statusColorMap[cellValue]}
+            size="sm"
+            variant="dot"
+          >
+            {cellValue}
+          </Chip>
         );
       default:
         return cellValue;
@@ -179,39 +155,23 @@ export default function App() {
           value={filterValue}
           onClear={() => setFilterValue('')}
           onValueChange={onSearchChange}
-          startContent={<SearchIcon />}
+          className="w-[650px]"
         />
-       {/*  <Dropdown>
-          <DropdownTrigger>
-            <Button endContent={<ChevronDownIcon />}>Status</Button>
-          </DropdownTrigger>
-          <DropdownMenu
-            aria-label="Status Menu"
-            selectionMode="multiple"
-            selectedKeys={statusFilter}
-            onSelectionChange={setStatusFilter}
-          >
-            {statusOptions.map((option) => (
-              <DropdownItem key={option.uid}>
-                {capitalize(option.name)}
-              </DropdownItem>
-            ))}
-          </DropdownMenu>
-        </Dropdown> */}
+        <span className="text-base text-default-600">
+          Total de usuarios: {data.length}
+        </span>
       </div>
     );
-  }, [filterValue, onSearchChange, statusFilter]);
+  }, [filterValue, onSearchChange]);
 
   return (
     <div className="m-12">
-      <h2 className="font-semibold text-xl mb-5">Seguimientos Asignados:</h2>
+      <h2 className="font-semibold text-xl mb-5">Seguimientos:</h2>
       <Table
         aria-label="Example table with custom content"
         className="min-w-full"
         sortDescriptor={sortDescriptor}
         onSortChange={setSortDescriptor}
-        selectedKeys={selectedKeys}
-        onSelectionChange={setSelectedKeys}
         topContent={topContent}
         bottomContent={
           <Pagination
@@ -223,7 +183,7 @@ export default function App() {
           />
         }
       >
-        <TableHeader columns={headerColumns}>
+        <TableHeader columns={columns}>
           {(column) => (
             <TableColumn key={column.uid} allowsSorting={column.sortable}>
               {column.name}
@@ -232,7 +192,7 @@ export default function App() {
         </TableHeader>
         <TableBody items={sortedItems}>
           {(item) => (
-            <TableRow key={item.id}>
+            <TableRow key={item.identificacion}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
@@ -241,7 +201,6 @@ export default function App() {
         </TableBody>
       </Table>
 
-      {/* Modal para seguimiento */}
       <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
         <Modal.Header>
           <p>Seguimiento</p>
@@ -251,7 +210,6 @@ export default function App() {
         </Modal.Body>
       </Modal>
 
-      {/* Modal de acciones (puedes personalizar el contenido) */}
       <AccionesModal
         isOpen={modalAccionesVisible}
         onClose={() => setModalAccionesVisible(false)}
