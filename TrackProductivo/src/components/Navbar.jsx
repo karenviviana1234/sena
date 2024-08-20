@@ -15,13 +15,18 @@ export const Navbar2 = ({ title }) => {
           </NavbarBrand>
           <NavbarContent className="hidden sm:flex gap-4">
             <NavbarItem>
-              <Link color="inherit" href="#" className="text-lime-500 dark:text-gray-300">
+              <Link color="inherit" href="/home" className="text-lime-500 dark:text-gray-300">
                 Dashboard
               </Link>
             </NavbarItem>
             <NavbarItem>
-              <Link color="inherit" href="#" className="text-gray-600 dark:text-gray-300">
-                Usuarios
+              <Link color="inherit" href="/nomina" className="text-gray-600 dark:text-gray-300">
+                Nomina
+              </Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Link color="inherit" href="/fichas" className="text-gray-600 dark:text-gray-300">
+                Fichas
               </Link>
             </NavbarItem>
           </NavbarContent>

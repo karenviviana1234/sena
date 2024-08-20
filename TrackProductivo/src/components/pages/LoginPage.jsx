@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import logo from "../assets/img/logo-sena-verde.png";
+import logo from "../../assets/img/logo-sena-verde.png";
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import axiosClient from '../configs/axiosClient';
 
 export const LoginPage = () => {
   const [username, setUsername] = useState('');
