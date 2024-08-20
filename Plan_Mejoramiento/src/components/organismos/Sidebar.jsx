@@ -11,12 +11,15 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import { usePersonas } from "../../Context/ContextPersonas";
 
 const { width } = Dimensions.get("window");
 
 const Sidebar = ({ menuVisible, toggleMenu }) => {
   const [menuPosition] = useState(new Animated.Value(-width)); // Inicia fuera de la pantalla
   const navigation = useNavigation(); // Obtiene la instancia de navegación
+
+  const { rol } = usePersonas();
 
   useEffect(() => {
     Animated.timing(menuPosition, {
@@ -45,7 +48,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
       { cancelable: false }
     );
   };
-
+  console.log("El rol actual es:", rol); 
   return (
     <View style={StyleSheet.absoluteFillObject}>
       {menuVisible && (
@@ -64,20 +67,23 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
             resizeMode="contain"
           />
         </View>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate("principal")}
-        >
-          <View style={styles.menuItemContent}>
-            <Icon
-              name="dashboard"
-              size={20}
-              color="black"
-              style={styles.menuIcon}
-            />
-            <Text style={styles.menuText}>Seguimientos</Text>
-          </View>
-        </TouchableOpacity>
+
+        { rol !== "Aprendiz" && (
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("principal")}
+          >
+            <View style={styles.menuItemContent}>
+              <Icon
+                name="dashboard"
+                size={20}
+                color="black"
+                style={styles.menuIcon}
+              />
+              <Text style={styles.menuText}>Seguimientos</Text>
+            </View>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate("bitacoras")}
@@ -148,13 +154,13 @@ const styles = StyleSheet.create({
     right: 10,
   },
   menuItem: {
-    color: 'black',
+    color: "black",
     marginVertical: 5, // Reduce el margen vertical entre los elementos
     flexDirection: "row", // Alinea íconos y texto en fila
     alignItems: "center", // Centra los íconos y texto verticalmente
   },
   menuItemContent: {
-    color: 'black',
+    color: "black",
     flexDirection: "row", // Alinea íconos y texto en fila
     alignItems: "center", // Centra los íconos y texto verticalmente
   },
@@ -162,7 +168,7 @@ const styles = StyleSheet.create({
     marginRight: 10, // Espacio entre el ícono y el texto
   },
   menuText: {
-    color: 'black',
+    color: "black",
     fontSize: 18, // Tamaño del texto
     paddingVertical: 10, // Ajusta el padding para que los elementos sean más compactos
   },

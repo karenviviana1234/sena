@@ -10,6 +10,7 @@ export const PersonasProvider = ({ children }) => {
     const [personas, SetPersonas] = useState([]);
     const [persona, SetPersona] = useState({});
     const [id_persona, SetId_persona] = useState(null);
+    const [rol, SetRol] = useState(null); //
 
     const getPersonas = async () => {
         try {
@@ -26,6 +27,7 @@ export const PersonasProvider = ({ children }) => {
             const response = await axiosClient.get(`/personas/buscar/${id_persona}`);
             console.log(response.data);
             SetPersona(response.data);
+            SetRol(response.data.rol)
         } catch (error) {
             console.log('Error del servidor' + error);
         }
@@ -37,11 +39,13 @@ export const PersonasProvider = ({ children }) => {
                 personas,
                 persona,
                 id_persona,
+                rol,
                 SetPersonas,
                 SetPersona,
                 SetId_persona,
                 getPersonas,
                 getPersona,
+                SetRol
             }}
         >
             {children}

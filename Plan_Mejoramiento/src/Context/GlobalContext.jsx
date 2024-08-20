@@ -16,3 +16,4 @@ const GlobalProvider = ({ children }) => {
 };
 
 export default GlobalProvider;
+
