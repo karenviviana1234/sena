@@ -34,6 +34,41 @@ const storage = multer.diskStorage(
 const upload = multer({storage: storage})
 export const cargarSeguimiento = upload.single('seguimientoPdf')
 
+export const listarSeguimientoAprendices = async (req, res) => {
+    try {
+        // Modifica la consulta SQL para seleccionar los campos necesarios
+        let sql = `
+            SELECT
+                p.identificacion AS identificacion,
+                p.nombres AS nombres,
+                f.codigo AS codigo,
+                e.razon_social AS razon_social,
+                s.fecha AS fecha
+            FROM
+                seguimientos s
+                LEFT JOIN productiva pr ON s.productiva = pr.id_productiva
+                LEFT JOIN matriculas m ON pr.matricula = m.id_matricula
+                LEFT JOIN personas p ON m.aprendiz = p.id_persona
+                LEFT JOIN empresa e ON pr.empresa = e.id_empresa
+                LEFT JOIN fichas f ON m.ficha = f.codigo
+        `;
+
+        const [result] = await pool.query(sql);
+        if (result.length > 0) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({
+                error: 'No hay seguimientos registrados'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error.message
+        });
+    }
+};
+
+
 export const registrarSeguimiento = async(req, res) => {
     try {
         let seguimientoPdf = req.file.originalname
