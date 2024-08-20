@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home, Users ,BookMarked,BookUser ,Building2 ,GraduationCap  ,  FolderSearch2, BookPlus   } from "lucide-react";
+import { Home, Users ,BookMarked,BookUser ,Building2 ,GraduationCap  ,  FolderSearch2, BookPlus, BookPlusIcon   } from "lucide-react";
 import Sidebar, { SidebarItem, SidebarAccordion } from "./components/Sidebar";
 import { LoginPage } from '../src/components/pages/LoginPage';
 import { ProtectedRoute } from './configs/ProtectedRoute';
@@ -22,7 +22,7 @@ const EtapaPracticaPage = lazy(() => import('./components/pages/EtapaPracticaPag
 const ReportesPage = lazy(() => import('./components/pages/ReportesPage'));
 const EstadisticasPage = lazy(() => import('./components/pages/EstadisticasPage'));
 const BitacorasPage = lazy(() => import('./components/pages/BitacorasPage'));
-
+const ExcelUploader = lazy(() => import('./components/organisms/Form.jsx'))
 
 export const App = () => {
   // las paginas de cada seccion son su respectiva ruta
@@ -119,6 +119,15 @@ export const App = () => {
           </ProtectedRoute>
         } />
 
+<Route path="/form" element={
+          <ProtectedRoute>
+            <WithSidebar>
+              <Suspense fallback={<div>Loading...</div>}>
+                <ExcelUploader />
+              </Suspense>
+            </WithSidebar>
+          </ProtectedRoute>
+        } />
 
       </Routes>
       
@@ -137,6 +146,7 @@ const WithSidebar = ({ children }) => (
       <SidebarItem nav="/empresa" icon={<Building2  size={20} />} text="Empresa" />
       <SidebarItem nav="/etapapractica" icon={<GraduationCap   size={20} />} text="Etapa Practica" />
       <SidebarItem nav="/bitacoras" icon={<BookPlus    size={20} />} text="Bitacoras" />
+      <SidebarItem nav="/form" icon={<BookPlusIcon    size={20} />} text="Excel" />
 
       <SidebarAccordion icon={<FolderSearch2  size={20} />} text="Seguimientos">
         <SidebarItem nav="/reportes" text="Reportes" />
