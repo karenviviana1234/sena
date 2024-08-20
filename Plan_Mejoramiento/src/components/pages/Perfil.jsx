@@ -60,10 +60,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
+    color: 'black',
     fontWeight: "bold",
     marginBottom: 20,
   },
   text: {
+    color: 'black',
     fontSize: 20,
     marginLeft: 10, // Agrega espacio entre el ícono y el texto
   },

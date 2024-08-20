@@ -34,12 +34,14 @@ const Login = () => {
         onFocus={() => setIsFocusedEmail(true)}
         onBlur={() => setIsFocusedEmail(false)}
         placeholder="Correo"
+        placeholderTextColor="black"
       />
       <TextInput
         style={[styles.input, isFocusedPassword && styles.inputFocused]}
         onFocus={() => setIsFocusedPassword(true)}
         onBlur={() => setIsFocusedPassword(false)}
         placeholder="Contraseña"
+        placeholderTextColor="black"
         secureTextEntry={true}
       />
       <TouchableOpacity
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
   textOlvide: {
     fontSize: 16,
     marginTop: 30,
-    color: 'blue',
+    color: 'black',
     textDecorationLine: 'underline',
   }
 });

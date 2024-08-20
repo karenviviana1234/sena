@@ -4,7 +4,7 @@ import { validarToken } from './../controllers/seguridad.controller.js'
 
 const rutaSeguimiento = Router()
 
-rutaSeguimiento.get('/listar', validarToken, listarSeguimiento)
+rutaSeguimiento.get('/listar', /* validarToken, */ listarSeguimiento)
 rutaSeguimiento.post('/registrar', validarToken, cargarSeguimiento, registrarSeguimiento)
 rutaSeguimiento.put('/actualizar/:id', validarToken, cargarSeguimiento, actualizarSeguimiento)
 rutaSeguimiento.put('/aprobar/:id', validarToken, aprobarSeguimiento)

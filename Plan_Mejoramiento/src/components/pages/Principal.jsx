@@ -16,7 +16,7 @@ const Principal = () => {
   };
 
   return (
-    <Layout title="Principal">
+    <Layout style={styles.textH} title="Seguimientos">
       <View style={styles.container}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleOpenModal}>

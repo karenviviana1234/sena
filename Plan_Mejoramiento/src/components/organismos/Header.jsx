@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
     marginRight: 260,
   },
   title: {
+    color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
   },

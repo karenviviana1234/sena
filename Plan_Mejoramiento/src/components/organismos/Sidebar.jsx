@@ -148,11 +148,13 @@ const styles = StyleSheet.create({
     right: 10,
   },
   menuItem: {
+    color: 'black',
     marginVertical: 5, // Reduce el margen vertical entre los elementos
     flexDirection: "row", // Alinea íconos y texto en fila
     alignItems: "center", // Centra los íconos y texto verticalmente
   },
   menuItemContent: {
+    color: 'black',
     flexDirection: "row", // Alinea íconos y texto en fila
     alignItems: "center", // Centra los íconos y texto verticalmente
   },
@@ -160,6 +162,7 @@ const styles = StyleSheet.create({
     marginRight: 10, // Espacio entre el ícono y el texto
   },
   menuText: {
+    color: 'black',
     fontSize: 18, // Tamaño del texto
     paddingVertical: 10, // Ajusta el padding para que los elementos sean más compactos
   },
