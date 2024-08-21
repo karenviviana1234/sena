@@ -1,11 +1,28 @@
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
-import React, { useState } from "react";
 import Layout from "../Template/Layout";
 import PersonasModal from "../moleculas/Modal_personas";
-import Icon from "react-native-vector-icons/FontAwesome"; 
+import Icon from "react-native-vector-icons/FontAwesome";
+import axiosClient from "../../axiosClient";
+import { usePersonas } from "../../Context/ContextPersonas";
 
 const Perfil = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [userData, setUserData] = useState(null); 
+  const { id_persona } = usePersonas();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axiosClient.get(`/personas/buscar/${id_persona}`);
+        setUserData(response.data);
+      } catch (error) {
+        console.error("Error al obtener los datos del usuario:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [id_persona]);
 
   const handleEditProfile = () => {
     setModalVisible(true);
@@ -20,29 +37,42 @@ const Perfil = () => {
       <View style={styles.container}>
         <Text style={styles.title}>Perfil</Text>
 
-        <View style={styles.infoContainer}>
-          <Icon name="id-card" size={24} color="black" />
-          <Text style={styles.text}>Identificación: 123456</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Icon name="user" size={24} color="black" />
-          <Text style={styles.text}>Nombre: Alejo</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Icon name="phone" size={24} color="black" />
-          <Text style={styles.text}>Teléfono: 22171237</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Icon name="envelope" size={24} color="black" />
-          <Text style={styles.text}>Correo: manomano@gmail.com</Text>
-        </View>
+        {userData ? (
+          <>
+            <View style={styles.infoContainer}>
+              <Icon name="id-card" size={24} color="black" />
+              <Text style={styles.text}>
+                Identificación: {userData.identificacion}
+              </Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Icon name="user" size={24} color="black" />
+              <Text style={styles.text}>Nombre: {userData.nombres}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Icon name="phone" size={24} color="black" />
+              <Text style={styles.text}>Teléfono: {userData.telefono}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Icon name="envelope" size={24} color="black" />
+              <Text style={styles.text}>Correo: {userData.correo}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Icon name="check-circle" size={24} color="black" />
+              <Text style={styles.text}>Rol: {userData.rol}</Text>
+            </View>
+          </>
+        ) : (
+          <Text>Cargando datos del usuario...</Text>
+        )}
 
         <TouchableOpacity style={styles.button} onPress={handleEditProfile}>
           <Text style={styles.buttonText}>Editar Perfil</Text>
         </TouchableOpacity>
+
         <Image
           style={styles.logo}
-          source={require("../../../public/logo_sigueme.png")}
+          source={require("../../../public/logo-sena-verde.png")}
         />
 
         <PersonasModal visible={modalVisible} onClose={handleCloseModal} />
@@ -60,14 +90,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
-    color: 'black',
+    color: "black",
     fontWeight: "bold",
     marginBottom: 20,
   },
   text: {
-    color: 'black',
+    color: "black",
     fontSize: 20,
-    marginLeft: 10, // Agrega espacio entre el ícono y el texto
+    marginLeft: 10, 
   },
   infoContainer: {
     flexDirection: "row",

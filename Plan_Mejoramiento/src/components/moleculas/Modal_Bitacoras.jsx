@@ -73,6 +73,12 @@ const ModalBitacoras = ({ visible, onClose }) => {
   };
 
   const handleSubmit = async () => {
+
+    if (!bitacora || !seguimiento || !instructor || !pdf) {
+      Alert.alert('Todos los campos son obligatorios')
+      return;
+    }
+
     const formData = new FormData();
     formData.append("fecha", fecha.toISOString().split("T")[0]); // Asegúrate de enviar la fecha en el formato correcto
     formData.append("bitacora", bitacora);

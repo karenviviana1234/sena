@@ -20,6 +20,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
   const navigation = useNavigation(); // Obtiene la instancia de navegación
 
   const { rol } = usePersonas();
+  const [subMenuVisible, setSubMenuVisible] = useState(false); // Estado para controlar el submenú
 
   useEffect(() => {
     Animated.timing(menuPosition, {
@@ -48,7 +49,13 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
       { cancelable: false }
     );
   };
-  console.log("El rol actual es:", rol); 
+
+  const toggleSubMenu = () => {
+    setSubMenuVisible(!subMenuVisible); // Alterna la visibilidad del submenú
+  };
+
+  console.log("El rol actual es:", rol);
+  
   return (
     <View style={StyleSheet.absoluteFillObject}>
       {menuVisible && (
@@ -62,28 +69,71 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
         </TouchableOpacity>
         <View style={styles.logoContainer}>
           <Image
-            source={require("../../../public/logo_sigueme.png")}
+            source={require("../../../public/logo-sena-verde.png")}
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
 
-        { rol !== "Aprendiz" && (
+        {rol !== "Aprendiz" && (
+          <>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={toggleSubMenu}
+            >
+              <View style={styles.menuItemContent}>
+                <Icon
+                  name="dashboard"
+                  size={20}
+                  color="black"
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.menuText}>Seguimientos</Text>
+                <Icon
+                  name={subMenuVisible ? "angle-up" : "angle-down"}
+                  size={20}
+                  color="black"
+                  style={styles.menuIcon}
+                />
+              </View>
+            </TouchableOpacity>
+
+            {subMenuVisible && (
+              <View style={styles.subMenu}>
+                <TouchableOpacity
+                  style={styles.subMenuItem}
+                  onPress={() => navigation.navigate("reporte")}
+                >
+                  <Text style={styles.subMenuText}>Reportes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.subMenuItem}
+                  onPress={() => navigation.navigate("estadisticas")}
+                >
+                  <Text style={styles.subMenuText}>Estadísticas</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
+        )}
+        
+        {rol !== "Aprendiz" && (
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => navigation.navigate("principal")}
+            onPress={() => navigation.navigate("personas")}
           >
             <View style={styles.menuItemContent}>
               <Icon
-                name="dashboard"
+                name="users"
                 size={20}
                 color="black"
                 style={styles.menuIcon}
               />
-              <Text style={styles.menuText}>Seguimientos</Text>
+              <Text style={styles.menuText}>Usuarios</Text>
             </View>
           </TouchableOpacity>
         )}
+
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate("bitacoras")}
@@ -93,6 +143,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
             <Text style={styles.menuText}>Bitácoras</Text>
           </View>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate("perfil")}
@@ -102,6 +153,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
             <Text style={styles.menuText}>Perfil</Text>
           </View>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.menuItem} onPress={handleSignOut}>
           <View style={styles.menuItemContent}>
             <Icon
@@ -144,8 +196,8 @@ const styles = StyleSheet.create({
   logo: {
     marginBottom: 5,
     marginTop: 30,
-    width: 180, // Ajusta el ancho de la imagen
-    height: 180, // Ajusta la altura de la imagen
+    width: 120, // Ajusta el ancho de la imagen
+    height: 120, // Ajusta la altura de la imagen
     borderRadius: 40, // Ajusta el radio del borde para que sea redondeado
   },
   closeIcon: {
@@ -171,6 +223,17 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 18, // Tamaño del texto
     paddingVertical: 10, // Ajusta el padding para que los elementos sean más compactos
+    marginRight: 10
+  },
+  subMenu: {
+    paddingLeft: 30, // Indenta el submenú para distinguirlo visualmente
+  },
+  subMenuItem: {
+    marginVertical: 5,
+  },
+  subMenuText: {
+    color: "black",
+    fontSize: 18,
   },
 });
 

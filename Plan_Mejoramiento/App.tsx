@@ -8,6 +8,8 @@ import Perfil from './src/components/pages/Perfil';
 import GlobalProvider from './src/Context/GlobalContext';
 import Landing_page from './src/components/pages/Landing_page';
 import Login from './src/components/pages/login';
+import Usuarios from './src/components/pages/Usuarios';
+import Reportes from './src/components/pages/Reportes';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +23,16 @@ const App = () => {
           <Stack.Screen 
             name="principal" 
             component={Principal} 
+            options={{ headerShown: false }} // Ocultar el encabezado para esta pantalla
+          />
+          <Stack.Screen 
+            name="reporte" 
+            component={Reportes} 
+            options={{ headerShown: false }} // Ocultar el encabezado para esta pantalla
+          />
+          <Stack.Screen 
+            name="personas" 
+            component={Usuarios} 
             options={{ headerShown: false }} // Ocultar el encabezado para esta pantalla
           />
           <Stack.Screen 

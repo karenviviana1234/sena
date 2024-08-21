@@ -19,7 +19,7 @@ const Login = () => {
   const [isFocusedPassword, setIsFocusedPassword] = useState(false);
   const navigation = useNavigation();
 
-  const { SetRol } = usePersonas()
+  const { SetRol, SetId_persona } = usePersonas()
 
   const handleLogin = async () => {
     try {
@@ -32,6 +32,7 @@ const Login = () => {
         // Autenticación exitosa
         const { user, token } = response.data;
         SetRol (user.rol);
+        SetId_persona (user.id_persona);
 
         const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
 
@@ -64,7 +65,7 @@ const Login = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../../public/logo_sigueme.png")}
+        source={require("../../../public/logo-sena-verde.png")}
         style={styles.logo}
         resizeMode="cover"
       />
@@ -108,8 +109,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   logo: {
-    width: 220,
-    height: 220,
+    width: 140,
+    height: 140,
   },
   input: {
     width: 300,

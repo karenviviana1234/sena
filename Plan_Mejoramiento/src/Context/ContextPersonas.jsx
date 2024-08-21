@@ -10,7 +10,7 @@ export const PersonasProvider = ({ children }) => {
     const [personas, SetPersonas] = useState([]);
     const [persona, SetPersona] = useState({});
     const [id_persona, SetId_persona] = useState(null);
-    const [rol, SetRol] = useState(null); //
+    const [rol, SetRol] = useState(null); 
 
     const getPersonas = async () => {
         try {
