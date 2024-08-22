@@ -1,14 +1,9 @@
-import React from "react";
-
+import React from 'react'
 
 function BitacorasPage() {
-    return ( 
-        <>
-        <main className='w-full p-3'>
-        BitacorasPage
-        </main>
-      </>
-     );
+  return (
+    <div>BitacorasPage</div>
+  )
 }
 
-export default BitacorasPage;
+export default BitacorasPage

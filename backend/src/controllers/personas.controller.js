@@ -20,6 +20,53 @@ export const listarPersonas = async(req, res) => {
     }
 }
 
+export const listarInstructores = async (req, res) => {
+  try {
+    // Asegúrate de tener la tabla 'personas' con la columna 'rol'
+    const sql = `SELECT * FROM personas WHERE rol = 'Instructor'`;
+    const [results] = await pool.query(sql);
+
+    if (results.length > 0) {
+      res.status(200).json(results);
+    } else {
+      res.status(404).json({
+        message: 'No hay instructores registrados',
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: `Error del servidor: ${error.message}`,
+    });
+  }
+};
+
+
+export const listarAprendices = async (req, res) => {
+  try {
+    // Consulta SQL con JOIN para obtener el nombre del municipio
+    const sql = `
+      SELECT p.*, m.nombre_mpio
+      FROM personas p
+      LEFT JOIN municipios m ON p.municipio = m.id_municipio
+      WHERE p.rol = 'Aprendiz'
+    `;
+    const [results] = await pool.query(sql);
+
+    if (results.length > 0) {
+      res.status(200).json(results);
+    } else {
+      res.status(404).json({
+        message: 'No hay personas con el rol de aprendiz'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error del servidor: ' + error.message
+    });
+  }
+};
+
+
 /* Registrar Instructores y Aprendices */
 export const registrarPersona = async (req, res) => {
   try {
