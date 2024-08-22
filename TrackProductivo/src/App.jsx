@@ -5,6 +5,8 @@ import Sidebar, { SidebarItem, SidebarAccordion } from "./components/Sidebar";
 import { LoginPage } from '../src/components/pages/LoginPage';
 import { ProtectedRoute } from './configs/ProtectedRoute';
 import { Navbar2 } from './components/Navbar';
+import GlobalProvider from './context/GlobalContext';
+
 
 
 
@@ -13,31 +15,23 @@ import { Navbar2 } from './components/Navbar';
 // las rutas de todos los modulos [tengo que crear la vista y ubicarlas en el sliderbar]
 //son los modulos de la base de datos pero vamos a dividir en secciones 
 
-const HomePage = lazy(() => import('./components/pages/HomePage'));
 const NominaPage = lazy(() => import('./components/pages/NominaPage'));
 const FichasPage = lazy(() => import('./components/pages/FichasPage'));
 const MatriculasPage = lazy(() => import('./components/pages/MatriculasPage'));
 const EmpresaPage = lazy(() => import('./components/pages/EmpresaPage'));
-const EtapaPracticaPage = lazy(() => import('./components/pages/EtapaPracticaPage'));
-const ReportesPage = lazy(() => import('./components/pages/ReportesPage'));
+import ReportesPage from './components/pages/ReportesPage.jsx'
 const EstadisticasPage = lazy(() => import('./components/pages/EstadisticasPage'));
+const EtapaPracticaPage = lazy(() => import('./components/pages/EtapaPracticaPage'));
 const BitacorasPage = lazy(() => import('./components/pages/BitacorasPage'));
 
 export const App = () => {
   // las paginas de cada seccion son su respectiva ruta
   return (
+
     <BrowserRouter>
+    <GlobalProvider>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/home" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
-                <HomePage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
+        
 
         <Route path="/nomina" element={
           <ProtectedRoute>
@@ -93,7 +87,7 @@ export const App = () => {
           <ProtectedRoute>
             <WithSidebar>
               <Suspense fallback={<div>Loading...</div>}>
-                <ReportesPage />
+              <ReportesPage />
               </Suspense>
             </WithSidebar>
           </ProtectedRoute>
@@ -121,7 +115,7 @@ export const App = () => {
 
 
       </Routes>
-      
+      </GlobalProvider>
     </BrowserRouter>
   );
 };
@@ -130,7 +124,6 @@ const WithSidebar = ({ children }) => (
   <div className="flex">
     <Sidebar>
       {/* estas son las secciones de el rol de Coordinador  */}
-      <SidebarItem nav="/home" icon={<Home size={20} />} text="Home" />
       <SidebarItem nav="/nomina" icon={<Users  size={20} />} text="Nomina" />
       <SidebarItem nav="/fichas" icon={<BookMarked  size={20} />} text="Fichas" />
       <SidebarItem nav="/matriculas" icon={<BookUser  size={20} />} text="Matriculas" />

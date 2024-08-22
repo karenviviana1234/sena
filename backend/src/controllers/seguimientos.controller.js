@@ -36,14 +36,16 @@ export const cargarSeguimiento = upload.single('seguimientoPdf')
 
 export const listarSeguimientoAprendices = async (req, res) => {
     try {
-        // Modifica la consulta SQL para seleccionar los campos necesarios
         let sql = `
             SELECT
                 p.identificacion AS identificacion,
                 p.nombres AS nombres,
                 f.codigo AS codigo,
+                prg.sigla AS sigla, -- Agregamos la sigla del programa
                 e.razon_social AS razon_social,
-                s.fecha AS fecha
+                DATE_ADD(pr.fecha_inicio, INTERVAL 2 MONTH) AS seguimiento1,
+                DATE_ADD(pr.fecha_inicio, INTERVAL 4 MONTH) AS seguimiento2,
+                pr.fecha_fin AS seguimiento3
             FROM
                 seguimientos s
                 LEFT JOIN productiva pr ON s.productiva = pr.id_productiva
@@ -51,14 +53,20 @@ export const listarSeguimientoAprendices = async (req, res) => {
                 LEFT JOIN personas p ON m.aprendiz = p.id_persona
                 LEFT JOIN empresa e ON pr.empresa = e.id_empresa
                 LEFT JOIN fichas f ON m.ficha = f.codigo
+                LEFT JOIN programas prg ON f.programa = prg.id_programa -- Unión con la tabla de programas
+            WHERE
+                p.rol = 'Aprendiz'
+            ORDER BY
+                p.identificacion;
         `;
 
         const [result] = await pool.query(sql);
+
         if (result.length > 0) {
             res.status(200).json(result);
         } else {
             res.status(404).json({
-                error: 'No hay seguimientos registrados'
+                error: 'No hay seguimientos registrados para aprendices'
             });
         }
     } catch (error) {
@@ -67,7 +75,6 @@ export const listarSeguimientoAprendices = async (req, res) => {
         });
     }
 };
-
 
 export const registrarSeguimiento = async(req, res) => {
     try {
