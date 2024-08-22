@@ -5,7 +5,7 @@ export const listarasignaciones = async (req, res) => {
         const [result] = await pool.query(`
             SELECT 
                 p.id_asignacion, 
-                p.fecha_inicio AS asignacion_fecha_inicio,
+                p.fecha_inicio,
                 p.fecha_fin,
                 p.estado,
                 u.instructor,
@@ -18,7 +18,6 @@ export const listarasignaciones = async (req, res) => {
                 productiva AS a ON p.productiva = a.id_productiva;
         `);
 
-        console.log("Resultado de la consulta:", result);
 
         if (result.length > 0) {
             return res.status(200).json(result);

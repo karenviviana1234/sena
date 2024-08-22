@@ -37,10 +37,10 @@ export const registrarPersona = async (req, res) => {
     const municipioValue = rol === 'Instructor' ? null : municipio;
 
     /* Encriptar la contraseña */
-    const bcryptPassword = bcrypt.hashSync(password, 12);
+    // const bcryptPassword = bcrypt.hashSync(password, 12);
 
     const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo, municipio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol, cargo, municipioValue];
+    const params = [identificacion, nombres, correo, telefono, password, rol, cargo, municipioValue];
 
     const [result] = await pool.query(query, params);
 
