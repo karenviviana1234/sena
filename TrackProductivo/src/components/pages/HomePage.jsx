@@ -1,32 +1,9 @@
-import React, { useState } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
+import React from 'react'
 
-// Componente GlobalModal
-const GlobalModal = ({ isOpen, onClose, title, bodyContent, footerActions }) => {
+function HomePage() {
   return (
-    <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-            <ModalBody>{bodyContent}</ModalBody>
-            <ModalFooter>
-              {footerActions.map((action, index) => (
-                <Button
-                  key={index}
-                  color={action.color || "primary"}
-                  variant={action.variant || "solid"}
-                  onPress={action.onPress || onClose}
-                >
-                  {action.label}
-                </Button>
-              ))}
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
-  );
-};
+    <div>HomePage</div>
+  )
+}
 
-export default GlobalModal
+export default HomePage
