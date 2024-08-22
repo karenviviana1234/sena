@@ -11,15 +11,17 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import axiosClient from "../../axiosClient";
 import { usePersonas } from "../../Context/ContextPersonas";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocusedEmail, setIsFocusedEmail] = useState(false);
   const [isFocusedPassword, setIsFocusedPassword] = useState(false);
   const navigation = useNavigation();
 
-  const { SetRol, SetId_persona } = usePersonas()
+  const { SetRol, SetId_persona } = usePersonas();
 
   const handleLogin = async () => {
     try {
@@ -29,10 +31,9 @@ const Login = () => {
       });
 
       if (response.status === 200) {
-        // Autenticación exitosa
         const { user, token } = response.data;
-        SetRol (user.rol);
-        SetId_persona (user.id_persona);
+        SetRol(user.rol);
+        SetId_persona(user.id_persona);
 
         const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
 
@@ -49,10 +50,8 @@ const Login = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        // Error en la autenticación
         Alert.alert("Error", error.response.data.message);
       } else {
-        // Otro tipo de error
         Alert.alert("Error", "Hubo un problema con el servidor.");
       }
     }
@@ -78,16 +77,28 @@ const Login = () => {
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
-        style={[styles.input, isFocusedPassword && styles.inputFocused]}
-        onFocus={() => setIsFocusedPassword(true)}
-        onBlur={() => setIsFocusedPassword(false)}
-        placeholder="Contraseña"
-        placeholderTextColor="black"
-        secureTextEntry={true}
-        value={password}
-        onChangeText={setPassword}
-      />
+      <View style={[styles.input, styles.passwordContainer, isFocusedPassword && styles.inputFocused]}>
+        <TextInput
+          style={styles.passwordInput}
+          onFocus={() => setIsFocusedPassword(true)}
+          onBlur={() => setIsFocusedPassword(false)}
+          placeholder="Contraseña"
+          placeholderTextColor="black"
+          secureTextEntry={!isPasswordVisible}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+        >
+          <Icon
+            name={isPasswordVisible ? "eye-slash" : "eye"}
+            size={24}
+            color="gray"
+          />
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <Text style={styles.button}>Ingresar</Text>
       </TouchableOpacity>
@@ -125,6 +136,23 @@ const styles = StyleSheet.create({
   },
   inputFocused: {
     borderColor: "orange",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingRight: 10,
+  },
+  passwordInput: {
+    flex: 1,
+    height: "100%",
+    fontSize: 18,
+    color: "black",
+    paddingRight: 40, 
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 15, 
   },
   buttonContainer: {
     height: 50,
