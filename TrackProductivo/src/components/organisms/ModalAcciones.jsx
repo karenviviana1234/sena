@@ -1,25 +1,32 @@
-import React from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
+import React, { useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
 
-export default function AccionesModal({ label, isOpen, onClose, onAccept }) {
-
+// Componente GlobalModal
+const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions }) => {
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose} placement="top-center">
-        <ModalContent>
-              <ModalHeader className="flex flex-col gap-1">  </ModalHeader>
-              <ModalBody>
-                
-                <label> {label} </label>
-
-              </ModalBody>
-              <ModalFooter>
-                <Button color="primary" onClick={onClose} onPress={onAccept}>
-                  Aceptar
+    <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
+            <ModalBody>{bodyContent}</ModalBody>
+            <ModalFooter>
+              {footerActions.map((action, index) => (
+                <Button
+                  key={index}
+                  color={action.color || "primary"}
+                  variant={action.variant || "solid"}
+                  onPress={action.onPress || onClose}
+                >
+                  {action.label}
                 </Button>
-              </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+              ))}
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
-}
+};
+
+export default ModalAcciones

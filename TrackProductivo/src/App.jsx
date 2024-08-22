@@ -23,6 +23,7 @@ import ReportesPage from './components/pages/ReportesPage.jsx'
 const EstadisticasPage = lazy(() => import('./components/pages/EstadisticasPage'));
 const EtapaPracticaPage = lazy(() => import('./components/pages/EtapaPracticaPage'));
 const BitacorasPage = lazy(() => import('./components/pages/BitacorasPage'));
+const HomePage = lazy(() => import('./components/pages/HomePage.jsx'));
 
 export const App = () => {
   // las paginas de cada seccion son su respectiva ruta
@@ -32,6 +33,15 @@ export const App = () => {
     <GlobalProvider>
       <Routes>
         
+      <Route path="/" element={
+          <ProtectedRoute>
+            <WithSidebar>
+              <Suspense fallback={<div>Loading...</div>}>
+                <HomePage />
+              </Suspense>
+            </WithSidebar>
+          </ProtectedRoute>
+        } />
 
         <Route path="/nomina" element={
           <ProtectedRoute>
@@ -124,6 +134,7 @@ const WithSidebar = ({ children }) => (
   <div className="flex">
     <Sidebar>
       {/* estas son las secciones de el rol de Coordinador  */}
+      <SidebarItem nav="/" icon={<Home  size={20} />} text="Home" />
       <SidebarItem nav="/nomina" icon={<Users  size={20} />} text="Nomina" />
       <SidebarItem nav="/fichas" icon={<BookMarked  size={20} />} text="Fichas" />
       <SidebarItem nav="/matriculas" icon={<BookUser  size={20} />} text="Matriculas" />
