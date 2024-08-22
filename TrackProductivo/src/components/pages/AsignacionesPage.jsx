@@ -1,14 +1,14 @@
 import React from "react";
 
 
-function BitacorasPage() {
+function AsignacionesPage() {
     return ( 
         <>
         <main className='w-full p-3'>
-        BitacorasPage
+        AsignacionesPage
         </main>
       </>
      );
 }
 
-export default BitacorasPage;
+export default AsignacionesPage;

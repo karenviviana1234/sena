@@ -1,10 +1,10 @@
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home, Users ,BookMarked,BookUser ,Building2 ,GraduationCap  ,  FolderSearch2, BookPlus, BookPlusIcon   } from "lucide-react";
-import Sidebar, { SidebarItem, SidebarAccordion } from "./components/Sidebar";
+import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSearch2, UserCheck ,BookText } from 'lucide-react';
+import Sidebar, { SidebarItem, SidebarAccordion } from './components/Sidebar';
 import { LoginPage } from '../src/components/pages/LoginPage';
-import { ProtectedRoute } from './configs/ProtectedRoute';
 import { Navbar2 } from './components/Navbar';
+<<<<<<< HEAD
 import GlobalProvider from './components/context/GlobalContext';
 
 
@@ -24,12 +24,27 @@ import Registro from './components/pages/RegistroPage';
 const ReportesPage = lazy(() => import('./components/pages/ReportesPage'));
 const EstadisticasPage = lazy(() => import('./components/pages/EstadisticasPage'));
 const BitacorasPage = lazy(() => import('./components/pages/BitacorasPage'));
+=======
+import GlobalProvider from './context/GlobalContext';
+
+// Importa las páginas directamente
+import NominaPage  from './components/pages/NominaPage.jsx';
+import FichasPage from './components/pages/FichasPage.jsx';
+import MatriculasPage from './components/pages/MatriculasPage.jsx';
+import EmpresaPage from './components/pages/EmpresaPage.jsx';
+import SeguimientoPage from './components/pages/SeguimientoPage.jsx';
+import EstadisticasPage from './components/pages/EstadisticasPage.jsx';
+import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
+import HomePage from './components/pages/HomePage.jsx';
+import ReportesPage from './components/pages/ReportesPage.jsx';
+import AsignacionesPage from './components/pages/AsignacionesPage.jsx';
+>>>>>>> 9e2bcc2848340c7e97565f9908d2bd0216959937
 
 export const App = () => {
-  // las paginas de cada seccion son su respectiva ruta
   return (
 
     <BrowserRouter>
+<<<<<<< HEAD
     <GlobalProvider>
       <Routes>
         <Route path="/" element={<LoginPage />} />
@@ -38,96 +53,84 @@ export const App = () => {
           <ProtectedRoute>
             <WithSidebar>
               <Suspense fallback={<div>Loading...</div>}>
+=======
+      <GlobalProvider>
+        <Routes>
+          <Route path="/" element={
+              <WithSidebar>
+>>>>>>> 9e2bcc2848340c7e97565f9908d2bd0216959937
                 <HomePage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
+              </WithSidebar>
+          } />
 
+<<<<<<< HEAD
 
 
         <Route path="/nomina" element={
           <ProtectedRoute>
             <WithSidebar>
               <Suspense fallback={<div>Loading...</div>}>
+=======
+          <Route path="/nomina" element={
+              <WithSidebar>
+>>>>>>> 9e2bcc2848340c7e97565f9908d2bd0216959937
                 <NominaPage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/fichas" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
+              </WithSidebar>
+          } />
+
+          <Route path="/fichas" element={
+              <WithSidebar>
                 <FichasPage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
+              </WithSidebar>
+          } />
 
-        <Route path="/matriculas" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
+          <Route path="/matriculas" element={
+              <WithSidebar>
                 <MatriculasPage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
+              </WithSidebar>
+          } />
+           <Route path="/asignaciones" element={
+              <WithSidebar>
+                <AsignacionesPage />
+              </WithSidebar>
+          } />
 
-        <Route path="/empresa" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
+          <Route path="/empresa" element={
+              <WithSidebar>
                 <EmpresaPage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
+              </WithSidebar>
+          } />
 
-        <Route path="/etapapractica" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
+          <Route path="/etapapractica" element={
+              <WithSidebar>
                 <EtapaPracticaPage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
+              </WithSidebar>
+          } />
 
-        <Route path="/reportes" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
-                <ReportesPage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
-  
-       <Route path="/estadisticas" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
+          <Route path="/seguimiento" element={
+              <WithSidebar>
+                <SeguimientoPage />
+              </WithSidebar>
+          } />
+
+          <Route path="/estadisticas" element={
+              <WithSidebar>
                 <EstadisticasPage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
-      <Route path="/bitacoras" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
-                <BitacorasPage />
-              </Suspense>
-            </WithSidebar>
-          </ProtectedRoute>
-        } />
+              </WithSidebar>
+          } />
 
+<Route path="/reportes" element={
+              <WithSidebar>
+                <ReportesPage />
+              </WithSidebar>
+          } />
 
+<<<<<<< HEAD
 
       </Routes>
+=======
+        </Routes>
+>>>>>>> 9e2bcc2848340c7e97565f9908d2bd0216959937
       </GlobalProvider>
     </BrowserRouter>
   );
@@ -136,26 +139,26 @@ export const App = () => {
 const WithSidebar = ({ children }) => (
   <div className="flex">
     <Sidebar>
-      {/* estas son las secciones de el rol de Coordinador  */}
-      <SidebarItem nav="/home" icon={<Home size={20} />} text="Home" />
-      <SidebarItem nav="/nomina" icon={<Users  size={20} />} text="Nomina" />
-      <SidebarItem nav="/fichas" icon={<BookMarked  size={20} />} text="Fichas" />
-      <SidebarItem nav="/matriculas" icon={<BookUser  size={20} />} text="Matriculas" />
-      <SidebarItem nav="/empresa" icon={<Building2  size={20} />} text="Empresa" />
-      <SidebarItem nav="/etapapractica" icon={<GraduationCap   size={20} />} text="Etapa Practica" />
-      <SidebarItem nav="/bitacoras" icon={<BookPlus    size={20} />} text="Bitacoras" />
+      {/* estas son las secciones de el rol de Coordinador */}
+      <SidebarItem nav="/" icon={<Home size={20} />} text="Home" />
+      <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Nomina" />
+      <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
+      <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
+      <SidebarItem nav="/asignaciones" icon={<UserCheck size={20} />} text="Asignaciones" />
+      <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
+      <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
 
-      <SidebarAccordion icon={<FolderSearch2  size={20} />} text="Seguimientos">
-        <SidebarItem nav="/reportes" text="Reportes" /> 
-        <SidebarItem nav="/estadisticas" text="Estadisticas" />
-      </SidebarAccordion>
+      <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimineto" />
+      <SidebarItem nav="/reportes" icon={<BookText size={20} />} text="Reportes" />
+      <SidebarItem nav="/estadisticas" text="Estadisticas" />
+
+
+      {/* <SidebarAccordion icon={<FolderSearch2 size={20} />} text="Seguimientos">
+      
+      </SidebarAccordion> */}
       {/* fin de secciones de el rol de Coordinador */}
-
-
-
-
     </Sidebar>
-    <div className='w-full bg-white h-screen overflow-auto'>
+    <div className="w-full bg-white h-screen overflow-auto">
       <Navbar2 />
       {children}
     </div>
