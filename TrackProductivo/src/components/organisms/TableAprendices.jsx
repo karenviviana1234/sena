@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import FormEtapaPractica from './FormEtapaPractica.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
-import FormAprendices from './FormAprendices.jsx';
 import axiosClient from '../../configs/axiosClient.jsx';
 import { format } from 'date-fns';
 import {
