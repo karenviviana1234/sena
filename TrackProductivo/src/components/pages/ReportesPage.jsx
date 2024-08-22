@@ -1,261 +1,401 @@
-import React from "react";
+import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import SeguimientoModal from '../templates/SeguimientosModal.jsx';
+import GlobalModal from '../componets_globals/GlobalModal.jsx'
+import Swal from 'sweetalert2';
+import axiosClient from '../../configs/axiosClient.jsx';
+import SeguimientosContext from '../../context/SeguimientosContext.jsx';
+import { format } from 'date-fns';
 import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Input,
-  Button,
-  DropdownTrigger,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
-  Chip,
-  User,
-  Pagination,
-  Modal,
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+    Input,
+    Button,
+    DropdownTrigger,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    Chip,
+    Pagination,
+    User,
 } from "@nextui-org/react";
-import { PlusIcon } from "../NextIU/atoms/plusicons";
-import { VerticalDotsIcon } from "../NextIU/atoms/verticalicons";
-import { SearchIcon } from "../NextIU/atoms/searchicons";
-import { ChevronDownIcon } from "../NextIU/atoms/icons";
-import { columns, users, statusOptions } from "../NextIU/molecules/data";
-import { capitalize } from "../NextIU/atoms/utils";
-import ModalNominas from "../templates/ModalNominas";
-import AccionesModal from "../molecules/AccionesModal";
+import { PlusIcon } from "../NextIU/atoms/PlusIcons.jsx";
+import { SearchIcon } from "../NextIU/atoms/SearchIcons.jsx";
+import { ChevronDownIcon } from "../NextIU/atoms/CheveronIcons.jsx";
+import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
+import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 
-const statusColorMap = {
-  Activo: "success",
-  Proceso: "warning",
-  Inactivo: "danger",
-};
+function ReportesPage() {
+    const { seguimientos, getSeguimientos } = useContext(SeguimientosContext);
 
-const INITIAL_VISIBLE_COLUMNS = [
-  "id",
-  "name",
-  "role",
-  "age",
-  "team",
-  "seguimiento1",
-  "seguimiento2",
-  "seguimiento3",
-];
+    const statusColorMap = {
+        activo: "success",
+        inactivo: "danger",
+        todos: "primary",
+    };
 
-export default function App() {
-  const [filterValue, setFilterValue] = React.useState("");
-  const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter, setStatusFilter] = React.useState(new Set(["all"]));
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "age",
-    direction: "ascending",
-  });
-  const [page, setPage] = React.useState(1);
-  const [modalVisible, setModalVisible] = React.useState(false); // Estado para manejar la visibilidad del modal
-  const [selectedCellValue, setSelectedCellValue] = React.useState(""); // Estado para almacenar el valor de la celda
-
-  const [modalAccionesVisible, setModalAccionesVisible] = React.useState(false); // Estado para manejar la visibilidad del modal de acciones
-
-  const pages = Math.ceil(users.length / rowsPerPage);
-
-  const hasSearchFilter = Boolean(filterValue);
-
-  const headerColumns = React.useMemo(() => {
-    if (visibleColumns === "all") return columns;
-
-    return columns.filter((column) => visibleColumns.has(column.uid));
-  }, [visibleColumns]);
-
-  const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
-
-    if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase()),
-      );
-    }
-    if (statusFilter.size && !statusFilter.has("all")) {
-      filteredUsers = filteredUsers.filter((user) =>
-        statusFilter.has(user.status),
-      );
-    }
-
-    return filteredUsers;
-  }, [users, filterValue, statusFilter]);
-
-  const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
-
-  const sortedItems = React.useMemo(() => {
-    return [...items].sort((a, b) => {
-      const first = a[sortDescriptor.column];
-      const second = b[sortDescriptor.column];
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    const [filterValue, setFilterValue] = useState("");
+    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+    const [statusFilter, setStatusFilter] = useState("todos");
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [sortDescriptor, setSortDescriptor] = useState({
+        column: "identificacion",
+        direction: "ascending",
     });
-  }, [sortDescriptor, items]);
+    const [page, setPage] = useState(1);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalAcciones, setModalAcciones] = useState(false);
+    const [mode, setMode] = useState('create');
+    const [initialData, setInitialData] = useState(null);
+    const [mensaje, setMensaje] = useState('');
+    const [selectedDate, setSelectedDate] = useState('');
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+    useEffect(() => {
+        getSeguimientos(); 
+    }, [getSeguimientos]);
 
-    switch (columnKey) {
-      case "name":
-        return (
-          <User
-            avatarProps={{ radius: "full", size: "sm", src: user.avatar }}
-            classNames={{
-              description: "text-default-500",
-            }}
-            description={user.email}
-            name={cellValue}
-          >
-            {user.email}
-          </User>
-        );
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize border-none gap-1 text-default-600"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="dot"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "seguimiento1":
-      case "seguimiento2":
-      case "seguimiento3":
-        return (
-          <Button
-            size="sm"
-            className="text-white bg-[#84CC16]"
-            onClick={() => {
-              setModalAccionesVisible(true); // Muestra el modal de acciones
-            }}
-          >
-            {cellValue}
-          </Button>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+    const statusOptions = [
+        { name: "Todos", uid: "todos" },
+        { name: "Activo", uid: "activo" },
+        { name: "Inactivo", uid: "inactivo" },
+    ];
 
-  const onRowsPerPageChange = React.useCallback((e) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
+    const hasSearchFilter = Boolean(filterValue);
 
-  const onSearchChange = React.useCallback((value) => {
-    if (value) {
-      setFilterValue(value);
-      setPage(1);
-    } else {
-      setFilterValue("");
-    }
-  }, []);
+    const filteredItems = useMemo(() => {
+        let filteredSeguimientos = seguimientos;
 
-  const topContent = React.useMemo(() => {
-    return (
-      <div className="flex flex-col gap-4">
-        <Input
-          isClearable
-          placeholder="Search..."
-          value={filterValue}
-          onClear={() => setFilterValue('')}
-          onValueChange={onSearchChange}
-          startContent={<SearchIcon />}
-        />
-       {/*  <Dropdown>
-          <DropdownTrigger>
-            <Button endContent={<ChevronDownIcon />}>Status</Button>
-          </DropdownTrigger>
-          <DropdownMenu
-            aria-label="Status Menu"
-            selectionMode="multiple"
-            selectedKeys={statusFilter}
-            onSelectionChange={setStatusFilter}
-          >
-            {statusOptions.map((option) => (
-              <DropdownItem key={option.uid}>
-                {capitalize(option.name)}
-              </DropdownItem>
-            ))}
-          </DropdownMenu>
-        </Dropdown> */}
-      </div>
-    );
-  }, [filterValue, onSearchChange, statusFilter]);
-
-  return (
-    <div className="m-12">
-      <h2 className="font-semibold text-xl mb-5">Seguimientos Asignados:</h2>
-      <Table
-        aria-label="Example table with custom content"
-        className="min-w-full"
-        sortDescriptor={sortDescriptor}
-        onSortChange={setSortDescriptor}
-        selectedKeys={selectedKeys}
-        onSelectionChange={setSelectedKeys}
-        topContent={topContent}
-        bottomContent={
-          <Pagination
-            showControls
-            initialPage={1}
-            page={page}
-            total={pages}
-            onChange={setPage}
-          />
+        if (hasSearchFilter) {
+            filteredSeguimientos = filteredSeguimientos.filter(seg =>
+                seg.nombres.toLowerCase().includes(filterValue.toLowerCase())
+            );
         }
-      >
-        <TableHeader columns={headerColumns}>
-          {(column) => (
-            <TableColumn key={column.uid} allowsSorting={column.sortable}>
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={sortedItems}>
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
 
-      {/* Modal para seguimiento */}
-      <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
-        <Modal.Header>
-          <p>Seguimiento</p>
-        </Modal.Header>
-        <Modal.Body>
-          <p>{selectedCellValue}</p>
-        </Modal.Body>
-      </Modal>
+        if (statusFilter !== "todos") {
+            filteredSeguimientos = filteredSeguimientos.filter(seg =>
+                seg.estado === statusFilter
+            );
+        }
 
-      {/* Modal de acciones (puedes personalizar el contenido) */}
-      <AccionesModal
-        isOpen={modalAccionesVisible}
-        onClose={() => setModalAccionesVisible(false)}
-      />
-    </div>
-  );
+        return filteredSeguimientos;
+    }, [seguimientos, filterValue, statusFilter]);
+
+    const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+    const items = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        return filteredItems.slice(start, end);
+    }, [page, filteredItems, rowsPerPage]);
+
+    const sortedItems = useMemo(() => {
+        return [...items].sort((a, b) => {
+            const first = a[sortDescriptor.column];
+            const second = b[sortDescriptor.column];
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [sortDescriptor, items]);
+
+    const [programColorMap, setProgramColorMap] = useState({});
+
+    const generateRandomColor = useCallback(() => {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        const a = 0.3; // Ajusta el nivel de transparencia
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }, []);
+
+    const getProgramColor = useCallback((sigla) => {
+        if (!programColorMap[sigla]) {
+            setProgramColorMap(prevMap => ({
+                ...prevMap,
+                [sigla]: generateRandomColor(),
+            }));
+        }
+        return programColorMap[sigla];
+    }, [programColorMap, generateRandomColor]);
+
+    const renderCell = useCallback((item, columnKey) => {
+        const cellValue = item[columnKey];
+
+        switch (columnKey) {
+            case "seguimiento1":
+            case "seguimiento2":
+            case "seguimiento3":
+                const formattedDate = format(new Date(cellValue), 'dd-MM-yyyy');
+                return (
+                    <Button
+                        size="sm"
+                        className="bg-[#90d12c] text-white"
+                        onClick={() => handleButtonClick(formattedDate)}
+                    >
+                        {formattedDate}
+                    </Button>
+                );
+            case "sigla":
+                return (
+                    <Chip
+                        style={{ backgroundColor: getProgramColor(item.sigla) }}
+                        className='text-[#3c3c3c]'
+                        variant="flat"
+                    >
+                        {cellValue}
+                    </Chip>
+                );
+            case "estado":
+                return (
+                    <Chip className="capitalize" color={statusColorMap[item.estado]} size="sm" variant="flat">
+                        {cellValue}
+                    </Chip>
+                );
+            case "actions":
+                return (
+                    <div className="relative flex justify-end items-center gap-2">
+                        <Dropdown>
+                            <DropdownTrigger>
+                                <ButtonActualizar onClick={() => handleToggle('update', item)} />
+                                <ButtonDesactivar
+                                    onClick={() => peticionDesactivar(item.id)}
+                                    estado={item.estado}
+                                />
+                            </DropdownTrigger>
+                            <DropdownMenu>
+                                <DropdownItem onClick={() => handleToggle('view', item)}>View</DropdownItem>
+                                <DropdownItem onClick={() => handleToggle('edit', item)}>Edit</DropdownItem>
+                                <DropdownItem onClick={() => peticionDesactivar(item.id)}>Delete</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
+                );
+
+            case "nombres":
+                return (
+                    <User
+                        name={cellValue}
+                        description="Aquí va el correo"
+                        avatarSrc="https://via.placeholder.com/150"
+                        bordered
+                        as="button"
+                        size="sm"
+                        color="primary"
+                    />
+                );
+            default:
+                return cellValue;
+        }
+    }, [statusColorMap, getProgramColor]);
+
+    const handleButtonClick = (date) => {
+        console.log("Handling button click, setting date:", date);
+        setSelectedDate(date);
+        setModalAcciones(true); // Asegúrate de que esto está abriendo el modal correctamente
+    };
+    
+    
+    const handleToggle = (mode, data = null) => {
+        console.log("Toggling modal, mode:", mode, "data:", data);
+        setMode(mode);
+        setInitialData(data);
+        setModalOpen(prev => !prev);
+    };
+    
+
+    const onNextPage = useCallback(() => {
+        if (page < pages) {
+            setPage(prevPage => prevPage + 1);
+        }
+    }, [page, pages]);
+
+    const onPreviousPage = useCallback(() => {
+        if (page > 1) {
+            setPage(prevPage => prevPage - 1);
+        }
+    }, [page]);
+
+    const onRowsPerPageChange = useCallback((e) => {
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
+    }, []);
+
+    const onSearchChange = useCallback((value) => {
+        setFilterValue(value || "");
+        setPage(1);
+    }, []);
+
+    const onClear = useCallback(() => {
+        setFilterValue("");
+        setPage(1);
+    }, []);
+
+    const onStatusFilter = (selectedKeys) => {
+        setStatusFilter(selectedKeys[0]);
+    };
+
+    const topContent = useMemo(() => {
+        return (
+            <div className="flex flex-col mt-3">
+                <div className="flex justify-between gap-3 items-end">
+                    <Input
+                        isClearable
+                        className="w-full sm:max-w-[44%] bg-[#f4f4f5] rounded"
+                        placeholder="Buscar..."
+                        startContent={<SearchIcon />}
+                        value={filterValue}
+                        onClear={() => onClear()}
+                        onValueChange={onSearchChange}
+                    />
+                    <div className="flex gap-3">
+                        <Dropdown>
+                            <DropdownTrigger className="hidden sm:flex mr-2 text-black bg-[#f4f4f5]">
+                                <Button endContent={<ChevronDownIcon className="cursor-pointer text-small text-slate-700" />} variant="flat">
+                                    Estado
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                                disallowEmptySelection
+                                aria-label="Menu de acciones"
+                                closeOnSelect={false}
+                                selectedKeys={statusFilter}
+                                selectionMode="single"
+                                onSelectionChange={onStatusFilter}
+                            >
+                                {statusOptions.map((status) => (
+                                    <DropdownItem key={status.uid} className="capitalize w-55">
+                                        {status.name}
+                                    </DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </Dropdown>
+                        <Button className="z-1 mr-30 text-white bg-[#90d12c] cursor-pointer" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
+                            Registrar
+                        </Button>
+                    </div>
+                </div>
+                <div className="flex items-center justify-between">
+                    <span className="text-white text-small">Total {seguimientos.length} Resultados</span>
+                    <label className="flex items-center text-white mr-30 text-small">
+                        Columnas por página:
+                        <select
+                            className="bg-transparent outline-none text-white text-small"
+                            onChange={onRowsPerPageChange}
+                        >
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+        );
+    }, [filterValue, statusFilter, seguimientos.length, onRowsPerPageChange, onClear, onSearchChange, onStatusFilter, page, pages]);
+
+    const columns = [
+        { key: "identificacion", label: "Identificacion" },
+        { key: "nombres", label: "Nombres" },
+        { key: "codigo", label: "Ficha" },
+        { key: "sigla", label: "Programa" },
+        { key: "razon_social", label: "Empresa" },
+        { key: "seguimiento1", label: "Seguimiento 1" },
+        { key: "seguimiento2", label: "Seguimiento 2" },
+        { key: "seguimiento3", label: "Seguimiento 3" },
+    ];
+
+
+
+    const peticionDesactivar = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡Esta acción no se puede deshacer!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, desactivar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axiosClient.patch(`/seguimientos/${id}`, { estado: 'inactivo' })
+                    .then(response => {
+                        Swal.fire(
+                            'Desactivado!',
+                            'El seguimiento ha sido desactivado.',
+                            'success'
+                        );
+                        getSeguimientos(); // Actualiza la lista de seguimientos
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            'Error!',
+                            'Hubo un problema al desactivar el seguimiento.',
+                            'error'
+                        );
+                    });
+            }
+        });
+    };
+
+    return (
+        <div className="overflow-hidden flex-1 min-h-screen bg-dark p-2 m-20">
+            <div className="flex flex-col">
+                {topContent}
+                <Table aria-label="Tabla de Seguimientos" css={{ height: "auto", minWidth: "100%" }}>
+                    <TableHeader>
+                        {columns.map((column) => (
+                            <TableColumn key={column.key}>{column.label}</TableColumn>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {sortedItems.map((item) => (
+                            <TableRow key={item.id}>
+                                {columns.map((column) => (
+                                    <TableCell key={column.key}>
+                                        {renderCell(item, column.key)}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <div className="flex justify-between mt-4">
+                    <Button disabled={page === 1} onClick={onPreviousPage}>
+                        Anterior
+                    </Button>
+                    <Button disabled={page === pages} onClick={onNextPage}>
+                        Siguiente
+                    </Button>
+                </div>
+            </div>
+            <SeguimientoModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                mode={mode}
+                initialData={initialData}
+                setMensaje={setMensaje}
+                mensaje={mensaje}
+            />
+            <GlobalModal
+                open={GlobalModal}
+                onClose={() => setModalGlobal(false)}
+                title="Acciones"
+                footer={(onClose) => (
+                    <>
+                        <Button auto flat onClick={() => onClose()}>
+                            Cancelar
+                        </Button>
+                        <Button auto onClick={() => setModalAcciones(false)}>
+                            Confirmar
+                        </Button>
+                    </>
+                )}
+            >
+                <div>Detalles del seguimiento para la fecha: {selectedDate}</div>
+            </GlobalModal>
+        </div>
+    );
 }
+
+export default ReportesPage;
