@@ -1,6 +1,5 @@
 import React, { createContext } from 'react'
-
-import { UsuarioProvider } from './UsuariosContext'
+import { AsignacionesProvider } from './EtapaContext'
 
 
 export const GlobalContext = createContext()
@@ -12,10 +11,10 @@ const GlobalProvider = ({ children }) => {
     return (
         <GlobalContext.Provider value={globalContextValue}>
 
-            <UsuarioProvider>
+            <AsignacionesProvider>
 
                 {children}
-            </UsuarioProvider>
+            </AsignacionesProvider>
 
         </GlobalContext.Provider>
     )

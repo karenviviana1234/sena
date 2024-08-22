@@ -1,6 +1,6 @@
 import React from 'react';
-import FormUsuarios from '../molecules/FormEtapa.jsx';
-import AccionesModal from '../organisms/Modal.jsx';
+import FormEtapa from '../molecules/FormEtapa.jsx'
+import AccionesModal from '../molecules/Modal.jsx';
 
 function EtapaModal({ open, onClose, handleSubmit, actionLabel, title, initialData, mode }) {
     return (

@@ -5,6 +5,7 @@ import Sidebar, { SidebarItem, SidebarAccordion } from "./components/Sidebar";
 import { LoginPage } from '../src/components/pages/LoginPage';
 import { ProtectedRoute } from './configs/ProtectedRoute';
 import { Navbar2 } from './components/Navbar';
+import GlobalProvider from './components/context/GlobalContext';
 
 
 
@@ -13,12 +14,13 @@ import { Navbar2 } from './components/Navbar';
 // las rutas de todos los modulos [tengo que crear la vista y ubicarlas en el sliderbar]
 //son los modulos de la base de datos pero vamos a dividir en secciones 
 
-const HomePage = lazy(() => import('./components/pages/HomePage'));
+import HomePage from './components/pages/HomePage';
 const NominaPage = lazy(() => import('./components/pages/NominaPage'));
 const FichasPage = lazy(() => import('./components/pages/FichasPage'));
 const MatriculasPage = lazy(() => import('./components/pages/MatriculasPage'));
 const EmpresaPage = lazy(() => import('./components/pages/EmpresaPage'));
-const EtapaPracticaPage = lazy(() => import('./components/pages/EtapaPracticaPage'));
+ import { EtapaPracticaPage } from './components/pages/EtapaPracticaPage';
+import Registro from './components/pages/RegistroPage';
 const ReportesPage = lazy(() => import('./components/pages/ReportesPage'));
 const EstadisticasPage = lazy(() => import('./components/pages/EstadisticasPage'));
 const BitacorasPage = lazy(() => import('./components/pages/BitacorasPage'));
@@ -26,9 +28,12 @@ const BitacorasPage = lazy(() => import('./components/pages/BitacorasPage'));
 export const App = () => {
   // las paginas de cada seccion son su respectiva ruta
   return (
+
     <BrowserRouter>
+    <GlobalProvider>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        <Route path="/registro" element={<Registro />} />
         <Route path="/home" element={
           <ProtectedRoute>
             <WithSidebar>
@@ -38,6 +43,8 @@ export const App = () => {
             </WithSidebar>
           </ProtectedRoute>
         } />
+
+
 
         <Route path="/nomina" element={
           <ProtectedRoute>
@@ -121,7 +128,7 @@ export const App = () => {
 
 
       </Routes>
-      
+      </GlobalProvider>
     </BrowserRouter>
   );
 };

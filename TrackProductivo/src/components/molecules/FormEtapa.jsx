@@ -1,21 +1,19 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { ModalFooter, Button, Select } from "@nextui-org/react";
+import { ModalFooter, Button } from "@nextui-org/react";
 import axiosClient from '../../configs/axiosClient';
 import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
 import EtapaContext from '../context/EtapaContext';
 
 const FormEtapa = ({ mode, initialData, handleSubmit, onClose, actionLabel }) => {
-
-  
   const [estadoOp, setEstadoOp] = useState('');
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
-  const [productiva, setproductiva] = useState([]);
-  const [instructor, setinstructor] = useState([]);
+  const [productiva, setProductiva] = useState([]);
+  const [instructor, setInstructor] = useState([]);
   const [estado, setEstado] = useState([]);
  
-  const { idEtapa } = useContext(EtapaContext);
+  const { idAsignacion } = useContext(EtapaContext);
 
   useEffect(() => {
     const enumData = [
@@ -29,40 +27,40 @@ const FormEtapa = ({ mode, initialData, handleSubmit, onClose, actionLabel }) =>
 
   useEffect(() => {
     axiosClient.get('/productiva/listar').then((response) => {
-      const productivaFilter = response.data.filter((productiva) => productiva.estado === 'activo');
-      setproductiva(productivaFilter);
+      const productivaFilter = response.data.filter((prod) => prod.estado === 'activo');
+      setProductiva(productivaFilter);
     });
   }, []);
 
   useEffect(() => {
-    if (mode === 'update' && idEtapa) {
-        const formattedFechaInicio = idEtapa.fecha_inicio ? parseDate(idEtapa.fecha_inicio) : null;
-        const formattedFechaFin = idEtapa.fecha_fin ? parseDate(idEtapa.fecha_fin) : null;
+    if (mode === 'update' && idAsignacion) {
+      const formattedFechaInicio = idAsignacion.fecha_inicio ? parseDate(idAsignacion.fecha_inicio) : null;
+      const formattedFechaFin = idAsignacion.fecha_fin ? parseDate(idAsignacion.fecha_fin) : null;
 
-        setFechaInicio(formattedFechaInicio);
-        setFechaFin(formattedFechaFin);
-        setSelectedInstructor(idEtapa.fk_identificacion); // Verifica que fk_identificacion sea un valor primitivo
-        setSelectedProductiva(idEtapa.productiva); // Verifica que productiva sea un valor primitivo
-        setSelectedEstadoOp(idEtapa.estado); // Verifica que estado sea un valor primitivo
+      setFechaInicio(formattedFechaInicio);
+      setFechaFin(formattedFechaFin);
+      setInstructor(idAsignacion.fk_identificacion); // Asegúrate de que sea un valor primitivo
+      setProductiva(idAsignacion.productiva); // Asegúrate de que sea un valor primitivo
+      setEstadoOp(idAsignacion.estado); // Asegúrate de que sea un valor primitivo
     }
-}, [mode, idEtapa]);
+  }, [mode, idAsignacion]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-        const formData = {
-            fecha_inicio: fechaInicio ? fechaInicio.toString() : '',
-            fecha_fin: fechaFin ? fechaFin.toString() : '',
-            productiva: selectedProductiva,
-            instructor: selectedInstructor,
-            estado: selectedEstadoOp,
-        };
-        handleSubmit(formData, e);
+      const formData = {
+        fecha_inicio: fechaInicio ? fechaInicio.toString() : '',
+        fecha_fin: fechaFin ? fechaFin.toString() : '',
+        productiva: productiva,
+        instructor: instructor,
+        estado: estadoOp,
+      };
+      handleSubmit(formData, e);
     } catch (error) {
-        console.error('Error al enviar el formulario:', error);
-        alert('Hay un error en el sistema: ' + error.message);
+      console.error('Error al enviar el formulario:', error);
+      alert('Hay un error en el sistema: ' + error.message);
     }
-};
+  };
 
   return (
     <form method="post" onSubmit={handleFormSubmit}>
@@ -92,15 +90,15 @@ const FormEtapa = ({ mode, initialData, handleSubmit, onClose, actionLabel }) =>
             id="instructor"
             name="instructor"
             value={instructor}
-            onChange={(e) => setinstructor(e.target.value)}
+            onChange={(e) => setInstructor(e.target.value)}
             required
           >
             <option value="" disabled hidden>
               Seleccionar instructor
             </option>
-            {instructor.map((acti) => (
-              <option key={acti.id_vinculacion} value={acti.id_vinculacion}>
-                {acti.id_vinculacion}
+            {instructor.map((inst) => (
+              <option key={inst.id_vinculacion} value={inst.id_vinculacion}>
+                {inst.id_vinculacion}
               </option>
             ))}
           </select>
@@ -112,15 +110,15 @@ const FormEtapa = ({ mode, initialData, handleSubmit, onClose, actionLabel }) =>
             id="productiva"
             name="productiva"
             value={productiva}
-            onChange={(e) => setproductiva(e.target.value)}
+            onChange={(e) => setProductiva(e.target.value)}
             required
           >
             <option value="" disabled hidden>
               Seleccionar Productiva
             </option>
-            {productiva.map((productiva) => (
-              <option key={productiva.id_productiva} value={productiva.id_productiva}>
-                {productiva.id_productiva}
+            {productiva.map((prod) => (
+              <option key={prod.id_productiva} value={prod.id_productiva}>
+                {prod.id_productiva}
               </option>
             ))}
           </select>
@@ -128,7 +126,6 @@ const FormEtapa = ({ mode, initialData, handleSubmit, onClose, actionLabel }) =>
 
         <div className="py-2">
           <select
-            label="Estado"
             className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             value={estadoOp}
             onChange={(e) => setEstadoOp(e.target.value)}

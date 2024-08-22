@@ -2,14 +2,14 @@ import axios from "axios";
 
 
 const axiosClient = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/'
+    baseURL: 'http://localhost:3000'
 });
 
 axiosClient.interceptors.request.use((config) => {
-    // const token = localStorage.getItem('token');
-    // const rol = localStorage.getItem('rol'); 
-    // config.headers.token = token;
-    // config.headers.rol = rol; 
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('rol'); 
+    config.headers.token = token;
+    config.headers.rol = rol; 
     return config;
 });
 

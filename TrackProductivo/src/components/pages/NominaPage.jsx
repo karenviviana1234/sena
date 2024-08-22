@@ -19,7 +19,7 @@ import {
 } from "@nextui-org/react";
 import v from '../../styles/Variables'
 import { columns, users } from "../NextIU/molecules/data";
-import AccionesModal from "../molecules/AccionesModal";
+import AccionesModal from "../molecules/Modal";
 
 const statusColorMap = {
   Activo: "success",
