@@ -22,8 +22,8 @@ import {
     Pagination,
     User,
 } from "@nextui-org/react";
-import { PlusIcon } from "../NextIU/atoms/PlusIcons.jsx";
-import { SearchIcon } from "../NextIU/atoms/SearchIcons.jsx";
+import { PlusIcon } from "../NextIU/atoms/plusicons.jsx";
+import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import { ChevronDownIcon } from "../NextIU/atoms/CheveronIcons.jsx";
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
