@@ -1,5 +1,5 @@
 import React from 'react';
-import ExcelUploader from './Excel.jsx';
+import ExcelUploader from '../molecules/Excel.jsx';
 import { Chip } from "@nextui-org/react";
 import v from '../../styles/Variables.jsx';
 

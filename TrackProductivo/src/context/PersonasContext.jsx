@@ -10,16 +10,15 @@ export const PersonasProvider = ({ children }) => {
 
     const getPersonas = useCallback(() => {
         try {
-            axiosClient.get('/personas/listar').then((response) => {
+            axiosClient.get('/personas/listarA').then((response) => {
                 console.log(response.data);
                 setPersona(response.data);
             });
         } catch (error) {
             console.log('Error del servidor' + error);
         }
-    }, []); // Dependencias vacías para que la función no cambie
+    }, []); 
 
-    // Memoriza la función para evitar cambios innecesarios de referencia
     const getPersona = useCallback((id_persona) => {
         try {
             axiosClient.get(`/buscar${id_persona}`).then((response) => {
@@ -29,7 +28,7 @@ export const PersonasProvider = ({ children }) => {
         } catch (error) {
             console.log('Error' + error);
         }
-    }, []); // Dependencias vacías para que la función no cambie
+    }, []); 
 
     return (
         <PersonasContext.Provider

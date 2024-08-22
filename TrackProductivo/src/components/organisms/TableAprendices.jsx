@@ -1,9 +1,7 @@
 import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
-import ComponentSeguimiento from '../organisms/ComponentSeguimiento.jsx';
-import ModalAcciones from '../organisms/ModalAcciones.jsx';
-import Swal from 'sweetalert2';
+import FormEtapaPractica from './FormEtapaPractica.jsx';
+import ModalAcciones from './ModalAcciones.jsx';
 import axiosClient from '../../configs/axiosClient.jsx';
-import SeguimientosContext from '../../context/SeguimientosContext.jsx';
 import { format } from 'date-fns';
 import {
     Table,
@@ -21,6 +19,7 @@ import {
     Chip,
     Pagination,
     User,
+    Link,
 } from "@nextui-org/react";
 import { PlusIcon } from "../NextIU/atoms/plusicons.jsx";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
@@ -28,8 +27,8 @@ import { ChevronDownIcon } from "../NextIU/atoms/CheveronIcons.jsx";
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 
-function ReportesPage() {
-    const { seguimientos, getSeguimientos } = useContext(SeguimientosContext);
+function TableAprendices() {
+    const [personas, setPersonas] = useState([]);
 
     const statusColorMap = {
         activo: "success",
@@ -54,33 +53,42 @@ function ReportesPage() {
     const [selectedDate, setSelectedDate] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
 
     useEffect(() => {
-        getSeguimientos();
-    }, [getSeguimientos]);
+        const fetchData = async () => {
+            try {
+                const response = await axiosClient.get('/personas/listarA'); // Ajusta la ruta del endpoint
+                setPersonas(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
 
     const hasSearchFilter = Boolean(filterValue);
 
     const filteredItems = useMemo(() => {
-        let filteredSeguimientos = seguimientos;
+        let filteredPersonas = personas;
 
         if (hasSearchFilter) {
-            filteredSeguimientos = filteredSeguimientos.filter(seg =>
+            filteredPersonas = filteredPersonas.filter(seg =>
                 seg.nombres.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
 
-        return filteredSeguimientos;
-    }, [seguimientos, filterValue, statusFilter]);
+        return filteredPersonas;
+    }, [personas, filterValue, statusFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -123,17 +131,14 @@ function ReportesPage() {
         const cellValue = item[columnKey];
 
         switch (columnKey) {
-            case "seguimiento1":
-            case "seguimiento2":
-            case "seguimiento3":
-                const formattedDate = format(new Date(cellValue), 'dd-MM-yyyy');
+            case "etapaProductiva":
                 return (
                     <Button
                         size="sm"
                         className="bg-[#90d12c] text-white"
-                        onClick={() => handleOpenModal(formattedDate)}
+                        onClick={(handleOpenModal)}
                     >
-                        {formattedDate}
+                        Registrar
                     </Button>
                 );
             case "sigla":
@@ -166,7 +171,6 @@ function ReportesPage() {
                 return (
                     <User
                         name={cellValue}
-                        description="Aquí va el correo"
                         avatarSrc="https://via.placeholder.com/150"
                         bordered
                         as="button"
@@ -238,9 +242,11 @@ function ReportesPage() {
                         onClear={() => onClear()}
                         onValueChange={onSearchChange}
                     />
+                    <Button onClick={(handleOpenModal)}
+                        className='bg-[#90d12c] text-white'>Registrar Aprendiz</Button>
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-white text-small">Total {seguimientos.length} Resultados</span>
+                    <span className="text-white text-small">Total {personas.length} Resultados</span>
                     <label className="flex items-center text-white mr-30 text-small">
                         Columnas por página:
                         <select
@@ -255,27 +261,26 @@ function ReportesPage() {
                 </div>
             </div>
         );
-    }, [filterValue, statusFilter, seguimientos.length, onRowsPerPageChange, onClear, onSearchChange, onStatusFilter, page, pages]);
+    }, [filterValue, statusFilter, personas.length, onRowsPerPageChange, onClear, onSearchChange, onStatusFilter, page, pages]);
 
     const columns = [
+        { key: "id_persona", label: "ID" },
         { key: "identificacion", label: "Identificacion" },
         { key: "nombres", label: "Nombres" },
-        { key: "codigo", label: "Ficha" },
-        { key: "sigla", label: "Programa" },
-        { key: "razon_social", label: "Empresa" },
-        { key: "seguimiento1", label: "Seguimiento 1" },
-        { key: "seguimiento2", label: "Seguimiento 2" },
-        { key: "seguimiento3", label: "Seguimiento 3" },
+        { key: "correo", label: "Correo" },
+        { key: "telefono", label: "Telefono" },
+        { key: "nombre_mpio", label: "Municipio" },
+        { key: "etapaProductiva", label: "Etapa Productiva" },
     ];
 
 
 
-   
+
     return (
-        <div className="overflow-hidden flex-1 min-h-screen bg-dark p-2 m-20">
+        <div className="overflow-hidden flex-1  bg-dark p-2">
             <div className="flex flex-col">
                 {topContent}
-                <Table aria-label="Tabla de Seguimientos" css={{ height: "auto", minWidth: "100%" }}>
+                <Table aria-label="Tabla de Personas" css={{ height: "auto", minWidth: "100%" }}>
                     <TableHeader>
                         {columns.map((column) => (
                             <TableColumn key={column.key}>{column.label}</TableColumn>
@@ -306,8 +311,8 @@ function ReportesPage() {
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-                    title="Seguimiento 1"
-                    bodyContent={<ComponentSeguimiento />}
+                    title="Registrar Etapa Practica"
+                    bodyContent={<FormEtapaPractica />}
                     footerActions={[
                         {
                             label: "Cerrar",
@@ -321,9 +326,10 @@ function ReportesPage() {
                         },
                     ]}
                 />
+                
             </div>
         </div>
     );
 }
 
-export default ReportesPage;
+export default TableAprendices;
