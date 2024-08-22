@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
-import SeguimientoModal from '../templates/SeguimientosModal.jsx';
-import GlobalModal from '../componets_globals/GlobalModal.jsx'
+import ComponentSeguimiento from '../molecules/ComponentSeguimiento.jsx';
+import ModalAcciones from '../organisms/ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
 import SeguimientosContext from '../../context/SeguimientosContext.jsx';
@@ -52,9 +52,19 @@ function ReportesPage() {
     const [initialData, setInitialData] = useState(null);
     const [mensaje, setMensaje] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
 
     useEffect(() => {
-        getSeguimientos(); 
+        getSeguimientos();
     }, [getSeguimientos]);
 
     const statusOptions = [
@@ -132,7 +142,7 @@ function ReportesPage() {
                     <Button
                         size="sm"
                         className="bg-[#90d12c] text-white"
-                        onClick={() => handleButtonClick(formattedDate)}
+                        onClick={() => handleOpenModal(formattedDate)}
                     >
                         {formattedDate}
                     </Button>
@@ -195,15 +205,15 @@ function ReportesPage() {
         setSelectedDate(date);
         setModalAcciones(true); // Asegúrate de que esto está abriendo el modal correctamente
     };
-    
-    
+
+
     const handleToggle = (mode, data = null) => {
         console.log("Toggling modal, mode:", mode, "data:", data);
         setMode(mode);
         setInitialData(data);
         setModalOpen(prev => !prev);
     };
-    
+
 
     const onNextPage = useCallback(() => {
         if (page < pages) {
@@ -369,31 +379,26 @@ function ReportesPage() {
                     </Button>
                 </div>
             </div>
-            <SeguimientoModal
-                open={modalOpen}
-                onClose={() => setModalOpen(false)}
-                mode={mode}
-                initialData={initialData}
-                setMensaje={setMensaje}
-                mensaje={mensaje}
-            />
-            <GlobalModal
-                open={GlobalModal}
-                onClose={() => setModalGlobal(false)}
-                title="Acciones"
-                footer={(onClose) => (
-                    <>
-                        <Button auto flat onClick={() => onClose()}>
-                            Cancelar
-                        </Button>
-                        <Button auto onClick={() => setModalAcciones(false)}>
-                            Confirmar
-                        </Button>
-                    </>
-                )}
-            >
-                <div>Detalles del seguimiento para la fecha: {selectedDate}</div>
-            </GlobalModal>
+            <div>
+                <ModalAcciones
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    title="Título del Modal"
+                    bodyContent={<ComponentSeguimiento />}
+                    footerActions={[
+                        {
+                            label: "Cerrar",
+                            color: "danger",
+                            onPress: handleCloseModal,
+                        },
+                        {
+                            label: "Acción",
+                            color: "primary",
+                            onPress: () => console.log("Acción realizada"),
+                        },
+                    ]}
+                />
+            </div>
         </div>
     );
 }
