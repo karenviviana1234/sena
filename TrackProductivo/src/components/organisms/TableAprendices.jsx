@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import FormEtapaPractica from './FormEtapaPractica.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
+import FormAprendices from './FormAprendices.jsx';
 import axiosClient from '../../configs/axiosClient.jsx';
-import { format } from 'date-fns';
 import {
     Table,
     TableHeader,
@@ -12,55 +12,25 @@ import {
     TableCell,
     Input,
     Button,
-    DropdownTrigger,
+    Chip,
     Dropdown,
+    DropdownTrigger,
     DropdownMenu,
     DropdownItem,
-    Chip,
-    Pagination,
     User,
-    Link,
 } from "@nextui-org/react";
-import { PlusIcon } from "../NextIU/atoms/plusicons.jsx";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
-import { ChevronDownIcon } from "../NextIU/atoms/CheveronIcons.jsx";
-import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 
 function TableAprendices() {
     const [personas, setPersonas] = useState([]);
-
-    const statusColorMap = {
-        activo: "success",
-        inactivo: "danger",
-        todos: "primary",
-    };
-
     const [filterValue, setFilterValue] = useState("");
-    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-    const [statusFilter, setStatusFilter] = useState("todos");
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sortDescriptor, setSortDescriptor] = useState({
-        column: "identificacion",
-        direction: "ascending",
-    });
     const [page, setPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
     const [modalOpen, setModalOpen] = useState(false);
-    const [modalAcciones, setModalAcciones] = useState(false);
-    const [mode, setMode] = useState('create');
-    const [initialData, setInitialData] = useState(null);
-    const [mensaje, setMensaje] = useState('');
+    const [formMode, setFormMode] = useState(''); // Modo del formulario: 'formAprendices' o 'formEtapaPractica'
+    const [modalEtapaOpen, setModalEtapaOpen] = useState(false); // Estado para el modal de etapa práctica
     const [selectedDate, setSelectedDate] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const handleOpenModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -71,26 +41,18 @@ function TableAprendices() {
                 console.error('Error fetching data:', error);
             }
         };
-
         fetchData();
     }, []);
 
-
-    const hasSearchFilter = Boolean(filterValue);
-
     const filteredItems = useMemo(() => {
         let filteredPersonas = personas;
-
-        if (hasSearchFilter) {
+        if (filterValue) {
             filteredPersonas = filteredPersonas.filter(seg =>
                 seg.nombres.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
-
         return filteredPersonas;
-    }, [personas, filterValue, statusFilter]);
-
-    const pages = Math.ceil(filteredItems.length / rowsPerPage);
+    }, [personas, filterValue]);
 
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -98,170 +60,20 @@ function TableAprendices() {
         return filteredItems.slice(start, end);
     }, [page, filteredItems, rowsPerPage]);
 
-    const sortedItems = useMemo(() => {
-        return [...items].sort((a, b) => {
-            const first = a[sortDescriptor.column];
-            const second = b[sortDescriptor.column];
-            const cmp = first < second ? -1 : first > second ? 1 : 0;
-            return sortDescriptor.direction === "descending" ? -cmp : cmp;
-        });
-    }, [sortDescriptor, items]);
-
-    const [programColorMap, setProgramColorMap] = useState({});
-
-    const generateRandomColor = useCallback(() => {
-        const r = Math.floor(Math.random() * 256);
-        const g = Math.floor(Math.random() * 256);
-        const b = Math.floor(Math.random() * 256);
-        const a = 0.3; // Ajusta el nivel de transparencia
-        return `rgba(${r}, ${g}, ${b}, ${a})`;
-    }, []);
-
-    const getProgramColor = useCallback((sigla) => {
-        if (!programColorMap[sigla]) {
-            setProgramColorMap(prevMap => ({
-                ...prevMap,
-                [sigla]: generateRandomColor(),
-            }));
-        }
-        return programColorMap[sigla];
-    }, [programColorMap, generateRandomColor]);
-
-    const renderCell = useCallback((item, columnKey) => {
-        const cellValue = item[columnKey];
-
-        switch (columnKey) {
-            case "etapaProductiva":
-                return (
-                    <Button
-                        size="sm"
-                        className="bg-[#90d12c] text-white"
-                        onClick={(handleOpenModal)}
-                    >
-                        Registrar
-                    </Button>
-                );
-            case "sigla":
-                return (
-                    <Chip
-                        style={{ backgroundColor: getProgramColor(item.sigla) }}
-                        className='text-[#3c3c3c]'
-                        variant="flat"
-                    >
-                        {cellValue}
-                    </Chip>
-                );
-            case "actions":
-                return (
-                    <div className="relative flex justify-end items-center gap-2">
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <ButtonActualizar onClick={() => handleToggle('update', item)} />
-                            </DropdownTrigger>
-                            <DropdownMenu>
-                                <DropdownItem onClick={() => handleToggle('view', item)}>View</DropdownItem>
-                                <DropdownItem onClick={() => handleToggle('edit', item)}>Edit</DropdownItem>
-                                <DropdownItem onClick={() => peticionDesactivar(item.id)}>Delete</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-                    </div>
-                );
-
-            case "nombres":
-                return (
-                    <User
-                        name={cellValue}
-                        avatarSrc="https://via.placeholder.com/150"
-                        bordered
-                        as="button"
-                        size="sm"
-                        color="primary"
-                    />
-                );
-            default:
-                return cellValue;
-        }
-    }, [statusColorMap, getProgramColor]);
-
-    const handleButtonClick = (date) => {
-        console.log("Handling button click, setting date:", date);
-        setSelectedDate(date);
-        setModalAcciones(true); // Asegúrate de que esto está abriendo el modal correctamente
+    const handleOpenModal = (mode) => {
+        setFormMode(mode);
+        setModalOpen(true);
     };
 
-
-    const handleToggle = (mode, data = null) => {
-        console.log("Toggling modal, mode:", mode, "data:", data);
-        setMode(mode);
-        setInitialData(data);
-        setModalOpen(prev => !prev);
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setModalEtapaOpen(false); // Cerrar ambos modales
     };
 
-
-    const onNextPage = useCallback(() => {
-        if (page < pages) {
-            setPage(prevPage => prevPage + 1);
-        }
-    }, [page, pages]);
-
-    const onPreviousPage = useCallback(() => {
-        if (page > 1) {
-            setPage(prevPage => prevPage - 1);
-        }
-    }, [page]);
-
-    const onRowsPerPageChange = useCallback((e) => {
-        setRowsPerPage(Number(e.target.value));
-        setPage(1);
-    }, []);
-
-    const onSearchChange = useCallback((value) => {
-        setFilterValue(value || "");
-        setPage(1);
-    }, []);
-
-    const onClear = useCallback(() => {
-        setFilterValue("");
-        setPage(1);
-    }, []);
-
-    const onStatusFilter = (selectedKeys) => {
-        setStatusFilter(selectedKeys[0]);
+    const handleFormAprendicesSubmit = () => {
+        handleCloseModal(); // Cerrar modal de FormAprendices
+        setModalEtapaOpen(true); // Abrir modal de FormEtapaPractica
     };
-
-    const topContent = useMemo(() => {
-        return (
-            <div className="flex flex-col mt-3">
-                <div className="flex justify-between gap-3 items-end">
-                    <Input
-                        isClearable
-                        className="w-full sm:max-w-[44%] bg-[#f4f4f5] rounded"
-                        placeholder="Buscar..."
-                        startContent={<SearchIcon />}
-                        value={filterValue}
-                        onClear={() => onClear()}
-                        onValueChange={onSearchChange}
-                    />
-                    <Button onClick={(handleOpenModal)}
-                        className='bg-[#90d12c] text-white'>Registrar Aprendiz</Button>
-                </div>
-                <div className="flex items-center justify-between">
-                    <span className="text-white text-small">Total {personas.length} Resultados</span>
-                    <label className="flex items-center text-white mr-30 text-small">
-                        Columnas por página:
-                        <select
-                            className="bg-transparent outline-none text-white text-small"
-                            onChange={onRowsPerPageChange}
-                        >
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                        </select>
-                    </label>
-                </div>
-            </div>
-        );
-    }, [filterValue, statusFilter, personas.length, onRowsPerPageChange, onClear, onSearchChange, onStatusFilter, page, pages]);
 
     const columns = [
         { key: "id_persona", label: "ID" },
@@ -273,13 +85,42 @@ function TableAprendices() {
         { key: "etapaProductiva", label: "Etapa Productiva" },
     ];
 
-
-
-
     return (
         <div className="overflow-hidden flex-1  bg-dark p-2">
             <div className="flex flex-col">
-                {topContent}
+                <div className="flex flex-col mt-3">
+                    <div className="flex justify-between gap-3 items-end">
+                        <Input
+                            isClearable
+                            className="w-full sm:max-w-[44%] bg-[#f4f4f5] rounded"
+                            placeholder="Buscar..."
+                            startContent={<SearchIcon />}
+                            value={filterValue}
+                            onClear={() => setFilterValue('')}
+                            onValueChange={(value) => setFilterValue(value || '')}
+                        />
+                        <Button onClick={() => handleOpenModal('formAprendices')} className='bg-[#90d12c] text-white'>
+                            Registrar Aprendiz
+                        </Button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <span className="text-white text-small">Total {personas.length} Resultados</span>
+                        <label className="flex items-center text-white mr-30 text-small">
+                            Columnas por página:
+                            <select
+                                className="bg-transparent outline-none text-white text-small"
+                                onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setPage(1);
+                                }}
+                            >
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
                 <Table aria-label="Tabla de Personas" css={{ height: "auto", minWidth: "100%" }}>
                     <TableHeader>
                         {columns.map((column) => (
@@ -287,11 +128,30 @@ function TableAprendices() {
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {sortedItems.map((item) => (
+                        {items.map((item) => (
                             <TableRow key={item.id}>
                                 {columns.map((column) => (
                                     <TableCell key={column.key}>
-                                        {renderCell(item, column.key)}
+                                        {column.key === "etapaProductiva" ? (
+                                            <Button
+                                                size="sm"
+                                                className="bg-[#90d12c] text-white"
+                                                onClick={() => handleOpenModal('formEtapaPractica')}
+                                            >
+                                                Registrar
+                                            </Button>
+                                        ) : column.key === "nombres" ? (
+                                            <User
+                                                name={item[column.key]}
+                                                avatarSrc="https://via.placeholder.com/150"
+                                                bordered
+                                                as="button"
+                                                size="sm"
+                                                color="primary"
+                                            />
+                                        ) : (
+                                            item[column.key]
+                                        )}
                                     </TableCell>
                                 ))}
                             </TableRow>
@@ -299,35 +159,50 @@ function TableAprendices() {
                     </TableBody>
                 </Table>
                 <div className="flex justify-between mt-4">
-                    <Button disabled={page === 1} onClick={onPreviousPage}>
+                    <Button disabled={page === 1} onClick={() => setPage(prevPage => prevPage - 1)}>
                         Anterior
                     </Button>
-                    <Button disabled={page === pages} onClick={onNextPage}>
+                    <Button disabled={page === Math.ceil(filteredItems.length / rowsPerPage)} onClick={() => setPage(prevPage => prevPage + 1)}>
                         Siguiente
                     </Button>
                 </div>
             </div>
-            <div>
-                <ModalAcciones
-                    isOpen={isModalOpen}
-                    onClose={handleCloseModal}
-                    title="Registrar Etapa Practica"
-                    bodyContent={<FormEtapaPractica />}
-                    footerActions={[
-                        {
-                            label: "Cerrar",
-                            color: "danger",
-                            onPress: handleCloseModal,
-                        },
-                        {
-                            label: "Acción",
-                            color: "primary",
-                            onPress: () => console.log("Acción realizada"),
-                        },
-                    ]}
-                />
-                
-            </div>
+            <ModalAcciones
+                isOpen={modalOpen}
+                onClose={handleCloseModal}
+                title={formMode === 'formAprendices' ? "Registrar Aprendiz" : "Registrar Etapa Practica"}
+                bodyContent={formMode === 'formAprendices' ? <FormAprendices onSubmit={handleFormAprendicesSubmit} /> : <FormEtapaPractica />}
+                footerActions={[
+                    {
+                        label: "Cerrar",
+                        color: "danger",
+                        onPress: handleCloseModal,
+                    },
+                    {
+                        label: formMode === 'formAprendices' ? "Registrar" : "Acción",
+                        color: "primary",
+                        onPress: formMode === 'formAprendices' ? handleFormAprendicesSubmit : () => console.log("Acción realizada"),
+                    },
+                ]}
+            />
+            <ModalAcciones
+                isOpen={modalEtapaOpen}
+                onClose={handleCloseModal}
+                title="Registrar Etapa Practica"
+                bodyContent={<FormEtapaPractica />}
+                footerActions={[
+                    {
+                        label: "Cerrar",
+                        color: "danger",
+                        onPress: handleCloseModal,
+                    },
+                    {
+                        label: "Acción",
+                        color: "primary",
+                        onPress: () => console.log("Acción realizada"),
+                    },
+                ]}
+            />
         </div>
     );
 }
