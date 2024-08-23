@@ -11,16 +11,6 @@ const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions }) =
             <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
             <ModalBody>{bodyContent}</ModalBody>
             <ModalFooter>
-              {footerActions.map((action, index) => (
-                <Button
-                  key={index}
-                  color={action.color || "primary"}
-                  variant={action.variant || "solid"}
-                  onPress={action.onPress || onClose}
-                >
-                  {action.label}
-                </Button>
-              ))}
             </ModalFooter>
           </>
         )}

@@ -257,12 +257,12 @@ function TableInstructores() {
                         onValueChange={onSearchChange}
                     />
                     <div>
-                    <Button onClick={() => handleOpenModal('formUsuarios')} className='bg-[#90d12c] text-white mr-10'>
-                        Registrar 
-                    </Button>
-                    <Button onClick={() => handleOpenModal('formVinculaciones')} className='bg-[#5a851b] text-white'>
-                        Vincular 
-                    </Button>
+                        <Button onClick={() => handleOpenModal('formUsuarios')} className='bg-[#90d12c] text-white mr-10'>
+                            Registrar
+                        </Button>
+                        <Button onClick={() => handleOpenModal('formVinculaciones')} className='bg-[#5a851b] text-white'>
+                            Vincular
+                        </Button>
                     </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -316,14 +316,7 @@ function TableInstructores() {
                         ))}
                     </TableBody>
                 </Table>
-                <div className="flex justify-between mt-4">
-                    <Button disabled={page === 1} onClick={onPreviousPage}>
-                        Anterior
-                    </Button>
-                    <Button disabled={page === pages} onClick={onNextPage}>
-                        Siguiente
-                    </Button>
-                </div>
+
             </div>
             <div>
                 <ModalAcciones
@@ -331,19 +324,8 @@ function TableInstructores() {
                     onClose={handleCloseModal}
                     title="Registro de Instructores"
                     bodyContent={bodyContent}
-                    footerActions={[
-                        {
-                            label: "Cerrar",
-                            color: "danger",
-                            onPress: handleCloseModal,
-                        },
-                        {
-                            label: "Acción",
-                            color: "primary",
-                            onPress: () => console.log("Acción realizada"),
-                        },
-                    ]}
                 />
+
             </div>
         </div>
     );
