@@ -16,7 +16,7 @@ import {
   Pagination,
 } from "@nextui-org/react";
 import { Plus, EllipsisVertical, Search, ChevronDown } from 'lucide-react';
-
+//  por el momento esto solo es plantilla 
 const columns = [
   {name: "ID", uid: "id_empresa", sortable: true},
   {name: "RAZÓN SOCIAL", uid: "razon_social", sortable: true},
