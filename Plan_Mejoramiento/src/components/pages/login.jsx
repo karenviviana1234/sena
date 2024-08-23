@@ -6,26 +6,68 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
+import axiosClient from "../../axiosClient";
+import { usePersonas } from "../../Context/ContextPersonas";
+import Icon from "react-native-vector-icons/FontAwesome";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocusedEmail, setIsFocusedEmail] = useState(false);
   const [isFocusedPassword, setIsFocusedPassword] = useState(false);
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    navigation.navigate('principal');
+  const { SetRol, SetId_persona } = usePersonas();
+
+  const handleLogin = async () => {
+    try {
+      const response = await axiosClient.post("/validacion", {
+        correo: email,
+        password: password,
+      });
+
+      if (response.status === 200) {
+        const { user, token } = response.data;
+        await AsyncStorage.setItem('token', token)
+        SetRol(user.rol);
+        SetId_persona(user.id_persona);
+
+        const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
+
+        if (allowedRoles.includes(user.rol)) {
+/*           console.log("Usuario autenticado:", user);
+          console.log("Token:", token); */
+          navigation.navigate("principal");
+        } else {
+          Alert.alert(
+            "Acceso denegado",
+            "Los roles permitidos son seguimiento, instructor, y aprendiz."
+          );
+        }
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        Alert.alert("Error", error.response.data.message);
+      } else {
+        Alert.alert("Error", "Hubo un problema con el servidor.");
+      }
+    }
   };
 
   const handleForgotPassword = () => {
-    console.log('Ir a la pantalla de recuperación de contraseña');
+    console.log("Ir a la pantalla de recuperación de contraseña");
   };
 
   return (
     <View style={styles.container}>
+      <Text style= {styles.textTitle} >TrackProductivo</Text>
       <Image
-        source={require("../../../public/logo_sigueme.png")}
+        source={require("../../../public/logo-sena-verde.png")}
         style={styles.logo}
         resizeMode="cover"
       />
@@ -34,23 +76,38 @@ const Login = () => {
         onFocus={() => setIsFocusedEmail(true)}
         onBlur={() => setIsFocusedEmail(false)}
         placeholder="Correo"
+        placeholderTextColor="black"
+        value={email}
+        onChangeText={setEmail}
       />
-      <TextInput
-        style={[styles.input, isFocusedPassword && styles.inputFocused]}
-        onFocus={() => setIsFocusedPassword(true)}
-        onBlur={() => setIsFocusedPassword(false)}
-        placeholder="Contraseña"
-        secureTextEntry={true}
-      />
-      <TouchableOpacity
-        style={styles.buttonContainer}
-        onPress={handleLogin}
-      >
+      <View style={[styles.input, styles.passwordContainer, isFocusedPassword && styles.inputFocused]}>
+        <TextInput
+          style={styles.passwordInput}
+          onFocus={() => setIsFocusedPassword(true)}
+          onBlur={() => setIsFocusedPassword(false)}
+          placeholder="Contraseña"
+          placeholderTextColor="black"
+          secureTextEntry={!isPasswordVisible}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+        >
+          <Icon
+            name={isPasswordVisible ? "eye-slash" : "eye"}
+            size={24}
+            color="gray"
+          />
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <Text style={styles.button}>Ingresar</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonContainer}>
+{/*       <TouchableOpacity style={styles.buttonContainer}>
         <Text style={styles.button}>Registrarme</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.textOlvide}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
@@ -65,9 +122,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
+  textTitle: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 20
+  },
   logo: {
-    width: 220,
-    height: 220,
+    width: 140,
+    height: 140,
   },
   input: {
     width: 300,
@@ -82,6 +145,23 @@ const styles = StyleSheet.create({
   },
   inputFocused: {
     borderColor: "orange",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingRight: 10,
+  },
+  passwordInput: {
+    flex: 1,
+    height: "100%",
+    fontSize: 18,
+    color: "black",
+    paddingRight: 40, 
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 15, 
   },
   buttonContainer: {
     height: 50,
@@ -100,9 +180,9 @@ const styles = StyleSheet.create({
   textOlvide: {
     fontSize: 16,
     marginTop: 30,
-    color: 'blue',
-    textDecorationLine: 'underline',
-  }
+    color: "black",
+    textDecorationLine: "underline",
+  },
 });
 
 export default Login;

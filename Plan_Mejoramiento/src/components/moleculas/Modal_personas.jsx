@@ -14,39 +14,45 @@ const PersonasModal = ({ visible, onClose }) => {
           <TextInput
             style={styles.input}
             placeholder='Identificación'
+            placeholderTextColor='black'
           />
           <TextInput
             style={styles.input}
             placeholder='Nombre'
+            placeholderTextColor='black'
           />
-            <TextInput
-              style={styles.input}
-              placeholder='Correo'
-              keyboardType='email-address'
-            />
+          <TextInput
+            style={styles.input}
+            placeholder='Correo'
+            keyboardType='email-address'
+            placeholderTextColor='black'
+          />
           <TextInput
             style={styles.input}
             placeholder='Teléfono'
             keyboardType='phone-pad'
+            placeholderTextColor='black'
           />
           <TextInput
             style={styles.input}
             placeholder='Password'
-            keyboardType='password'
+            secureTextEntry={true}
+            placeholderTextColor='black'
           />
           <TextInput
             style={styles.input}
             placeholder='Rol'
-            keyboardType='password'
+            placeholderTextColor='black'
           />
           <TextInput
             style={styles.input}
             placeholder='Cargo'
-
+            placeholderTextColor='black'
           />
           <TextInput
             style={styles.input}
             placeholder='Municipio'
+            placeholderTextColor='black'
           />
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -93,6 +99,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   input: {
+    color: 'black',
     height: 50,
     width: '100%',
     borderColor: 'orange',
