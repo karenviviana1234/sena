@@ -55,7 +55,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
   };
 
   console.log("El rol actual es:", rol);
-  
+
   return (
     <View style={StyleSheet.absoluteFillObject}>
       {menuVisible && (
@@ -74,13 +74,11 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
             resizeMode="contain"
           />
         </View>
+        {/* Vistas por roles */}
 
-        {rol !== "Aprendiz" && (
+        {(rol === "Instructor" || rol === "Seguimiento") && (
           <>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={toggleSubMenu}
-            >
+            <TouchableOpacity style={styles.menuItem} onPress={toggleSubMenu}>
               <View style={styles.menuItemContent}>
                 <Icon
                   name="dashboard"
@@ -116,8 +114,8 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
             )}
           </>
         )}
-        
-        {rol !== "Aprendiz" && (
+
+        {rol === "Seguimiento" && (
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate("personas")}
@@ -133,17 +131,22 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
             </View>
           </TouchableOpacity>
         )}
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate("bitacoras")}
-        >
-          <View style={styles.menuItemContent}>
-            <Icon name="book" size={20} color="black" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Bitácoras</Text>
-          </View>
-        </TouchableOpacity>
-
+        {rol === "Aprendiz" && (
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("bitacoras")}
+          >
+            <View style={styles.menuItemContent}>
+              <Icon
+                name="book"
+                size={20}
+                color="black"
+                style={styles.menuIcon}
+              />
+              <Text style={styles.menuText}>Bitácoras</Text>
+            </View>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate("perfil")}
@@ -223,7 +226,7 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 18, // Tamaño del texto
     paddingVertical: 10, // Ajusta el padding para que los elementos sean más compactos
-    marginRight: 10
+    marginRight: 10,
   },
   subMenu: {
     paddingLeft: 30, // Indenta el submenú para distinguirlo visualmente
