@@ -25,7 +25,7 @@ const ModalBitacoras = ({ visible, onClose }) => {
   useEffect(() => {
     const fetchInstructores = async () => {
       try {
-        const response = await axiosClient.get("/personas/Instructores");
+        const response = await axiosClient.get("/personas/listarI");
         setInstructores(response.data);
         if (response.data.length > 0) {
           setInstructor(response.data[0].id_persona);

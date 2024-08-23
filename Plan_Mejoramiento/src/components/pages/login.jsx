@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import axiosClient from "../../axiosClient";
 import { usePersonas } from "../../Context/ContextPersonas";
 import Icon from "react-native-vector-icons/FontAwesome";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -32,14 +33,15 @@ const Login = () => {
 
       if (response.status === 200) {
         const { user, token } = response.data;
+        await AsyncStorage.setItem('token', token)
         SetRol(user.rol);
         SetId_persona(user.id_persona);
 
         const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
 
         if (allowedRoles.includes(user.rol)) {
-          console.log("Usuario autenticado:", user);
-          console.log("Token:", token);
+/*           console.log("Usuario autenticado:", user);
+          console.log("Token:", token); */
           navigation.navigate("principal");
         } else {
           Alert.alert(
@@ -63,6 +65,7 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+      <Text style= {styles.textTitle} >TrackProductivo</Text>
       <Image
         source={require("../../../public/logo-sena-verde.png")}
         style={styles.logo}
@@ -102,9 +105,9 @@ const Login = () => {
       <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <Text style={styles.button}>Ingresar</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonContainer}>
+{/*       <TouchableOpacity style={styles.buttonContainer}>
         <Text style={styles.button}>Registrarme</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.textOlvide}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
@@ -118,6 +121,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff",
+  },
+  textTitle: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 20
   },
   logo: {
     width: 140,

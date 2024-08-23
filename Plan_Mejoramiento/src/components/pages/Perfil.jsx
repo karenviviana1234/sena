@@ -15,14 +15,25 @@ const Perfil = () => {
     const fetchUserData = async () => {
       try {
         const response = await axiosClient.get(`/personas/buscar/${id_persona}`);
-        setUserData(response.data);
+        console.log("Datos del usuario recibidos:", response.data); // Verifica los datos obtenidos
+  
+        // Si los datos vienen como un array, acceder al primer elemento
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setUserData(response.data[0]);
+        } else {
+          setUserData(response.data);
+        }
+  
+        console.log("id persona", id_persona);
+        
       } catch (error) {
-        console.error("Error al obtener los datos del usuario:", error);
+        console.error("Error al obtener los datos del usuario:", error.response ? error.response.data : error.message);
       }
     };
-
+  
     fetchUserData();
   }, [id_persona]);
+  
 
   const handleEditProfile = () => {
     setModalVisible(true);

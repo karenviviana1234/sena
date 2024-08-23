@@ -12,6 +12,8 @@ axiosClient.interceptors.request.use(
       const token = await AsyncStorage.getItem('token');
       if (token) {
         config.headers['token'] = token;
+        console.log("Token desde axiosClient",token);
+        
       }
     } catch (error) {
       console.error("Error getting token from AsyncStorage:", error);
