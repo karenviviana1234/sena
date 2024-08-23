@@ -1,6 +1,7 @@
 import React, { createContext } from 'react'
 import { SeguimientosProvider } from './SeguimientosContext'
 import { PersonasProvider } from './PersonasContext'
+import { AsignacionesProvider } from './AsignacionContext'
 
 
 export const GlobalContext = createContext()
@@ -11,14 +12,14 @@ const GlobalProvider = ({ children }) => {
 
     return (
         <GlobalContext.Provider value={globalContextValue}>
+            <AsignacionesProvider>
+                <SeguimientosProvider>
+                    <PersonasProvider>
 
-            <SeguimientosProvider>
-                <PersonasProvider>
-
-                    {children}
-                </PersonasProvider>
-            </SeguimientosProvider>
-
+                        {children}
+                    </PersonasProvider>
+                </SeguimientosProvider>
+            </AsignacionesProvider>
         </GlobalContext.Provider>
     )
 }

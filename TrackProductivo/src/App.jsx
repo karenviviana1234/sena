@@ -16,14 +16,18 @@ import EstadisticasPage from './components/pages/EstadisticasPage.jsx';
 import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
-import AsignacionesPage from './components/pages/AsignacionesPage.jsx';
+import AsignacionPage from './components/pages/AsignacionesPage.jsx'
 
 export const App = () => {
   return (
     <BrowserRouter>
       <GlobalProvider>
+        
         <Routes>
-          <Route path="/" element={
+        <Route path='/' element={
+          <LoginPage/>
+        }/>
+          <Route path="/home" element={
               <WithSidebar>
                 <HomePage />
               </WithSidebar>
@@ -48,7 +52,7 @@ export const App = () => {
           } />
            <Route path="/asignaciones" element={
               <WithSidebar>
-                <AsignacionesPage />
+                <AsignacionPage />
               </WithSidebar>
           } />
 
