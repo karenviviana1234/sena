@@ -12,23 +12,32 @@ export const PersonasProvider = ({ children }) => {
         try {
             axiosClient.get('/personas/listarA').then((response) => {
                 console.log(response.data);
-                setPersona(response.data);
+                setPersonas(response.data);
             });
         } catch (error) {
-            console.log('Error del servidor' + error);
+            console.log('Error del servidor: ' + error);
         }
-    }, []); 
+    }, []);
 
     const getPersona = useCallback((id_persona) => {
         try {
-            axiosClient.get(`/buscar${id_persona}`).then((response) => {
+            axiosClient.get(`/personas/buscar/${id_persona}`).then((response) => {
                 console.log(response.data);
                 setPersona(response.data);
             });
         } catch (error) {
-            console.log('Error' + error);
+            console.log('Error: ' + error);
         }
-    }, []); 
+    }, []);
+
+    const registrarInstructor = async (data) => {
+        try {
+            const response = await axiosClient.post('/personas/registrarI', data);
+            console.log(response.data);
+        } catch (error) {
+            console.log('Error al registrar instructor: ' + error);
+        }
+    };
 
     return (
         <PersonasContext.Provider
@@ -40,7 +49,8 @@ export const PersonasProvider = ({ children }) => {
                 setPersona,
                 setPersonaId,
                 getPersonas,
-                getPersona
+                getPersona,
+                registrarInstructor
             }}
         >
             {children}

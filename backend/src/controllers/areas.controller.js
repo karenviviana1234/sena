@@ -2,7 +2,7 @@ import { pool } from "../database/conexion.js"
 
 export const listarAreas = async (req, res) => {
     try {
-        let sql = `SELECT * FROM areas`
+        let sql = "SELECT * FROM areas"
 
         const [results] = await pool.query(sql)
         if(results.length>0){
