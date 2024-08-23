@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react'
-import axiosClient from '../../configs/axiosClient.jsx'
+import axiosClient from '../configs/axiosClient'
 
 const AsignacionContext = createContext()
 

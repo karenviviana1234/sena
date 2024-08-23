@@ -4,27 +4,6 @@ import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSear
 import Sidebar, { SidebarItem, SidebarAccordion } from './components/Sidebar';
 import { LoginPage } from '../src/components/pages/LoginPage';
 import { Navbar2 } from './components/Navbar';
-<<<<<<< HEAD
-import GlobalProvider from './components/context/GlobalContext';
-
-
-
-
-// Lazy load the pages
-// las rutas de todos los modulos [tengo que crear la vista y ubicarlas en el sliderbar]
-//son los modulos de la base de datos pero vamos a dividir en secciones 
-
-import HomePage from './components/pages/HomePage';
-const NominaPage = lazy(() => import('./components/pages/NominaPage'));
-const FichasPage = lazy(() => import('./components/pages/FichasPage'));
-const MatriculasPage = lazy(() => import('./components/pages/MatriculasPage'));
-const EmpresaPage = lazy(() => import('./components/pages/EmpresaPage'));
- import { EtapaPracticaPage } from './components/pages/EtapaPracticaPage';
-import Registro from './components/pages/RegistroPage';
-const ReportesPage = lazy(() => import('./components/pages/ReportesPage'));
-const EstadisticasPage = lazy(() => import('./components/pages/EstadisticasPage'));
-const BitacorasPage = lazy(() => import('./components/pages/BitacorasPage'));
-=======
 import GlobalProvider from './context/GlobalContext';
 
 // Importa las páginas directamente
@@ -37,43 +16,25 @@ import EstadisticasPage from './components/pages/EstadisticasPage.jsx';
 import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
-import AsignacionesPage from './components/pages/AsignacionesPage.jsx';
->>>>>>> 9e2bcc2848340c7e97565f9908d2bd0216959937
+import AsignacionPage from './components/pages/AsignacionesPage.jsx'
 
 export const App = () => {
   return (
-
     <BrowserRouter>
-<<<<<<< HEAD
-    <GlobalProvider>
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/registro" element={<Registro />} />
-        <Route path="/home" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
-=======
       <GlobalProvider>
+        
         <Routes>
-          <Route path="/" element={
+        <Route path='/' element={
+          <LoginPage/>
+        }/>
+          <Route path="/home" element={
               <WithSidebar>
->>>>>>> 9e2bcc2848340c7e97565f9908d2bd0216959937
                 <HomePage />
               </WithSidebar>
           } />
 
-<<<<<<< HEAD
-
-
-        <Route path="/nomina" element={
-          <ProtectedRoute>
-            <WithSidebar>
-              <Suspense fallback={<div>Loading...</div>}>
-=======
           <Route path="/nomina" element={
               <WithSidebar>
->>>>>>> 9e2bcc2848340c7e97565f9908d2bd0216959937
                 <NominaPage />
               </WithSidebar>
           } />
@@ -91,7 +52,7 @@ export const App = () => {
           } />
            <Route path="/asignaciones" element={
               <WithSidebar>
-                <AsignacionesPage />
+                <AsignacionPage />
               </WithSidebar>
           } />
 
@@ -125,12 +86,7 @@ export const App = () => {
               </WithSidebar>
           } />
 
-<<<<<<< HEAD
-
-      </Routes>
-=======
         </Routes>
->>>>>>> 9e2bcc2848340c7e97565f9908d2bd0216959937
       </GlobalProvider>
     </BrowserRouter>
   );

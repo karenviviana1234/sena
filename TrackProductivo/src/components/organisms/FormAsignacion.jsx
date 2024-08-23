@@ -3,9 +3,9 @@ import { ModalFooter, Button } from "@nextui-org/react";
 import axiosClient from '../../configs/axiosClient';
 import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
-import EtapaContext from '../context/EtapaContext';
+import AsignacionContext from '../../context/AsignacionContext';
 
-const FormEtapa = ({ mode, initialData, handleSubmit, onClose, actionLabel }) => {
+const FormAsignacion = ({ mode, initialData, handleSubmit, onClose, actionLabel }) => {
   const [estadoOp, setEstadoOp] = useState('');
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
@@ -13,7 +13,7 @@ const FormEtapa = ({ mode, initialData, handleSubmit, onClose, actionLabel }) =>
   const [instructor, setInstructor] = useState([]);
   const [estado, setEstado] = useState([]);
  
-  const { idAsignacion } = useContext(EtapaContext);
+  const { idAsignacion } = useContext(AsignacionContext);
 
   useEffect(() => {
     const enumData = [
@@ -154,4 +154,4 @@ const FormEtapa = ({ mode, initialData, handleSubmit, onClose, actionLabel }) =>
   );
 };
 
-export default FormEtapa;
+export default FormAsignacion

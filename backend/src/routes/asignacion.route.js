@@ -6,7 +6,7 @@ import { validarToken } from '../controllers/seguridad.controller.js'
 
 const asignacioneRuta = Router()
 
-asignacioneRuta.get('/listar',  listarasignaciones)
+asignacioneRuta.get('/listar', validarToken, listarasignaciones)
 asignacioneRuta.post('/registrar',   registrarasignacion)
 asignacioneRuta.put('/actualizar/:id',  actualizarasignacion)
 asignacioneRuta.get('/buscar/:id', validarToken, buscarasignacion)
