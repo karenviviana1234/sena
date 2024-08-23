@@ -19,26 +19,6 @@ export const listarPersonas = async(req, res) => {
         })
     }
 }
-/* listar instrus */
-export const listarInstructores = async (req, res) => {
-    try {
-        const sql = `SELECT * FROM personas WHERE rol = 'Instructor'`;
-        const [results] = await pool.query(sql);
-
-        if (results.length > 0) {
-            res.status(200).json(results);
-        } else {
-            res.status(404).json({
-                message: 'No hay instructores registrados'
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: 'Error del servidor: ' + error.message
-        });
-    }
-};
-
 
 export const listarInstructores = async (req, res) => {
   try {
@@ -310,6 +290,3 @@ export const eliminarPersona = async(req, res) => {
         })
     }
 }
-
-
-
