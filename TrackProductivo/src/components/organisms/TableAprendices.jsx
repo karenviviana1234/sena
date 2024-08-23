@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import FormEtapaPractica from './FormEtapaPractica.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
-import FormAprendices from './FormAprendices.jsx';
+import FormAprendices from './FormUsuarios.jsx';
 import axiosClient from '../../configs/axiosClient.jsx';
 import {
     Table,
@@ -38,7 +38,7 @@ function TableAprendices() {
                 const response = await axiosClient.get('/personas/listarA'); // Ajusta la ruta del endpoint
                 setPersonas(response.data);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error', error);
             }
         };
         fetchData();

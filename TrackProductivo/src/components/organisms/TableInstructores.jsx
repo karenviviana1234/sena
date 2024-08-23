@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
-import ComponentSeguimiento from './ComponentSeguimiento.jsx';
+import FormUsuarios from './FormUsuarios.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
+import FormVinculaciones from './FormVinculaciones.jsx';
 import { format } from 'date-fns';
 import {
     Table,
@@ -53,28 +54,37 @@ function TableInstructores() {
     const [mensaje, setMensaje] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    /* Se define una constante para manejar el contenido dinamico */
+    const [bodyContent, setBodyContent] = useState(null);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axiosClient.get('/personas/listarI'); // Ajusta la ruta del endpoint
-        setPersonas(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
+    /* Se llaman las vistas que se quieren mostrar al dar clic dentro del modal */
+    const handleOpenModal = (formType) => {
+        if (formType === 'formUsuarios') {
+            setBodyContent(<FormUsuarios />);
+        } else if (formType === 'formVinculaciones') {
+            setBodyContent(<FormVinculaciones />);
+        }
+        setIsModalOpen(true);
     };
 
-    fetchData();
-  }, []);
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axiosClient.get('/personas/listarI'); // Ajusta la ruta del endpoint
+                setPersonas(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
 
     const hasSearchFilter = Boolean(filterValue);
@@ -89,7 +99,7 @@ function TableInstructores() {
         }
 
         return filteredPersonas;
-    }, [personas, filterValue, statusFilter]); 
+    }, [personas, filterValue, statusFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -246,6 +256,14 @@ function TableInstructores() {
                         onClear={() => onClear()}
                         onValueChange={onSearchChange}
                     />
+                    <div>
+                    <Button onClick={() => handleOpenModal('formUsuarios')} className='bg-[#90d12c] text-white mr-10'>
+                        Registrar 
+                    </Button>
+                    <Button onClick={() => handleOpenModal('formVinculaciones')} className='bg-[#5a851b] text-white'>
+                        Vincular 
+                    </Button>
+                    </div>
                 </div>
                 <div className="flex items-center justify-between">
                     <span className="text-white text-small">Total {personas.length} Resultados</span>
@@ -275,7 +293,7 @@ function TableInstructores() {
 
 
 
-   
+
     return (
         <div className="overflow-hidden flex-1  bg-dark p-2">
             <div className="flex flex-col">
@@ -311,8 +329,8 @@ function TableInstructores() {
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-                    title="Seguimiento 1"
-                    bodyContent={<ComponentSeguimiento />}
+                    title="Registro de Instructores"
+                    bodyContent={bodyContent}
                     footerActions={[
                         {
                             label: "Cerrar",

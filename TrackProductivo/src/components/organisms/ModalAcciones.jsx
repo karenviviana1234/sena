@@ -4,7 +4,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from
 // Componente GlobalModal
 const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions }) => {
   return (
-    <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         {(onClose) => (
           <>
@@ -29,4 +29,4 @@ const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions }) =
   );
 };
 
-export default ModalAcciones
+export default ModalAcciones;
