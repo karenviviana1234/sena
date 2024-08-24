@@ -7,8 +7,9 @@ import { Navbar2 } from './components/Navbar';
 import GlobalProvider from './context/GlobalContext';
 
 // Importa las páginas directamente
-import NominaPage  from './components/pages/NominaPage.jsx';
+
 import FichasPage from './components/pages/FichasPage.jsx';
+import NominaPage from './components/pages/NominaPage.jsx';
 import MatriculasPage from './components/pages/MatriculasPage.jsx';
 import EmpresaPage from './components/pages/EmpresaPage.jsx';
 import SeguimientoPage from './components/pages/SeguimientoPage.jsx';

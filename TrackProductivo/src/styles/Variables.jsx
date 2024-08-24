@@ -1,4 +1,4 @@
-import {Circle, CircleCheckBig, CircleX, CircleMinus, SendHorizontal, Download, Search, EyeOff, Eye} from 'lucide-react'
+import {Circle, CircleCheckBig, CircleX, CircleMinus, SendHorizontal, Download, Search, EyeOff, Eye, EditIcon} from 'lucide-react'
 
 const Icons = {
     circulo: Circle,
@@ -7,6 +7,7 @@ const Icons = {
     solicitud: CircleMinus,
     enviar: SendHorizontal,
     descargar: Download,
+    editar: EditIcon,
     buscar: Search,
     OjoON: Eye,
     OjoOFF: EyeOff,

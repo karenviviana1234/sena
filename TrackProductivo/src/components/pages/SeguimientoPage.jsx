@@ -54,13 +54,13 @@ function SeguimientoPage() {
     const [selectedDate, setSelectedDate] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
 
     useEffect(() => {
@@ -270,7 +270,7 @@ function SeguimientoPage() {
 
 
 
-   
+
     return (
         <div className="overflow-hidden flex-1 min-h-screen bg-dark p-2 m-20">
             <div className="flex flex-col">
@@ -307,6 +307,7 @@ function SeguimientoPage() {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     title="Seguimiento 1"
+                    size="6xl"  // Aumenta el tamaño del modal
                     bodyContent={<ComponentSeguimiento />}
                     footerActions={[
                         {
