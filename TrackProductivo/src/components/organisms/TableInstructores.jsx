@@ -291,6 +291,50 @@ function TableInstructores() {
         { key: "telefono", label: "Telefono" },
     ];
 
+    /* Registrar  */
+    const handleSubmit = async (formData, e) => {
+        e.preventDefault()
+
+        try {
+
+            if (mode === 'create') {
+                await axiosClient.post('/Registrarlote', formData).then((response) => {
+                    if (response.status == 200) {
+                        Swal.fire({
+                            position: "center", 
+                            icon: "success",
+                            title: "Lote registrado con éxito",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        peticionGet()
+                    } else {
+                        alert('Error en el registro')
+                    }
+                })
+            } else if (mode === 'update') {
+
+                await axiosClient.put(`/Actualizarlote/${idLote.id_lote}`, formData).then((response) => {
+                    if (response.status === 200) {
+                        Swal.fire({
+                            position: "center",
+                            icon: "success",
+                            title: "Se actualizó con éxito el lote",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        peticionGet()
+                    } else {
+                        alert('Error al actualizar')
+                    }
+                })
+            }
+            setModalOpen(false)
+
+        } catch (error) {
+            alert('Error en el servidor')
+        }
+    }
 
 
 
@@ -322,7 +366,6 @@ function TableInstructores() {
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-                    title="Registro de Instructores"
                     bodyContent={bodyContent}
                 />
 

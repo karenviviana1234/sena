@@ -129,33 +129,26 @@ export const registrarAprendiz = async (req, res) => {
 };
 
 /* Registrar Instructores */
+// personas.controller.js
 export const registrarInstructor = async (req, res) => {
   try {
-    const { identificacion, nombres, correo, telefono, rol, password } = req.body;
+      const { identificacion, nombres, correo, telefono, password, rol, cargo, municipio } = req.body;
+      
+      // Verifica si los campos necesarios están presentes
+      if (!identificacion || !nombres || !correo || !telefono || !password || !rol || !cargo || !municipio) {
+          return res.status(400).json({ message: 'Todos los campos son necesarios' });
+      }
 
-    const bcryptPassword = bcrypt.hashSync(password, 12);
+      // Inserción en la base de datos (ejemplo con pseudo-código)
+      const nuevoInstructor = await db.query(
+          'INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo, municipio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          [identificacion, nombres, correo, telefono, password, rol, cargo, municipio]
+      );
 
-    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo) VALUES (?, ?, ?, ?, ?, ?, 'Instructor')`;
-    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol];
-
-    const [result] = await pool.query(query, params);
-
-    if (result.affectedRows > 0) {
-      res.status(200).json({
-        status: 200,
-        message: 'Se registró con éxito el instructor ' + nombres
-      });
-    } else {
-      res.status(403).json({
-        status: 403,
-        message: 'No se registró el instructor'
-      });
-    }
+      res.status(201).json({ message: 'Instructor registrado exitosamente', data: nuevoInstructor });
   } catch (error) {
-    res.status(500).json({
-      status: 500,
-      message: 'Error del servidor: ' + error.message
-    });
+      console.error('Error al registrar instructor:', error);
+      res.status(500).json({ message: 'Error en el servidor' });
   }
 };
 

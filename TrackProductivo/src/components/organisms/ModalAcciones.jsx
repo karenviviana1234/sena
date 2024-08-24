@@ -11,6 +11,7 @@ const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions }) =
             <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
             <ModalBody>{bodyContent}</ModalBody>
             <ModalFooter>
+            
             </ModalFooter>
           </>
         )}
