@@ -4,7 +4,6 @@ import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
 import FormVinculaciones from './FormVinculaciones.jsx';
-import { format } from 'date-fns';
 import {
     Table,
     TableHeader,
@@ -25,7 +24,6 @@ import {
 import { PlusIcon } from "../NextIU/atoms/plusicons.jsx";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import { ChevronDownIcon } from "../NextIU/atoms/CheveronIcons.jsx";
-import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 
 function TableInstructores() {
@@ -47,9 +45,9 @@ function TableInstructores() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [bodyContent, setBodyContent] = useState(null);
 
-    const handleOpenModal = (formType) => {
+    const handleOpenModal = (formType, data = null) => {
         if (formType === 'formUsuarios') {
-            setBodyContent(<FormUsuarios />);
+            setBodyContent(<FormUsuarios initialData={data} />);
         } else if (formType === 'formVinculaciones') {
             setBodyContent(<FormVinculaciones />);
         }
@@ -139,19 +137,10 @@ function TableInstructores() {
                         {cellValue}
                     </Chip>
                 );
-            case "actions":
+            case "acciones":
                 return (
-                    <div className="relative flex justify-end items-center gap-2">
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <ButtonActualizar onClick={() => handleToggle('update', item)} />
-                            </DropdownTrigger>
-                            <DropdownMenu>
-                                <DropdownItem onClick={() => handleToggle('view', item)}>View</DropdownItem>
-                                <DropdownItem onClick={() => handleToggle('edit', item)}>Edit</DropdownItem>
-                                <DropdownItem onClick={() => peticionDesactivar(item.id)}>Delete</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
+                    <div className="flex justify-around items-center">
+                        <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
                     </div>
                 );
 
@@ -181,7 +170,19 @@ function TableInstructores() {
         console.log("Toggling modal, mode:", mode, "data:", data);
         setMode(mode);
         setInitialData(data);
-        setModalOpen(prev => !prev);
+        handleOpenModal('formUsuarios', data);
+    };
+
+    const peticionDesactivar = async (id) => {
+        try {
+            await axiosClient.post(`/personas/desactivar/${id}`);
+            Swal.fire('Desactivado', 'Usuario desactivado correctamente', 'success');
+            // Actualizar la lista de personas después de desactivar
+            const response = await axiosClient.get('/personas/listarI');
+            setPersonas(response.data);
+        } catch (error) {
+            Swal.fire('Error', 'Hubo un error al desactivar al usuario', 'error');
+        }
     };
 
     const onNextPage = useCallback(() => {
@@ -263,6 +264,7 @@ function TableInstructores() {
         { key: "correo", label: "Correo" },
         { key: "telefono", label: "Telefono" },
         { key: "rol", label: "Rol" },
+        { key: "acciones", label: "Acciones" },
     ];
 
     return (
@@ -289,12 +291,12 @@ function TableInstructores() {
                 </Table>
             </div>
             <div className="flex justify-between mt-4">
-                    <Button disabled={page === 1} onClick={() => setPage(prevPage => prevPage - 1)}>
-                        Anterior
-                    </Button>
-                    <Button disabled={page === Math.ceil(filteredItems.length / rowsPerPage)} onClick={() => setPage(prevPage => prevPage + 1)}>
-                        Siguiente
-                    </Button>
+                <Button disabled={page === 1} onClick={onPreviousPage}>
+                    Anterior
+                </Button>
+                <Button disabled={page === Math.ceil(filteredItems.length / rowsPerPage)} onClick={onNextPage}>
+                    Siguiente
+                </Button>
             </div>
             <div>
                 <ModalAcciones
