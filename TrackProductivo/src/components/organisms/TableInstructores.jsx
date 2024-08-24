@@ -4,7 +4,10 @@ import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
 import FormVinculaciones from './FormVinculaciones.jsx';
+<<<<<<< HEAD
 import { format } from 'date-fns';
+=======
+>>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
 import {
     Table,
     TableHeader,
@@ -19,27 +22,17 @@ import {
     DropdownMenu,
     DropdownItem,
     Chip,
-    Pagination,
     User,
     Link,
 } from "@nextui-org/react";
 import { PlusIcon } from "../NextIU/atoms/plusicons.jsx";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import { ChevronDownIcon } from "../NextIU/atoms/CheveronIcons.jsx";
-import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 
 function TableInstructores() {
     const [personas, setPersonas] = useState([]);
-
-    const statusColorMap = {
-        activo: "success",
-        inactivo: "danger",
-        todos: "primary",
-    };
-
     const [filterValue, setFilterValue] = useState("");
-    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
     const [statusFilter, setStatusFilter] = useState("todos");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDescriptor, setSortDescriptor] = useState({
@@ -54,6 +47,7 @@ function TableInstructores() {
     const [mensaje, setMensaje] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+<<<<<<< HEAD
     /* Se define una constante para manejar el contenido dinamico */
     const [bodyContent, setBodyContent] = useState(null);
 
@@ -61,12 +55,20 @@ function TableInstructores() {
     const handleOpenModal = (formType) => {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios />);
+=======
+    const [bodyContent, setBodyContent] = useState(null);
+
+    const handleOpenModal = (formType, data = null) => {
+        if (formType === 'formUsuarios') {
+            setBodyContent(<FormUsuarios initialData={data} />);
+>>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
         } else if (formType === 'formVinculaciones') {
             setBodyContent(<FormVinculaciones />);
         }
         setIsModalOpen(true);
     };
 
+<<<<<<< HEAD
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -85,76 +87,90 @@ function TableInstructores() {
 
         fetchData();
     }, []);
+=======
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+>>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axiosClient.get('/personas/listarI');
+                console.log('Datos recibidos:', response.data);
+                setPersonas(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const hasSearchFilter = Boolean(filterValue);
 
-    const filteredItems = useMemo(() => {
-        let filteredPersonas = personas;
+  const filteredItems = useMemo(() => {
+    let filteredPersonas = personas;
 
-        if (hasSearchFilter) {
-            filteredPersonas = filteredPersonas.filter(seg =>
-                seg.nombres.toLowerCase().includes(filterValue.toLowerCase())
-            );
-        }
+    if (hasSearchFilter) {
+      filteredPersonas = filteredPersonas.filter((seg) =>
+        seg.nombres.toLowerCase().includes(filterValue.toLowerCase())
+      );
+    }
 
+<<<<<<< HEAD
         return filteredPersonas;
     }, [personas, filterValue, statusFilter]);
+=======
+    return filteredPersonas;
+  }, [personas, filterValue, statusFilter]);
+>>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
 
-    const pages = Math.ceil(filteredItems.length / rowsPerPage);
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
-    const items = useMemo(() => {
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        return filteredItems.slice(start, end);
-    }, [page, filteredItems, rowsPerPage]);
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
 
-    const sortedItems = useMemo(() => {
-        return [...items].sort((a, b) => {
-            const first = a[sortDescriptor.column];
-            const second = b[sortDescriptor.column];
-            const cmp = first < second ? -1 : first > second ? 1 : 0;
-            return sortDescriptor.direction === "descending" ? -cmp : cmp;
-        });
-    }, [sortDescriptor, items]);
+  const sortedItems = useMemo(() => {
+    return [...items].sort((a, b) => {
+      const first = a[sortDescriptor.column];
+      const second = b[sortDescriptor.column];
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [sortDescriptor, items]);
 
-    const [programColorMap, setProgramColorMap] = useState({});
+  const [programColorMap, setProgramColorMap] = useState({});
 
-    const generateRandomColor = useCallback(() => {
-        const r = Math.floor(Math.random() * 256);
-        const g = Math.floor(Math.random() * 256);
-        const b = Math.floor(Math.random() * 256);
-        const a = 0.3; // Ajusta el nivel de transparencia
-        return `rgba(${r}, ${g}, ${b}, ${a})`;
-    }, []);
+  const generateRandomColor = useCallback(() => {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    const a = 0.3; // Ajusta el nivel de transparencia
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }, []);
 
-    const getProgramColor = useCallback((sigla) => {
-        if (!programColorMap[sigla]) {
-            setProgramColorMap(prevMap => ({
-                ...prevMap,
-                [sigla]: generateRandomColor(),
-            }));
-        }
-        return programColorMap[sigla];
-    }, [programColorMap, generateRandomColor]);
+  const getProgramColor = useCallback(
+    (sigla) => {
+      if (!programColorMap[sigla]) {
+        setProgramColorMap((prevMap) => ({
+          ...prevMap,
+          [sigla]: generateRandomColor(),
+        }));
+      }
+      return programColorMap[sigla];
+    },
+    [programColorMap, generateRandomColor]
+  );
 
-    const renderCell = useCallback((item, columnKey) => {
-        const cellValue = item[columnKey];
+  const renderCell = useCallback(
+    (item, columnKey) => {
+      const cellValue = item[columnKey];
 
         switch (columnKey) {
-            /* case "seguimiento1":
-            case "seguimiento2":
-            case "seguimiento3":
-                const formattedDate = format(new Date(cellValue), 'dd-MM-yyyy');
-                return (
-                    <Button
-                        size="sm"
-                        className="bg-[#90d12c] text-white"
-                        onClick={() => handleOpenModal(formattedDate)}
-                    >
-                        {formattedDate}
-                    </Button>
-                ); */
             case "sigla":
                 return (
                     <Chip
@@ -165,19 +181,10 @@ function TableInstructores() {
                         {cellValue}
                     </Chip>
                 );
-            case "actions":
+            case "acciones":
                 return (
-                    <div className="relative flex justify-end items-center gap-2">
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <ButtonActualizar onClick={() => handleToggle('update', item)} />
-                            </DropdownTrigger>
-                            <DropdownMenu>
-                                <DropdownItem onClick={() => handleToggle('view', item)}>View</DropdownItem>
-                                <DropdownItem onClick={() => handleToggle('edit', item)}>Edit</DropdownItem>
-                                <DropdownItem onClick={() => peticionDesactivar(item.id)}>Delete</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
+                    <div className="flex justify-around items-center">
+                        <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
                     </div>
                 );
 
@@ -195,7 +202,7 @@ function TableInstructores() {
             default:
                 return cellValue;
         }
-    }, [statusColorMap, getProgramColor]);
+    }, [programColorMap, getProgramColor]);
 
     const handleButtonClick = (date) => {
         console.log("Handling button click, setting date:", date);
@@ -203,14 +210,24 @@ function TableInstructores() {
         setModalAcciones(true); // Asegúrate de que esto está abriendo el modal correctamente
     };
 
-
     const handleToggle = (mode, data = null) => {
         console.log("Toggling modal, mode:", mode, "data:", data);
         setMode(mode);
         setInitialData(data);
-        setModalOpen(prev => !prev);
+        handleOpenModal('formUsuarios', data);
     };
 
+    const peticionDesactivar = async (id) => {
+        try {
+            await axiosClient.post(`/personas/desactivar/${id}`);
+            Swal.fire('Desactivado', 'Usuario desactivado correctamente', 'success');
+            // Actualizar la lista de personas después de desactivar
+            const response = await axiosClient.get('/personas/listarI');
+            setPersonas(response.data);
+        } catch (error) {
+            Swal.fire('Error', 'Hubo un error al desactivar al usuario', 'error');
+        }
+    };
 
     const onNextPage = useCallback(() => {
         if (page < pages) {
@@ -218,30 +235,30 @@ function TableInstructores() {
         }
     }, [page, pages]);
 
-    const onPreviousPage = useCallback(() => {
-        if (page > 1) {
-            setPage(prevPage => prevPage - 1);
-        }
-    }, [page]);
+  const onPreviousPage = useCallback(() => {
+    if (page > 1) {
+      setPage((prevPage) => prevPage - 1);
+    }
+  }, [page]);
 
-    const onRowsPerPageChange = useCallback((e) => {
-        setRowsPerPage(Number(e.target.value));
-        setPage(1);
-    }, []);
+  const onRowsPerPageChange = useCallback((e) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
 
-    const onSearchChange = useCallback((value) => {
-        setFilterValue(value || "");
-        setPage(1);
-    }, []);
+  const onSearchChange = useCallback((value) => {
+    setFilterValue(value || "");
+    setPage(1);
+  }, []);
 
-    const onClear = useCallback(() => {
-        setFilterValue("");
-        setPage(1);
-    }, []);
+  const onClear = useCallback(() => {
+    setFilterValue("");
+    setPage(1);
+  }, []);
 
-    const onStatusFilter = (selectedKeys) => {
-        setStatusFilter(selectedKeys[0]);
-    };
+  const onStatusFilter = (selectedKeys) => {
+    setStatusFilter(selectedKeys[0]);
+  };
 
     const topContent = useMemo(() => {
         return (
@@ -272,10 +289,11 @@ function TableInstructores() {
                         <select
                             className="bg-transparent outline-none text-white text-small"
                             onChange={onRowsPerPageChange}
+                            value={rowsPerPage}
                         >
+                            <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="15">15</option>
-                            <option value="20">20</option>
                         </select>
                     </label>
                 </div>
@@ -289,13 +307,18 @@ function TableInstructores() {
         { key: "nombres", label: "Nombres" },
         { key: "correo", label: "Correo" },
         { key: "telefono", label: "Telefono" },
+        { key: "rol", label: "Rol" },
+        { key: "acciones", label: "Acciones" },
     ];
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
     return (
-        <div className="overflow-hidden flex-1  bg-dark p-2">
+        <div className="overflow-hidden flex-1 bg-dark p-2">
             <div className="flex flex-col">
                 {topContent}
                 <Table aria-label="Tabla de Personas" css={{ height: "auto", minWidth: "100%" }}>
@@ -316,13 +339,27 @@ function TableInstructores() {
                         ))}
                     </TableBody>
                 </Table>
+<<<<<<< HEAD
 
+=======
+            </div>
+            <div className="flex justify-between mt-4">
+                <Button disabled={page === 1} onClick={onPreviousPage}>
+                    Anterior
+                </Button>
+                <Button disabled={page === Math.ceil(filteredItems.length / rowsPerPage)} onClick={onNextPage}>
+                    Siguiente
+                </Button>
+>>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
             </div>
             <div>
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
+<<<<<<< HEAD
                     title="Registro de Instructores"
+=======
+>>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
                     bodyContent={bodyContent}
                 />
 

@@ -25,7 +25,7 @@ export const listarPersonas = async(req, res) => {
 export const listarInstructores = async (req, res) => {
   try {
     // Asegúrate de tener la tabla 'personas' con la columna 'rol'
-    const sql = `SELECT * FROM personas WHERE rol = 'Instructor'`;
+    const sql = `SELECT * FROM personas WHERE cargo = 'Instructor'`;
     const [results] = await pool.query(sql);
 
     if (results.length > 0) {
@@ -133,28 +133,39 @@ export const registrarInstructor = async (req, res) => {
   try {
     const { identificacion, nombres, correo, telefono, rol, password } = req.body;
 
+    // Validar campos requeridos
+    if (!identificacion || !nombres || !correo || !telefono || !password || !rol) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Todos los campos son obligatorios.',
+      });
+    }
+
+    // Hash de la contraseña
     const bcryptPassword = bcrypt.hashSync(password, 12);
 
-    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo) VALUES (?, ?, ?, ?, ?, ?, 'Instructor')`;
-    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol];
+    // Consulta SQL para insertar datos
+    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol, 'Instructor'];
 
     const [result] = await pool.query(query, params);
 
     if (result.affectedRows > 0) {
       res.status(200).json({
         status: 200,
-        message: 'Se registró con éxito el instructor ' + nombres
+        message: 'Se registró con éxito el usuario ' + nombres,
       });
     } else {
       res.status(403).json({
         status: 403,
-        message: 'No se registró el instructor'
+        message: 'No se registró el usuario',
       });
     }
   } catch (error) {
+    console.error('Error del servidor:', error);  // Registrar el error en la consola
     res.status(500).json({
       status: 500,
-      message: 'Error del servidor: ' + error.message
+      message: 'Error del servidor: ' + error.message,
     });
   }
 };

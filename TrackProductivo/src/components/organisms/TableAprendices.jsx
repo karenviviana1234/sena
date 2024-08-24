@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import FormEtapaPractica from './FormEtapaPractica.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
+<<<<<<< HEAD
 import FormAprendices from './FormUsuarios.jsx';
+=======
+import FormUsuarios from './FormUsuarios.jsx';
+>>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
 import axiosClient from '../../configs/axiosClient.jsx';
 import {
     Table,

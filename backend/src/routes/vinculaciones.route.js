@@ -4,8 +4,8 @@ import { validarToken } from "../controllers/seguridad.controller.js";
 
 const rutaVinculaciones = Router()
 
-rutaVinculaciones.get('/listar', validarToken, listarVinculaciones)
-rutaVinculaciones.post('/registrar', validarToken, registrarVinculacion)
+rutaVinculaciones.get('/listar', /* validarToken,  */listarVinculaciones)
+rutaVinculaciones.post('/registrar',/*  validarToken,  */registrarVinculacion)
 rutaVinculaciones.put('/actualizar/:id', validarToken, actualizarVinculacion)
 rutaVinculaciones.put('/inactivar/:id', validarToken, inactivarVinculacion)
 rutaVinculaciones.put('/activar/:id', validarToken, activarVinculacion)
