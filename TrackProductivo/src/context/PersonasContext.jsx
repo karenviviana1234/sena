@@ -5,29 +5,26 @@ const PersonasContext = createContext();
 
 export const PersonasProvider = ({ children }) => {
     const [personas, setPersonas] = useState([]);
-    const [persona, setPersona] = useState([]);
-    const [idPersona, setPersonaId] = useState([]);
+    const [persona, setPersona] = useState(null); // Cambiado a null
+    const [idPersona, setPersonaId] = useState(null); // Cambiado a null
 
     const getPersonas = useCallback(() => {
-        try {
-            axiosClient.get('/personas/listarA').then((response) => {
-                console.log(response.data);
-                setPersonas(response.data);
-            });
-        } catch (error) {
+        axiosClient.get('/personas/listarA').then((response) => {
+            console.log(response.data);
+            setPersonas(response.data);
+        }).catch((error) => {
             console.log('Error del servidor: ' + error);
-        }
+        });
     }, []);
 
     const getPersona = useCallback((id_persona) => {
-        try {
-            axiosClient.get(`/personas/buscar/${id_persona}`).then((response) => {
-                console.log(response.data);
-                setPersona(response.data);
-            });
-        } catch (error) {
+        if (id_persona == null) return; // Validación básica
+        axiosClient.get(`/personas/buscar/${id_persona}`).then((response) => {
+            console.log(response.data);
+            setPersona(response.data);
+        }).catch((error) => {
             console.log('Error: ' + error);
-        }
+        });
     }, []);
 
     const registrarInstructor = async (data) => {

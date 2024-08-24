@@ -7,6 +7,7 @@ function FichasPage() {
         <TableFichas/>
       </main>
     </>
+    <div>FichasPage</div>
   )
 }
 
