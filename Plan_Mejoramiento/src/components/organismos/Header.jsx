@@ -23,9 +23,10 @@ const styles = StyleSheet.create({
     elevation: 4, // Sombra en Android
   },
   menuButton: {
-    marginRight: 260,
+    marginRight: 230,
   },
   title: {
+    color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
   },

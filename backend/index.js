@@ -22,7 +22,7 @@ servidor.use(cors())
 servidor.use(body_parser.json())
 servidor.use(body_parser.urlencoded({ extended: false }))
 
-servidor.use( rutaSeguridad)
+servidor.use( rutaSeguridad )
 servidor.use('/personas', rutaPersona)
 servidor.use('/actividades', rutaActividades)
 servidor.use('/seguimientos', rutaSeguimiento)

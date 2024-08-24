@@ -8,7 +8,6 @@ import GlobalProvider from './context/GlobalContext';
 
 // Importa las páginas directamente
 import NominaPage  from './components/pages/NominaPage.jsx';
-import FichasPage from './components/pages/FichasPage.jsx';
 import MatriculasPage from './components/pages/MatriculasPage.jsx';
 import EmpresaPage from './components/pages/EmpresaPage.jsx';
 import SeguimientoPage from './components/pages/SeguimientoPage.jsx';
@@ -17,6 +16,7 @@ import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
 import AsignacionPage from './components/pages/AsignacionesPage.jsx'
+import FichasPage from './components/pages/FichasPage.jsx';
 
 export const App = () => {
   return (

@@ -1,10 +1,10 @@
 import React from 'react'
-
+import TableFichas from '../organisms/Ficha/TableFicha'
 function FichasPage() {
   return (
     <>
       <main className='w-full p-3'>
-        FichasPage aca se muestran los titulados  y se pueden registrar aprendices de esos titulados
+        <TableFichas/>
       </main>
     </>
   )
