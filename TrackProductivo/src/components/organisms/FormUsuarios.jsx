@@ -3,12 +3,11 @@ import { Button, Select, SelectItem, Input } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
 import v from '../../styles/Variables';
 
-
 function FormUsuarios() {
   const [identificacion, setIdentificacion] = useState("");
   const [nombres, setNombres] = useState("");
   const [correo, setCorreo] = useState("");
-  const [rol, setRol] = useState("");
+  const [rol, setRol] = useState("Instructor"); // Valor por defecto "Instructor"
   const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
   const [municipio, setMunicipio] = useState("");
@@ -31,18 +30,23 @@ function FormUsuarios() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSend = {
+
+    const formData = {
       identificacion,
       nombres,
       correo,
       rol,
       telefono,
       password,
-      municipio
+      municipio,
     };
 
+    // Mostrar los datos del formulario en consola
+    console.log(formData);
+
     try {
-      const response = await axiosClient.post("/personas/registrarI", dataToSend);
+      // Enviar datos utilizando axiosClient
+      const response = await axiosClient.post('/personas/registrarI', formData);
       if (response.status === 200) {
         alert("Usuario registrado correctamente");
       } else {
@@ -118,30 +122,32 @@ function FormUsuarios() {
           </Button>
         </div>
 
-        <Select
+        <select
           name="municipio"
           label="Municipio"
-          className="mb-5"
+          className="mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2"
           value={municipio}
+          style={{width: '400px'}}
           onChange={(e) => setMunicipio(e.target.value)}
         >
           {municipiosList.map((mun) => (
-            <SelectItem key={mun.id_municipio} value={mun.id_municipio}>
+            <option key={mun.id_municipio} value={mun.id_municipio}>
               {mun.nombre_mpio}
-            </SelectItem>
+            </option>
           ))}
-        </Select>
+        </select>
 
-        <Select
+        <select
           name="rol"
           label="Rol"
-          className="mb-5"
           value={rol}
           onChange={(e) => setRol(e.target.value)}
+          className="mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2"
+          style={{width: '400px'}}
         >
-          <SelectItem value="Instructor">Instructor</SelectItem>
-          <SelectItem value="Lider">Líder</SelectItem>
-        </Select>
+          <option  value="Instructor">Instructor</option>
+          <option value="Lider">Lider</option>
+        </select>
 
         <div className="flex justify-end gap-5 mt-5">
           <Button type="button" color="danger">Cerrar</Button>

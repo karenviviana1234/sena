@@ -19,7 +19,6 @@ import {
     DropdownMenu,
     DropdownItem,
     Chip,
-    Pagination,
     User,
     Link,
 } from "@nextui-org/react";
@@ -31,15 +30,7 @@ import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 
 function TableInstructores() {
     const [personas, setPersonas] = useState([]);
-
-    const statusColorMap = {
-        activo: "success",
-        inactivo: "danger",
-        todos: "primary",
-    };
-
     const [filterValue, setFilterValue] = useState("");
-    const [selectedKeys, setSelectedKeys] = useState(new Set([]));
     const [statusFilter, setStatusFilter] = useState("todos");
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDescriptor, setSortDescriptor] = useState({
@@ -54,10 +45,8 @@ function TableInstructores() {
     const [mensaje, setMensaje] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    /* Se define una constante para manejar el contenido dinamico */
     const [bodyContent, setBodyContent] = useState(null);
 
-    /* Se llaman las vistas que se quieren mostrar al dar clic dentro del modal */
     const handleOpenModal = (formType) => {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios />);
@@ -67,16 +56,15 @@ function TableInstructores() {
         setIsModalOpen(true);
     };
 
-
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
 
-
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axiosClient.get('/personas/listarI'); // Ajusta la ruta del endpoint
+                const response = await axiosClient.get('/personas/listarI');
+                console.log('Datos recibidos:', response.data);
                 setPersonas(response.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -85,7 +73,6 @@ function TableInstructores() {
 
         fetchData();
     }, []);
-
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -142,19 +129,6 @@ function TableInstructores() {
         const cellValue = item[columnKey];
 
         switch (columnKey) {
-            /* case "seguimiento1":
-            case "seguimiento2":
-            case "seguimiento3":
-                const formattedDate = format(new Date(cellValue), 'dd-MM-yyyy');
-                return (
-                    <Button
-                        size="sm"
-                        className="bg-[#90d12c] text-white"
-                        onClick={() => handleOpenModal(formattedDate)}
-                    >
-                        {formattedDate}
-                    </Button>
-                ); */
             case "sigla":
                 return (
                     <Chip
@@ -195,7 +169,7 @@ function TableInstructores() {
             default:
                 return cellValue;
         }
-    }, [statusColorMap, getProgramColor]);
+    }, [programColorMap, getProgramColor]);
 
     const handleButtonClick = (date) => {
         console.log("Handling button click, setting date:", date);
@@ -203,14 +177,12 @@ function TableInstructores() {
         setModalAcciones(true); // Asegúrate de que esto está abriendo el modal correctamente
     };
 
-
     const handleToggle = (mode, data = null) => {
         console.log("Toggling modal, mode:", mode, "data:", data);
         setMode(mode);
         setInitialData(data);
         setModalOpen(prev => !prev);
     };
-
 
     const onNextPage = useCallback(() => {
         if (page < pages) {
@@ -272,10 +244,11 @@ function TableInstructores() {
                         <select
                             className="bg-transparent outline-none text-white text-small"
                             onChange={onRowsPerPageChange}
+                            value={rowsPerPage}
                         >
+                            <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="15">15</option>
-                            <option value="20">20</option>
                         </select>
                     </label>
                 </div>
@@ -289,57 +262,11 @@ function TableInstructores() {
         { key: "nombres", label: "Nombres" },
         { key: "correo", label: "Correo" },
         { key: "telefono", label: "Telefono" },
+        { key: "rol", label: "Rol" },
     ];
 
-    /* Registrar  */
-    const handleSubmit = async (formData, e) => {
-        e.preventDefault()
-
-        try {
-
-            if (mode === 'create') {
-                await axiosClient.post('/Registrarlote', formData).then((response) => {
-                    if (response.status == 200) {
-                        Swal.fire({
-                            position: "center", 
-                            icon: "success",
-                            title: "Lote registrado con éxito",
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                        peticionGet()
-                    } else {
-                        alert('Error en el registro')
-                    }
-                })
-            } else if (mode === 'update') {
-
-                await axiosClient.put(`/Actualizarlote/${idLote.id_lote}`, formData).then((response) => {
-                    if (response.status === 200) {
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "Se actualizó con éxito el lote",
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                        peticionGet()
-                    } else {
-                        alert('Error al actualizar')
-                    }
-                })
-            }
-            setModalOpen(false)
-
-        } catch (error) {
-            alert('Error en el servidor')
-        }
-    }
-
-
-
     return (
-        <div className="overflow-hidden flex-1  bg-dark p-2">
+        <div className="overflow-hidden flex-1 bg-dark p-2">
             <div className="flex flex-col">
                 {topContent}
                 <Table aria-label="Tabla de Personas" css={{ height: "auto", minWidth: "100%" }}>
@@ -360,7 +287,14 @@ function TableInstructores() {
                         ))}
                     </TableBody>
                 </Table>
-
+            </div>
+            <div className="flex justify-between mt-4">
+                    <Button disabled={page === 1} onClick={() => setPage(prevPage => prevPage - 1)}>
+                        Anterior
+                    </Button>
+                    <Button disabled={page === Math.ceil(filteredItems.length / rowsPerPage)} onClick={() => setPage(prevPage => prevPage + 1)}>
+                        Siguiente
+                    </Button>
             </div>
             <div>
                 <ModalAcciones
@@ -368,7 +302,6 @@ function TableInstructores() {
                     onClose={handleCloseModal}
                     bodyContent={bodyContent}
                 />
-
             </div>
         </div>
     );

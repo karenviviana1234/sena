@@ -25,7 +25,7 @@ export const listarPersonas = async(req, res) => {
 export const listarInstructores = async (req, res) => {
   try {
     // Asegúrate de tener la tabla 'personas' con la columna 'rol'
-    const sql = `SELECT * FROM personas WHERE rol = 'Instructor'`;
+    const sql = `SELECT * FROM personas WHERE cargo = 'Instructor'`;
     const [results] = await pool.query(sql);
 
     if (results.length > 0) {
@@ -129,26 +129,44 @@ export const registrarAprendiz = async (req, res) => {
 };
 
 /* Registrar Instructores */
-// personas.controller.js
 export const registrarInstructor = async (req, res) => {
   try {
-      const { identificacion, nombres, correo, telefono, password, rol, cargo, municipio } = req.body;
-      
-      // Verifica si los campos necesarios están presentes
-      if (!identificacion || !nombres || !correo || !telefono || !password || !rol || !cargo || !municipio) {
-          return res.status(400).json({ message: 'Todos los campos son necesarios' });
-      }
+    const { identificacion, nombres, correo, telefono, rol, password } = req.body;
 
-      // Inserción en la base de datos (ejemplo con pseudo-código)
-      const nuevoInstructor = await db.query(
-          'INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo, municipio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [identificacion, nombres, correo, telefono, password, rol, cargo, municipio]
-      );
+    // Validar campos requeridos
+    if (!identificacion || !nombres || !correo || !telefono || !password || !rol) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Todos los campos son obligatorios.',
+      });
+    }
 
-      res.status(201).json({ message: 'Instructor registrado exitosamente', data: nuevoInstructor });
+    // Hash de la contraseña
+    const bcryptPassword = bcrypt.hashSync(password, 12);
+
+    // Consulta SQL para insertar datos
+    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol, 'Instructor'];
+
+    const [result] = await pool.query(query, params);
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({
+        status: 200,
+        message: 'Se registró con éxito el usuario ' + nombres,
+      });
+    } else {
+      res.status(403).json({
+        status: 403,
+        message: 'No se registró el usuario',
+      });
+    }
   } catch (error) {
-      console.error('Error al registrar instructor:', error);
-      res.status(500).json({ message: 'Error en el servidor' });
+    console.error('Error del servidor:', error);  // Registrar el error en la consola
+    res.status(500).json({
+      status: 500,
+      message: 'Error del servidor: ' + error.message,
+    });
   }
 };
 
