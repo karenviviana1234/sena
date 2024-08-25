@@ -3,16 +3,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from
 
 // Componente GlobalModal
 const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions }) => {
-  return (
-<<<<<<< HEAD
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-            <ModalBody>{bodyContent}</ModalBody>
-            <ModalFooter>
-=======
+  return (      
     <Modal 
       isOpen={isOpen} 
       onClose={onClose}
@@ -28,7 +19,6 @@ const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions }) =
               {bodyContent}
             </ModalBody>
             <ModalFooter className="flex justify-end gap-2">
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
             </ModalFooter>
           </>
         )}

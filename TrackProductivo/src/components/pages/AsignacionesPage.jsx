@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
-import AsignacionModal from '../templates/AsignacionTemplete.jsx';
-import AccionesModal from '../molecules/Modal.jsx'
+import FormAsignacion from '../organisms/FormAsignacion.jsx';
+import ModalAcciones from '../organisms/ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
 import AsignacionContext from '../../context/AsignacionContext.jsx';
@@ -501,32 +501,47 @@ export default function AsignacionPage() {
     }
     const [modalAccionesVisible, setModalAccionesVisible] = useState(false);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+
     return (
 
         <>
+            <div className='w-full max-w-[90%] ml-28 items-center p-10'>
 
-            <div>
-                <div className='w-full max-w-[90%] ml-28 items-center p-10'>
-                    <AccionesModal
-                        isOpen={modalAccionesVisible}
-                        onClose={() => setModalAccionesVisible(false)}
-                        label={mensaje}
-                    />
-                    <AsignacionModal
-                        open={modalOpen}
-                        onClose={() => setModalOpen(false)}
-                        title={mode === 'create' ? 'Registrar Asignaciones' : 'Actualizar Asignaciones'}
-                        actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
-                        initialData={initialData}
-                        handleSubmit={handleSubmit}
-                        mode={mode}
-                    />
+            <ModalAcciones
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    title="Registro Asignación"
+                    size="6xl"  
+                    bodyContent={<FormAsignacion />}
+                    footerActions={[
+                        {
+                            label: "Cerrar",
+                            color: "danger",
+                            onPress: handleCloseModal,
+                        },
+                        {
+                            label: "Acción",
+                            color: "primary",
+                            onPress: () => console.log("Acción realizada"),
+                        },
+                    ]}
+                />
+
                     <Ejemplo
                         data={data}
                         asignaciones={asignaciones}
                     />
                 </div>
-            </div>
         </>
     )
 }

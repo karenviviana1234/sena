@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-<<<<<<< HEAD
-import { Select, SelectItem } from "@nextui-org/react";
-=======
 import { Button, Select, SelectItem } from "@nextui-org/react";
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
 import axiosClient from "../../configs/axiosClient";
 
 function FormVinculaciones() {
@@ -14,8 +10,6 @@ function FormVinculaciones() {
   const [instructores, setInstructores] = useState([]);
   const [areas, setAreas] = useState([]);
 
-<<<<<<< HEAD
-=======
   const tipos = [
     { id: "contratisca", nombre: "Contratista" },
     { id: "planta", nombre: "Planta" }
@@ -26,7 +20,6 @@ function FormVinculaciones() {
     { id: "yamboro", nombre: "Yamboro" }
   ];
 
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
   useEffect(() => {
     const fetchInstructores = async () => {
       try {
@@ -50,19 +43,6 @@ function FormVinculaciones() {
     fetchAreas();
   }, []);
 
-<<<<<<< HEAD
-  return (
-    <form>
-      <Select
-        name="instructor" // Añadido el nombre
-        placeholder="Selecciona el instructor"
-        className="mb-5"
-        value={instructor}
-        onChange={(value) => setInstructor(value)}
-      >
-        {instructores.map((inst) => (
-          <SelectItem key={inst.id_persona} value={inst.id_persona}>
-=======
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -114,45 +94,12 @@ function FormVinculaciones() {
       >
         {instructores.map((inst) => (
           <SelectItem key={inst.id_persona} value={inst.id_persona.toString()}>
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
             {inst.nombres}
           </SelectItem>
         ))}
       </Select>
 
       <Select
-<<<<<<< HEAD
-        name="tipo" // Añadido el nombre
-        placeholder="Selecciona el tipo"
-        className="mb-5"
-        value={tipo}
-        onChange={(value) => setTipo(value)}
-      >
-        <SelectItem value="contratista">Contratista</SelectItem>
-        <SelectItem value="planta">Planta</SelectItem>
-      </Select>
-
-      <Select
-        name="sede" // Añadido el nombre
-        placeholder="Selecciona la sede"
-        className="mb-5"
-        value={sede}
-        onChange={(value) => setSede(value)}
-      >
-        <SelectItem value="centro">Centro</SelectItem>
-        <SelectItem value="yamboro">Yamboro</SelectItem>
-      </Select>
-
-      <Select
-        name="area" // Añadido el nombre
-        placeholder="Selecciona el área"
-        className="mb-5"
-        value={area}
-        onChange={(value) => setArea(value)}
-      >
-        {areas.map((ar) => (
-          <SelectItem key={ar.id_area} value={ar.id_area}>
-=======
         name="tipo"
         placeholder="Selecciona el tipo"
         className="mb-5"
@@ -198,18 +145,10 @@ function FormVinculaciones() {
       >
         {areas.map((ar) => (
           <SelectItem key={ar.id_area} value={ar.id_area.toString()}>
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
             {ar.nombre_area}
           </SelectItem>
         ))}
       </Select>
-<<<<<<< HEAD
-    </form>
-  );
-}
-
-export default FormVinculaciones;
-=======
 
       <div className="flex justify-end gap-5 mt-5">
         <Button type="button" color="danger">Cerrar</Button>
@@ -221,4 +160,3 @@ export default FormVinculaciones;
 }
 
 export default FormVinculaciones;
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d

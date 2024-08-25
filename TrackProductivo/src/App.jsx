@@ -18,7 +18,6 @@ import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
 import AsignacionPage from './components/pages/AsignacionesPage.jsx'
-import FichasPage from './components/pages/FichasPage.jsx';
 
 export const App = () => {
   return (

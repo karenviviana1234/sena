@@ -4,10 +4,7 @@ import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
 import FormVinculaciones from './FormVinculaciones.jsx';
-<<<<<<< HEAD
 import { format } from 'date-fns';
-=======
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
 import {
     Table,
     TableHeader,
@@ -47,7 +44,6 @@ function TableInstructores() {
     const [mensaje, setMensaje] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-<<<<<<< HEAD
     /* Se define una constante para manejar el contenido dinamico */
     const [bodyContent, setBodyContent] = useState(null);
 
@@ -55,20 +51,18 @@ function TableInstructores() {
     const handleOpenModal = (formType) => {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios />);
-=======
     const [bodyContent, setBodyContent] = useState(null);
+    }
 
     const handleOpenModal = (formType, data = null) => {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios initialData={data} />);
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
         } else if (formType === 'formVinculaciones') {
             setBodyContent(<FormVinculaciones />);
         }
         setIsModalOpen(true);
     };
 
-<<<<<<< HEAD
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -87,25 +81,7 @@ function TableInstructores() {
 
         fetchData();
     }, []);
-=======
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axiosClient.get('/personas/listarI');
-                console.log('Datos recibidos:', response.data);
-                setPersonas(response.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
+  
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -118,13 +94,9 @@ function TableInstructores() {
       );
     }
 
-<<<<<<< HEAD
         return filteredPersonas;
     }, [personas, filterValue, statusFilter]);
-=======
-    return filteredPersonas;
-  }, [personas, filterValue, statusFilter]);
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
+
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -311,12 +283,6 @@ function TableInstructores() {
         { key: "acciones", label: "Acciones" },
     ];
 
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
     return (
         <div className="overflow-hidden flex-1 bg-dark p-2">
             <div className="flex flex-col">
@@ -339,9 +305,7 @@ function TableInstructores() {
                         ))}
                     </TableBody>
                 </Table>
-<<<<<<< HEAD
 
-=======
             </div>
             <div className="flex justify-between mt-4">
                 <Button disabled={page === 1} onClick={onPreviousPage}>
@@ -350,16 +314,13 @@ function TableInstructores() {
                 <Button disabled={page === Math.ceil(filteredItems.length / rowsPerPage)} onClick={onNextPage}>
                     Siguiente
                 </Button>
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
             </div>
             <div>
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-<<<<<<< HEAD
                     title="Registro de Instructores"
-=======
->>>>>>> 28fc74a883fc62fcfeaeb5bfc30c3690acb9ac7d
+d
                     bodyContent={bodyContent}
                 />
 
@@ -367,5 +328,5 @@ function TableInstructores() {
         </div>
     );
 }
-
+}
 export default TableInstructores;
