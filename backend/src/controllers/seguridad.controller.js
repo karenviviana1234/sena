@@ -13,7 +13,7 @@ export const validar = async (req, res) => {
       const user = rows[0];
       console.log(user);
       
-      const validPassword = await bcrypt.compare(password, user.password);
+      const validPassword = await /* bcrypt.compare */(password, user.password);
       if (!validPassword) {
         return res.status(404).json({ message: "Contraseña incorrecta", validPassword});
       }
