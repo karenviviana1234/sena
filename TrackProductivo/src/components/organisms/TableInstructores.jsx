@@ -244,5 +244,5 @@ d
         </div>
     );
 }
-}
+
 export default TableInstructores;
