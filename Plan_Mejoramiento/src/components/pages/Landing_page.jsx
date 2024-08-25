@@ -7,7 +7,7 @@ const Landing_page = () => {
 
   return (
     <ImageBackground 
-      source={require('../../../public/logo_sigueme.png')} 
+      source={require('../../../public/logo-sena-verde.png')} 
       style={styles.background}
       resizeMode="contain"
 
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonText: {
-    color: 'purple',
+    color: 'black',
     fontWeight: 'bold',
     fontSize: 20
   },

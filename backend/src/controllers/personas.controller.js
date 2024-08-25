@@ -20,39 +20,104 @@ export const listarPersonas = async(req, res) => {
     }
 }
 
-/* Registrar Instructores y Aprendices */
-export const registrarPersona = async (req, res) => {
-  try {
-    const { identificacion, nombres, correo, telefono, password, rol, cargo, municipio } = req.body;
 
-    /* Poner el campo de municipio obligatorio para el rol Aprendiz */
-    if (rol === 'Aprendiz' && !municipio) {
+
+export const listarInstructores = async (req, res) => {
+  try {
+    // Asegúrate de tener la tabla 'personas' con la columna 'rol'
+    const sql = `SELECT * FROM personas WHERE cargo = 'Instructor'`;
+    const [results] = await pool.query(sql);
+
+    if (results.length > 0) {
+      res.status(200).json(results);
+    } else {
+      res.status(404).json({
+        message: 'No hay instructores registrados',
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: `Error del servidor: ${error.message}`,
+    });
+  }
+};
+
+
+export const listarAprendices = async (req, res) => {
+  try {
+    // Consulta SQL con JOIN para obtener el nombre del municipio
+    const sql = `
+      SELECT p.*, m.nombre_mpio
+      FROM personas p
+      LEFT JOIN municipios m ON p.municipio = m.id_municipio
+      WHERE p.rol = 'Aprendiz'
+    `;
+    const [results] = await pool.query(sql);
+
+    if (results.length > 0) {
+      res.status(200).json(results);
+    } else {
+      res.status(404).json({
+        message: 'No hay personas con el rol de aprendiz'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error del servidor: ' + error.message
+    });
+  }
+};
+
+export const listarMunicipios = async(req, res) => {
+  try {
+      let sql = `SELECT * FROM municipios`
+      const [results] = await pool.query(sql)
+
+      if(results.length>0){
+          res.status(200).json(results)
+      }else{
+          res.status(404).json({
+              message: 'No hay municipios registrados'
+          })
+      }
+  } catch (error) {
+      res.status(500).json({
+          message: 'Error del servidor' + error
+      })
+  }
+}
+
+
+
+/* Registrar Aprendices */
+export const registrarAprendiz = async (req, res) => {
+  try {
+    const { identificacion, nombres, correo, telefono, password, municipio } = req.body;
+
+    if (!municipio) {
       return res.status(400).json({
         status: 400,
         message: 'El campo municipio es obligatorio para el rol de aprendiz.'
       });
     }
 
-    /* Enviar el campo de municipio "null" cuando el rol sea "Instructor" */
-    const municipioValue = rol === 'Instructor' ? null : municipio;
-
-    /* Encriptar la contraseña */
     const bcryptPassword = bcrypt.hashSync(password, 12);
 
-    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo, municipio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol, cargo, municipioValue];
+   /* rol y cargo como 'Aprendiz' */
+    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo, municipio) VALUES (?, ?, ?, ?, ?, 'Aprendiz', 'Aprendiz', ?)`;
+    const params = [identificacion, nombres, correo, telefono, bcryptPassword, municipio];
 
     const [result] = await pool.query(query, params);
 
     if (result.affectedRows > 0) {
       res.status(200).json({
         status: 200,
-        message: 'Se registró con éxito el usuario ' + nombres
+        message: 'Se registró con éxito el aprendiz ' + nombres
       });
     } else {
       res.status(403).json({
         status: 403,
-        message: 'No se registró el usuario'
+        message: 'No se registró el aprendiz'
       });
     }
   } catch (error) {
@@ -63,59 +128,47 @@ export const registrarPersona = async (req, res) => {
   }
 };
 
-/* registrar coordinador y administrativos */
-export const registrarAdmin = async (req, res) => {
-    try {
-      const { identificacion, nombres, correo, telefono, password, rol, cargo } = req.body;
-  
-      const id_persona = req.usuario;
-      
-  
-      // Determinar el rol a asignar y las restricciones de registro
-      let userRole = rol;
-  
-      if (rol === 'Coordinador') {
-        // Verificar si ya existe un coordinador en la base de datos
-        const [coordinadorCheck] = await pool.query('SELECT COUNT(*) AS coordinadorCount FROM personas WHERE rol = "coordinador"');
-        if (coordinadorCheck[0].coordinadorCount > 0) {
-          return res.status(400).json({
-            status: 400,
-            message: 'Ya existe un coordinador registrado.'
-          });
-        }
-      } else if (rol === 'Seguimiento') {
-        // Verificar si ya existen dos personas con el rol de seguimiento en la base de datos
-        const [seguimientoCheck] = await pool.query('SELECT COUNT(*) AS seguimientoCount FROM personas WHERE rol = "seguimiento"');
-        if (seguimientoCheck[0].seguimientoCount >= 2) {
-          return res.status(400).json({
-            status: 400,
-            message: 'Ya se han registrado dos personas con el rol de seguimiento.'
-          });
-        }
-      }
-  
-      const estado = 'activo';
-      const bcryptPassword = bcrypt.hashSync(password, 12);
-  
-      const query = `
-        INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `;
-  
-      const values = [identificacion, nombres, correo, telefono, bcryptPassword, rol, cargo];
-  
-      const [result] = await pool.query(query, values);
-  
-      return res.status(200).json({
-        status: 200,
-        message: 'Usuario registrado exitosamente',
+/* Registrar Instructores */
+export const registrarInstructor = async (req, res) => {
+  try {
+    const { identificacion, nombres, correo, telefono, rol, password } = req.body;
+
+    // Validar campos requeridos
+    if (!identificacion || !nombres || !correo || !telefono || !password || !rol) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Todos los campos son obligatorios.',
       });
-    } catch (error) {
-      console.error('Error al registrar usuario:', error);
-      return res.status(500).json({ status: 500, message: 'Error del servidor', error: error.message });
     }
-  };
-  
+
+    // Hash de la contraseña
+    const bcryptPassword = bcrypt.hashSync(password, 12);
+
+    // Consulta SQL para insertar datos
+    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol, 'Instructor'];
+
+    const [result] = await pool.query(query, params);
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({
+        status: 200,
+        message: 'Se registró con éxito el usuario ' + nombres,
+      });
+    } else {
+      res.status(403).json({
+        status: 403,
+        message: 'No se registró el usuario',
+      });
+    }
+  } catch (error) {
+    console.error('Error del servidor:', error);  // Registrar el error en la consola
+    res.status(500).json({
+      status: 500,
+      message: 'Error del servidor: ' + error.message,
+    });
+  }
+};
 
 
 /* Actualizar Personas */

@@ -1,14 +1,9 @@
-import React from "react";
-
+import React from 'react'
 
 function ReportesPage() {
-    return ( 
-        <>
-        <main className='w-full p-3'>
-        ReportesPage
-        </main>
-      </>
-     );
+  return (
+    <div>ReportesPage</div>
+  )
 }
 
-export default ReportesPage;
+export default ReportesPage
