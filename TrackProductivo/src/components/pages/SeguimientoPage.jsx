@@ -130,7 +130,7 @@ function SeguimientoPage() {
                 return (
                     <Button
                         size="sm"
-                        className="bg-[#90d12c] text-white"
+                        className="bg-[#ffa808] text-white"
                         onClick={() => handleOpenModal(formattedDate)}
                     >
                         {formattedDate}

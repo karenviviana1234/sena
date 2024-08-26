@@ -141,6 +141,17 @@ export const registrarInstructor = async (req, res) => {
       });
     }
 
+    // Verificar si la identificación ya existe
+    const checkQuery = 'SELECT COUNT(*) AS count FROM personas WHERE identificacion = ?';
+    const [checkResult] = await pool.query(checkQuery, [identificacion]);
+
+    if (checkResult[0].count > 0) {
+      return res.status(409).json({
+        status: 409,
+        message: 'La identificación ya está registrada.',
+      });
+    }
+
     // Hash de la contraseña
     const bcryptPassword = bcrypt.hashSync(password, 12);
 
@@ -177,9 +188,10 @@ export const actualizarPersona = async (req, res) => {
       const { id_persona } = req.params;
       const { identificacion, nombres, correo, telefono, password, rol, cargo, municipio } = req.body;
   
-      if (!identificacion && !nombres && !correo && !telefono && !password && !rol && !cargo && !municipio) {
+      if (!identificacion || !nombres || !correo || !telefono || !password || !rol) {
         return res.status(400).json({
-          message: 'Al menos uno de los campos (identificacion, nombres, correo, telefono, password, rol, cargo, municipio) debe estar presente en la solicitud para realizar la actualización.'
+          status: 400,
+          message: 'Todos los campos son obligatorios.',
         });
       }
   
