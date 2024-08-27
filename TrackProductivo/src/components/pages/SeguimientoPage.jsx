@@ -27,9 +27,7 @@ import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import { ChevronDownIcon } from "../NextIU/atoms/CheveronIcons.jsx";
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
-import { usePersonas } from "../../context/PersonasContext.jsx"
 
-const { IdPersona } = usePersonas()
 
 function SeguimientoPage() {
     const { seguimientos, getSeguimientos } = useContext(SeguimientosContext);
@@ -285,8 +283,8 @@ function SeguimientoPage() {
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {sortedItems.map((item) => (
-                            <TableRow key={item.id}>
+                        {sortedItems.map((item, index) => (
+                            <TableRow key={item.identificacion || index}>
                                 {columns.map((column) => (
                                     <TableCell key={column.key}>
                                         {renderCell(item, column.key)}

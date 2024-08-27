@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import v from "../../styles/Variables.jsx" 
+import React, { useState } from "react";
+import v from "../../styles/Variables.jsx";
 
-const PDFUploader = () => {
+const PDFUploader = ({ onFileSelect }) => {
   const [file, setFile] = useState(null);
-  const [fileName, setFileName] = useState('');
+  const [fileName, setFileName] = useState("");
 
   const handleFileUpload = (event) => {
     const uploadedFile = event.target.files[0];
@@ -17,13 +17,14 @@ const PDFUploader = () => {
 
     setFile(uploadedFile); // Guardar el archivo en el estado
     setFileName(uploadedFile.name); // Guardar el nombre del archivo
+    onFileSelect(uploadedFile); // Pasar el archivo al componente padre
   };
 
   const downloadFile = () => {
     if (!file) return;
 
     const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = file.name;
     a.click();
@@ -31,8 +32,7 @@ const PDFUploader = () => {
   };
 
   return (
-    <div>
-      <p className="my-2 text-gray-700">{fileName}</p>
+    <div className="flex items-center gap-4">
       <label className="relative inline-block cursor-pointer">
         <input
           type="file"
@@ -46,19 +46,12 @@ const PDFUploader = () => {
       </label>
 
       {file && (
-        <div className="mt-4 ml-40">
-          <button
-            onClick={downloadFile}
-            className="px-2 py-1 bg-[#98e326] text-white rounded-lg"
-          >
-            <v.descargar className='w-5 h-5' />
-          </button>
-          <button
-            className="px-2 py-1 ml-4 bg-[#70B22D] text-white rounded-lg"
-          >
-            <v.enviar className='w-5 h-5' />
-          </button>
-        </div>
+        <button
+          onClick={downloadFile}
+          className="px-2 py-1 bg-[#98e326] text-white rounded-lg flex items-center"
+        >
+          <v.descargar className="w-5 h-5" />
+        </button>
       )}
     </div>
   );
