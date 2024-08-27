@@ -27,6 +27,9 @@ import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import { ChevronDownIcon } from "../NextIU/atoms/CheveronIcons.jsx";
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
+import { usePersonas } from "../../context/PersonasContext.jsx"
+
+const { IdPersona } = usePersonas()
 
 function SeguimientoPage() {
     const { seguimientos, getSeguimientos } = useContext(SeguimientosContext);

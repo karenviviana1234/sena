@@ -6,8 +6,8 @@ function FichasPage() {
       <main className='w-full p-3'>
         <TableFichas/>
       </main>
+      <div>FichasPage</div>
     </>
-    <div>FichasPage</div>
   )
 }
 

@@ -1,9 +1,13 @@
 import React from 'react';
-import ExcelUploader from '../molecules/Excel.jsx';
 import { Chip } from "@nextui-org/react";
 import v from '../../styles/Variables.jsx';
+import PDFUploader from '../molecules/Pdf.jsx';
+import { usePersonas } from "../../context/PersonasContext.jsx"
 
 function ComponentSeguimiento({ initialData, mode, handleSubmit, onClose, actionLabel }) {
+
+  const { IdPersona } = usePersonas();
+  
   return (
     <div className='flex justify-between gap-20'>
     <div className='w-1/2 pl-4'>
@@ -21,7 +25,7 @@ function ComponentSeguimiento({ initialData, mode, handleSubmit, onClose, action
             </Chip>
           </h2>
           <p className='text-gray-500 text-lg'>20-12-2024</p>
-          <ExcelUploader />
+          <PDFUploader />
         </div>
       </div>
     </div>

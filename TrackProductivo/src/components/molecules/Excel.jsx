@@ -62,7 +62,7 @@ const ExcelUploader = () => {
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         <span className="inline-block px-4 py-2 border shadow-lg rounded-xl">
-          Seleccionar archivo
+          Seleccionar archivo 
         </span>
       </label>
 
