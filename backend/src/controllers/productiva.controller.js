@@ -1,5 +1,7 @@
 import { pool } from "../database/conexion.js";
 import multer from "multer";
+import { format, addMonths } from 'date-fns';
+
 
 export const listarProductiva = async (req, res) => {
     try {
@@ -39,32 +41,133 @@ export const productivaFiles = upload.fields([
     {name: 'consulta', maxCount: 1}
 ])
 
+
+
 export const registrarProductiva = async (req, res) => {
     try {
-        const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, aprendiz } = req.body
-        let acuerdo = req.files && req.files['acuerdo'] ? req.files['acuerdo'][0].originalname : null
-        let arl = req.files && req.files['arl'] ? req.files['arl'][0].originalname : null
-        let consulta = req.files && req.files['consulta'] ? req.files['consulta'][0].originalname : null
+        const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, aprendiz, instructor } = req.body;
+        const acuerdo = req.files?.acuerdo?.[0]?.originalname || null;
+        const arl = req.files?.arl?.[0]?.originalname || null;
+        const consulta = req.files?.consulta?.[0]?.originalname || null;
 
-        let sql = `INSERT INTO productiva (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)`
+        // Verificar que la matrícula existe en la tabla matriculas
+        const sqlCheckMatricula = 'SELECT id_matricula FROM matriculas WHERE id_matricula = ?';
+        const [rowsMatricula] = await pool.query(sqlCheckMatricula, [matricula]);
 
-        const [rows] = await pool.query(sql, [matricula, empresa, fecha_inicio, fecha_fin, alternativa, acuerdo, arl, consulta, aprendiz])
+        if (rowsMatricula.length === 0) {
+            return res.status(400).json({
+                message: 'La matrícula no existe'
+            });
+        }
 
-        if(rows.affectedRows>0){
-            res.status(200).json({
-                message: 'Etapa productiva registrada correctamente'
-            })
-        }else{
+        // Registrar etapa productiva
+        const sqlProductiva = `
+            INSERT INTO productiva 
+            (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
+            VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
+        `;
+        const [resultProductiva] = await pool.query(sqlProductiva, [
+            matricula, empresa, fecha_inicio, fecha_fin, alternativa, acuerdo, arl, consulta, aprendiz
+        ]);
+
+        if (resultProductiva.affectedRows > 0) {
+            const productivaId = resultProductiva.insertId;
+
+            // Calcular fechas para seguimientos
+            const fechaInicio = new Date(fecha_inicio);
+            const fechaFin = new Date(fecha_fin);
+
+            const fechaSeguimiento1 = addMonths(fechaInicio, 2);
+            const fechaSeguimiento2 = addMonths(fechaInicio, 4);
+            const fechaSeguimiento3 = fechaFin;
+
+            // Insertar tres seguimientos asociados a la etapa productiva
+            const sqlSeguimiento = `
+                INSERT INTO seguimientos (fecha, seguimiento, estado, pdf, productiva, instructor) 
+                VALUES (?, 1, 1, ?, ?, ?),
+                       (?, 2, 1, ?, ?, ?),
+                       (?, 3, 1, ?, ?, ?)
+            `;
+
+            const [resultSeguimiento] = await pool.query(sqlSeguimiento, [
+                format(fechaSeguimiento1, 'yyyy-MM-dd'), null, productivaId, instructor,
+                format(fechaSeguimiento2, 'yyyy-MM-dd'), null, productivaId, instructor,
+                format(fechaSeguimiento3, 'yyyy-MM-dd'), null, productivaId, instructor
+            ]);
+
+            if (resultSeguimiento.affectedRows >= 3) { 
+                const seguimientoIds = [
+                    resultSeguimiento.insertId,
+                    resultSeguimiento.insertId + 1,
+                    resultSeguimiento.insertId + 2
+                ];
+
+                // Insertar 4 bitácoras para cada seguimiento
+                const sqlBitacoras = `
+                    INSERT INTO bitacoras (fecha, bitacora, seguimiento, pdf, estado, instructor) 
+                    VALUES 
+                        (?, '1', ?, ?, 1, ?),
+                        (?, '2', ?, ?, 1, ?),
+                        (?, '3', ?, ?, 1, ?),
+                        (?, '4', ?, ?, 1, ?),
+                        (?, '5', ?, ?, 1, ?),
+                        (?, '6', ?, ?, 1, ?),
+                        (?, '7', ?, ?, 1, ?),
+                        (?, '8', ?, ?, 1, ?),
+                        (?, '9', ?, ?, 1, ?),
+                        (?, '10', ?, ?, 1, ?),
+                        (?, '11', ?, ?, 1, ?),
+                        (?, '12', ?, ?, 1, ?)
+                `;
+
+                const [resultBitacoras] = await pool.query(sqlBitacoras, [
+                    fecha_inicio, seguimientoIds[0], null, instructor,
+                    fecha_inicio, seguimientoIds[0], null, instructor,
+                    fecha_inicio, seguimientoIds[0], null, instructor,
+                    fecha_inicio, seguimientoIds[0], null, instructor,
+                    fecha_inicio, seguimientoIds[1], null, instructor,
+                    fecha_inicio, seguimientoIds[1], null, instructor,
+                    fecha_inicio, seguimientoIds[1], null, instructor,
+                    fecha_inicio, seguimientoIds[1], null, instructor,
+                    fecha_inicio, seguimientoIds[2], null, instructor,
+                    fecha_inicio, seguimientoIds[2], null, instructor,
+                    fecha_inicio, seguimientoIds[2], null, instructor,
+                    fecha_inicio, seguimientoIds[2], null, instructor
+                ]);
+
+                if (resultBitacoras.affectedRows >= 12) {
+                    res.status(200).json({
+                        message: 'Etapa productiva, seguimientos y bitácoras registrados correctamente'
+                    });
+                } else {
+                    await pool.query('DELETE FROM seguimientos WHERE productiva = ?', [productivaId]);
+                    await pool.query('DELETE FROM productiva WHERE id_productiva = ?', [productivaId]);
+                    res.status(403).json({
+                        message: 'Error al registrar las bitácoras'
+                    });
+                }
+            } else {
+                await pool.query('DELETE FROM productiva WHERE id_productiva = ?', [productivaId]);
+                res.status(403).json({
+                    message: 'Error al registrar los seguimientos'
+                });
+            }
+        } else {
             res.status(403).json({
                 message: 'Error al registrar la etapa productiva'
-            })
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })   
+            message: 'Error del servidor: ' + error.message
+        });
     }
-}
+};
+
+
+
+
+
 
 export const actualizarProductiva = async (req, res) => {
     try {

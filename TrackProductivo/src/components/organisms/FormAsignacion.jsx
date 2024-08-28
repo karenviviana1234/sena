@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ModalFooter, Button } from "@nextui-org/react";
 import axiosClient from '../../configs/axiosClient';
-import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
 import AsignacionContext from '../../context/AsignacionContext';
+import DatePicker from 'react-datepicker';
+
 
 const FormAsignacion = ({ mode, initialData, handleSubmit, onClose, actionLabel }) => {
   const [estadoOp, setEstadoOp] = useState('');
