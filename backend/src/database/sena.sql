@@ -112,7 +112,7 @@ CREATE TABLE `bitacoras` (
 
 --
 -- Volcado de datos para la tabla `bitacoras`
---
+--  
 
 INSERT INTO `bitacoras` (`id_bitacora`, `fecha`, `bitacora`, `seguimiento`, `pdf`, `estado`, `instructor`) VALUES
 (1, '2023-05-03', '1', 1, NULL, 'solicitud', 'Wilson Martinez Saldarriaga'),

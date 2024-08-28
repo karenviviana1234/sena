@@ -1,26 +1,33 @@
 import { pool } from "../database/conexion.js";
 import  Jwt  from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 export const validar = async (req, res) => {
     try {
         let { correo, password } = req.body;
-        let sql = `SELECT * from personas where correo='${correo}' and password='${password}'`;
+        let sql = `SELECT * FROM personas WHERE correo='${correo}'`;
 
-        const [rows] = await pool.query(sql)
+        const [rows] = await pool.query(sql);
+
         if (rows.length > 0) {
+            const user = rows[0];
+            const validPassword = await /* bcrypt.compare */(password, user.password);
+
+            if (!validPassword) {
+                return res.status(404).json({ "message": "Usuario no autorizado" });
+            }
+
             // Incluir la identificación del usuario en el token JWT
-            let token = Jwt.sign({ user: rows[0].identificacion }, process.env.AUT_SECRET, { expiresIn: process.env.AUT_EXPIRE })
-            return res.status(200).json({ 'user': rows, 'token': token, message: 'token generado con éxito' })
+            let token = Jwt.sign({ user: user.identificacion }, process.env.AUT_SECRET, { expiresIn: process.env.AUT_EXPIRE });
+            return res.status(200).json({ 'user': user, 'token': token, message: 'Token generado con éxito' });
         } else {
-            return res.status(404).json({ "message": "Usuario no autorizado" })
+            return res.status(404).json({ "message": "Usuario no autorizado" });
         }
 
     } catch (error) {
-        res.status(500).json({ status: 500, message: 'Error del servidor' + error })
+        res.status(500).json({ status: 500, message: 'Error del servidor: ' + error });
     }
-
 }
-
 
 //verificar
 export const validarToken = async (req, res, next) => {

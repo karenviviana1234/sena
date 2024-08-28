@@ -7,7 +7,7 @@ const Landing_page = () => {
 
   return (
     <ImageBackground 
-      source={require('../../../public/logo-sena-verde.png')} 
+      source={require('../../../public/logoTic.png')} 
       style={styles.background}
       resizeMode="contain"
 

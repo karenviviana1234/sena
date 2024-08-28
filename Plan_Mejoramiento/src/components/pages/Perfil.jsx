@@ -83,7 +83,7 @@ const Perfil = () => {
 
         <Image
           style={styles.logo}
-          source={require("../../../public/logo-sena-verde.png")}
+          source={require("../../../public/logoTic.png")}
         />
 
         <PersonasModal visible={modalVisible} onClose={handleCloseModal} />
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     marginTop: "40%",
     alignSelf: "center",
-    width: 180,
+    width: 220,
     height: 180,
     borderRadius: 40,
   },

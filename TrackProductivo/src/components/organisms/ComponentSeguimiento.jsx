@@ -15,7 +15,19 @@ function ComponentSeguimiento({
   const [seguimiento, setSeguimiento] = useState("");
   const [bitacoraPdf, setPdf] = useState(null); // Asegúrate de que el estado pdf inicie como null
   const [idPersona, setIdPersona] = useState("");
+  const [seguimientoData, setSeguimientoData] = useState(seguimiento || "");
 
+  useEffect(() => {
+    // Aquí puedes cargar o manipular la data del seguimiento
+    if (seguimiento) {
+      setSeguimientoData(seguimiento);
+    }
+  }, [seguimiento]);
+
+  const handleInputChange = (event) => {
+    setSeguimientoData(event.target.value);
+  };
+  
   useEffect(() => {
     const currentDate = new Date().toISOString().slice(0, 10);
     setFecha(currentDate);

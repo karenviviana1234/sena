@@ -269,9 +269,6 @@ function SeguimientoPage() {
         { key: "seguimiento3", label: "Seguimiento 3" },
     ];
 
-
-
-
     return (
         <div className="overflow-hidden flex-1 min-h-screen bg-dark p-2 m-20">
             <div className="flex flex-col">

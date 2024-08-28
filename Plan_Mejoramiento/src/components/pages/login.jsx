@@ -23,34 +23,44 @@ const Login = () => {
   const navigation = useNavigation();
 
   const { SetRol, SetId_persona } = usePersonas();
-
   const handleLogin = async () => {
     try {
+      console.log("Iniciando login...");
       const response = await axiosClient.post("/validacion", {
         correo: email,
         password: password,
       });
 
+      console.log("Respuesta recibida:", response);
+
       if (response.status === 200) {
+        console.log("Datos de respuesta:", response.data);
         const { user, token } = response.data;
-        await AsyncStorage.setItem('token', token)
-        SetRol(user.rol);
-        SetId_persona(user.id_persona);
 
-        const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
+        if (user) {
+          await AsyncStorage.setItem("token", token);
+          const storedToken = await AsyncStorage.getItem("token");
+          console.log("Token almacenado:", storedToken);
 
-        if (allowedRoles.includes(user.rol)) {
-/*           console.log("Usuario autenticado:", user);
-          console.log("Token:", token); */
-          navigation.navigate("principal");
-        } else {
-          Alert.alert(
-            "Acceso denegado",
-            "Los roles permitidos son seguimiento, instructor, y aprendiz."
-          );
+          SetRol(user.rol);
+          SetId_persona(user.id_persona);
+
+          const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
+
+          if (allowedRoles.includes(user.rol)) {
+            console.log("rol", user.rol, "id", user.id_persona);
+            navigation.navigate("seguimiento");
+          } else {
+            Alert.alert(
+              "Acceso denegado",
+              "Los roles permitidos son seguimiento, instructor, y aprendiz."
+            );
+          }
         }
       }
     } catch (error) {
+      console.log("Error en login:", error);
+
       if (error.response && error.response.status === 404) {
         Alert.alert("Error", error.response.data.message);
       } else {
@@ -65,9 +75,9 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <Text style= {styles.textTitle} >TrackProductivo</Text>
+      <Text style={styles.textTitle}>TrackProductivo</Text>
       <Image
-        source={require("../../../public/logo-sena-verde.png")}
+        source={require("../../../public/logoTic.png")}
         style={styles.logo}
         resizeMode="cover"
       />
@@ -80,7 +90,13 @@ const Login = () => {
         value={email}
         onChangeText={setEmail}
       />
-      <View style={[styles.input, styles.passwordContainer, isFocusedPassword && styles.inputFocused]}>
+      <View
+        style={[
+          styles.input,
+          styles.passwordContainer,
+          isFocusedPassword && styles.inputFocused,
+        ]}
+      >
         <TextInput
           style={styles.passwordInput}
           onFocus={() => setIsFocusedPassword(true)}
@@ -105,7 +121,7 @@ const Login = () => {
       <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <Text style={styles.button}>Ingresar</Text>
       </TouchableOpacity>
-{/*       <TouchableOpacity style={styles.buttonContainer}>
+      {/*       <TouchableOpacity style={styles.buttonContainer}>
         <Text style={styles.button}>Registrarme</Text>
       </TouchableOpacity> */}
       <TouchableOpacity onPress={handleForgotPassword}>
@@ -124,12 +140,12 @@ const styles = StyleSheet.create({
   },
   textTitle: {
     fontSize: 30,
-    fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 20
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: 20,
   },
   logo: {
-    width: 140,
+    width: 200,
     height: 140,
   },
   input: {
@@ -157,17 +173,17 @@ const styles = StyleSheet.create({
     height: "100%",
     fontSize: 18,
     color: "black",
-    paddingRight: 40, 
+    paddingRight: 40,
   },
   eyeIcon: {
     position: "absolute",
-    right: 15, 
+    right: 15,
   },
   buttonContainer: {
     height: 50,
     width: 180,
     justifyContent: "center",
-    backgroundColor: "orange",
+    backgroundColor: "green" /* #0c8652 */,
     alignItems: "center",
     marginTop: 20,
     borderRadius: 10,
