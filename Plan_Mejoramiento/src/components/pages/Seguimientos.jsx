@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import Layout from '../Template/Layout';
 import axiosClient from '../../axiosClient';
-import Modal_Seguimiento from '../moleculas/Modal_Seguimiento';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Asegúrate de que esta biblioteca esté correctamente vinculada
+import Modal_Global from '../moleculas/Modal_Global'; // Importa el Modal_Global
+import BotonRegistrar from '../atomos/BotonRegistrar';
+import FormNovedad from '../moleculas/FormNovedad';
 
 const Seguimientos = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -16,7 +17,7 @@ const Seguimientos = () => {
   useEffect(() => {
     const obtenerSeguimientos = async () => {
       try {
-        const response = await axiosClient.get(`/seguimientos/listar`);
+        const response = await axiosClient.get(`/seguimientos/listarA`);
         setSeguimientos(response.data);
         setLoading(false);
       } catch (error) {
@@ -28,10 +29,9 @@ const Seguimientos = () => {
     obtenerSeguimientos();
   }, []);
 
-  const handleOpenModal = (id_seguimiento) => {
+  const handleOpenModal = (id_seguimiento, type) => {
     setSelectedSeguimiento(id_seguimiento);
     setModalVisible(true);
-    // Filtrar las bitácoras correspondientes a este seguimiento
     const bitacorasFiltradas = bitacoras.filter(
       (bitacora) => bitacora.id_seguimiento === id_seguimiento
     );
@@ -65,32 +65,33 @@ const Seguimientos = () => {
   return (
     <Layout title={"Seguimientos"}>
       <View style={styles.container}>
+        <BotonRegistrar 
+          titulo="Subir Novedad" 
+          onPress={() => setModalVisible(true)} // Abre el Modal_Global
+        />
         <FlatList
           data={seguimientos}
-          keyExtractor={(item) => item.id_seguimiento.toString()}
+          keyExtractor={(item) => (item.id_seguimiento ? item.id_seguimiento.toString() : Math.random().toString())}
           renderItem={({ item }) => (
             <View style={styles.item}>
               <Text style={styles.itemText}>
-                Fecha: {formatDate(item.fecha)}
+                Aprendiz: {item.nombres}
               </Text>
               <Text style={styles.itemText}>
-                Seguimiento: {item.seguimiento}
+                Código: {item.codigo}
               </Text>
               <Text style={styles.itemText}>
-                Estado: {item.estado === 1 ? "Activo" : "Inactivo"}
+                Empresa: {item.razon_social}
               </Text>
-              <Text style={styles.itemText}>PDF: {item.pdf}</Text>
-              <Text style={styles.itemText}>Productiva: {item.productiva}</Text>
-              <Text style={styles.itemText}>Instructor: {item.instructor}</Text>
               <View style={styles.buttonContainer}>
-                {[1, 2, 3].map((num) => (
+                {['seguimiento1', 'seguimiento2', 'seguimiento3'].map((seguimiento, index) => (
                   <TouchableOpacity
-                    key={num}
+                    key={seguimiento}
                     style={styles.button}
-                    onPress={() => handleOpenModal(item.id_seguimiento, num)}
+                    onPress={() => handleOpenModal(item[`id_${seguimiento}`], seguimiento)}
                   >
                     <Text style={styles.buttonText}>
-                      Seguimiento {num}
+                      {new Date(item[seguimiento]).toLocaleDateString('es-ES')}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -98,27 +99,15 @@ const Seguimientos = () => {
             </View>
           )}
         />
-        <Modal_Seguimiento
+        <Modal_Global
           visible={modalVisible}
-          onClose={handleCloseModal}
-          bitacoras={bitacoras}
-        />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.uploadButton} onPress={handleOpenModal}>
-            <Icon name="upload" size={20} color="#fff" style={styles.icon} />
-            <Text style={styles.buttonText}>Subir Bitácora</Text>
-          </TouchableOpacity>
-        </View>
+          onClose={handleCloseModal} // Cierra el Modal_Global
+        >
+          <FormNovedad></FormNovedad>
+        </Modal_Global>
       </View>
     </Layout>
   );
-};
-
-// Función para formatear la fecha
-const formatDate = (dateString) => {
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  const date = new Date(dateString);
-  return date.toLocaleDateString(undefined, options);
 };
 
 const styles = StyleSheet.create({
@@ -133,29 +122,11 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "orange",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 15,
     borderRadius: 5,
     flex: 1,
     marginHorizontal: 5,
-  },
-  uploadButton: {
-    backgroundColor: '#28a745', // Color verde
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    elevation: 2, // Para sombra en Android
-    shadowColor: '#000', // Para sombra en iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: "center",
   },
   item: {
     padding: 16,
@@ -164,11 +135,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   itemText: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 4,
-  },
-  icon: {
-    marginRight: 5,
   },
 });
 

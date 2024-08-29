@@ -236,8 +236,7 @@ function TableInstructores() {
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-                    title="Registro de Instructores"
-d
+/*                     title="Registro de Instructores" */
                     bodyContent={bodyContent}
                 />
 

@@ -38,8 +38,6 @@ servidor.use('/programa', rutaPrograma)
 servidor.use('/areas', rutaAreas)
 servidor.use('/horarios', rutaHorarios )
 
-
-
 servidor.use(express.static('./public'))
 servidor.set('view engine', 'ejs')
 

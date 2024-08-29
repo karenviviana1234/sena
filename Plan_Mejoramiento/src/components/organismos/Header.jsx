@@ -8,7 +8,9 @@ const Header = ({ title, toggleMenu }) => {
       <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
         <Icon name="bars" size={30} color="black" />
       </TouchableOpacity>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+        {title}
+      </Text>
     </View>
   );
 };
@@ -20,15 +22,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    elevation: 4, // Sombra en Android
+    elevation: 4, 
   },
   menuButton: {
-    marginRight: 230,
+    marginRight: 16, 
   },
   title: {
     color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
+    flex: 1, 
+    textAlign: 'center', 
+    overflow: 'hidden', 
   },
 });
 

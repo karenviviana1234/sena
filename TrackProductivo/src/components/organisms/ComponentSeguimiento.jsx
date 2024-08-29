@@ -28,22 +28,29 @@ function ComponentSeguimiento({
     2: 2,
     3: 3,
   };
-
+  
   useEffect(() => {
     const currentDate = new Date().toISOString().slice(0, 10);
     setFecha(currentDate);
-
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
-      setIdPersona(user.id_persona);
+  
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      try {
+        const user = JSON.parse(userString);
+        if (user) {
+          setIdPersona(user.id_persona);
+        }
+      } catch (error) {
+        console.error("Error al parsear el usuario desde localStorage:", error);
+      }
     }
-
+  
     // Llama al callback para enviar el ID cuando el componente se monta
     if (onIdSend) {
       onIdSend(id_seguimiento);
     }
   }, [id_seguimiento, onIdSend]);
-
+  
   // Función para manejar la carga del archivo de acta
   const handleActaPdfSubmit = (file) => {
     setSeguimientoPdf(file);
