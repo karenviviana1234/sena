@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import v from "../../styles/Variables.jsx";
+import ButtonDescargar from "../atoms/ButtonDescargar.jsx";
 
 const PDFUploader = ({ onFileSelect }) => {
   const [file, setFile] = useState(null);
@@ -33,25 +33,24 @@ const PDFUploader = ({ onFileSelect }) => {
 
   return (
     <div className="flex items-center gap-4">
-      <label className="relative inline-block cursor-pointer">
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={handleFileUpload}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-        <span className="inline-block px-4 py-2 border shadow-lg rounded-xl">
-          Seleccionar archivo PDF
-        </span>
-      </label>
+      {file ? (
+        <span className="text-base text-gray-400">Archivo Cargado</span>
+      ) : (
+        <label className="relative inline-block cursor-pointer">
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleFileUpload}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          />
+          <span className="inline-block px-4 py-2 border shadow-lg rounded-xl">
+            Seleccionar archivo PDF
+          </span>
+        </label>
+      )}
 
       {file && (
-        <button
-          onClick={downloadFile}
-          className="px-2 py-1 bg-[#98e326] text-white rounded-lg flex items-center"
-        >
-          <v.descargar className="w-5 h-5" />
-        </button>
+        <ButtonDescargar onClick={downloadFile}/>
       )}
     </div>
   );

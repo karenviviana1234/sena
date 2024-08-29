@@ -3,6 +3,9 @@ import { Chip } from "@nextui-org/react";
 import v from "../../styles/Variables.jsx";
 import PDFUploader from "../molecules/Pdf.jsx";
 import axiosClient from "../../configs/axiosClient.jsx";
+import ButtonEnviar from "../atoms/ButtonEnviar.jsx";
+import Icons from "../../styles/Variables.jsx";
+import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 
 function ComponentSeguimiento({
   initialData,
@@ -10,11 +13,22 @@ function ComponentSeguimiento({
   handleSubmit,
   onClose,
   actionLabel,
+  id_seguimiento, // Asegúrate de que este prop está siendo recibido correctamente
+  onIdSend // Callback para enviar el ID
 }) {
   const [fecha, setFecha] = useState("");
-  const [seguimiento, setSeguimiento] = useState("");
-  const [bitacoraPdf, setPdf] = useState(null); // Asegúrate de que el estado pdf inicie como null
+  const [seguimientoPdf, setSeguimientoPdf] = useState(null);
+  const [bitacoraPdf, setBitacoraPdf] = useState(null); // Estado para PDF de bitácora
   const [idPersona, setIdPersona] = useState("");
+  const [estadoActaVisible, setEstadoActaVisible] = useState(false);
+  const [estadoBitacoraVisible, setEstadoBitacoraVisible] = useState(false);
+
+  const seguimientoNumeros = {
+    1: 1,
+    2: 2,
+    3: 3
+  };
+
 
   useEffect(() => {
     const currentDate = new Date().toISOString().slice(0, 10);
@@ -24,8 +38,62 @@ function ComponentSeguimiento({
     if (user) {
       setIdPersona(user.id_persona);
     }
-  }, []);
 
+    // Llama al callback para enviar el ID cuando el componente se monta
+    if (onIdSend) {
+      onIdSend(id_seguimiento);
+    }
+  }, [id_seguimiento, onIdSend]);
+
+  // Función para manejar la carga del archivo de acta
+  const handleActaPdfSubmit = (file) => {
+    setSeguimientoPdf(file);
+    setEstadoActaVisible(true);
+  };
+
+  // Función para manejar la carga del archivo de bitácora
+  const handleBitacoraPdfSubmit = (file) => {
+    setBitacoraPdf(file);
+    setEstadoBitacoraVisible(true);
+  };
+
+  // Función para enviar el acta
+  const handleSubmitActa = async () => {
+    if (!id_seguimiento) {
+      console.error("ID de seguimiento no definido");
+      alert("ID de seguimiento no definido");
+      return;
+    }
+
+    const formData = new FormData();
+    if (seguimientoPdf) {
+      formData.append("seguimientoPdf", seguimientoPdf);
+    }
+
+    try {
+      const response = await axiosClient.post(
+        `/seguimientos/cargarPDF/${id_seguimiento}`, // Usa id_seguimiento aquí
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert("Acta enviada correctamente");
+        if (handleSubmit) handleSubmit();
+      } else {
+        alert("Error al enviar el Acta.");
+      }
+    } catch (error) {
+      console.error("Error del servidor:", error);
+      alert("Error del servidor: " + error.message);
+    }
+  };
+
+  // Función para enviar la bitácora
   const handleSubmitBitacoras = async () => {
     const formData = new FormData();
     formData.append("fecha", fecha);
@@ -34,18 +102,10 @@ function ComponentSeguimiento({
     formData.append("instructor", idPersona);
 
     if (bitacoraPdf) {
-      formData.append("bitacoraPdf", bitacoraPdf); // Incluye el PDF si existe
+      formData.append("bitacoraPdf", bitacoraPdf);
     } else {
       console.warn("No se ha seleccionado ningún archivo PDF.");
     }
-
-    console.log("Enviando datos:", {
-      fecha,
-      bitacora: "1", // Debe ser una cadena, no un número
-      seguimiento: 1,
-      instructor: idPersona,
-      bitacoraPdf,
-    });
 
     try {
       const response = await axiosClient.post(
@@ -70,55 +130,82 @@ function ComponentSeguimiento({
     }
   };
 
-  const handlePdfSubmit = (file) => {
-    console.log("Archivo PDF recibido:", file);
-    setPdf(file); // Aquí deberías guardar el archivo, no solo la URL
-  };
-
   return (
-    <div className="flex justify-between gap-20">
-      <div className="w-1/2 pl-4">
-        <h1 className="font-semibold mb-5 text-2xl">Bitacoras:</h1>
-        <div className="flex flex-col gap-6">
-          <div className="border shadow-medium rounded-2xl p-6">
-            <h2 className="font-semibold text-2xl">
-              Bitacora 1:
-              <Chip
-                endContent={<v.aprobado size={24} />}
-                variant="flat"
-                color="success"
-                className="pr-4 mx-3"
-              >
-                Aprobado
-              </Chip>
-            </h2>
-            <p className="text-gray-500 text-lg">{fecha}</p>
-            <PDFUploader onFileSelect={handlePdfSubmit} />
-            <button
-              onClick={handleSubmitBitacoras}
-              className="px-2 py-1 ml-4 mt-4 bg-[#70B22D] text-white rounded-lg"
-            >
-              <v.enviar className="w-5 h-5" />
-            </button>
-          </div>
+   <div className="flex flex-col gap-8">
+    <h1 className="text-2xl font-semibold">
+      Seguimiento {seguimientoNumeros[id_seguimiento] || 1} {/* Mostrar el número de seguimiento */}
+    </h1>
+      {/* Sección para enviar acta */}
+      <h1 className="font-semibold text-xl">Acta:</h1>
+      <div className="border shadow-medium rounded-2xl p-4 flex flex-col gap-4 relative h-32">
+        <h2 className="font-semibold text-lg absolute top-4 left-4">Acta N° 1:</h2>
+        <div className="flex justify-center items-center h-full">
+          <PDFUploader onFileSelect={handleActaPdfSubmit} />
+          <ButtonEnviar onClick={handleSubmitActa} />
         </div>
+        {estadoActaVisible && (
+          <div className="absolute top-4 left-4 flex items-center gap-2 ml-24">
+            <Chip
+              endContent={<v.solicitud size={20} />}
+              variant="flat"
+              color="warning"
+            >
+              Solicitud
+            </Chip>
+          </div>
+        )}
+        {estadoActaVisible && (
+          <p className="absolute bottom-4 right-4 text-gray-500 text-sm">{fecha}</p>
+        )}
       </div>
 
-      <div className="w-1/2">
-        <h1 className="font-semibold mb-5 text-2xl">Actividades:</h1>
-        <div className="border shadow-medium rounded-2xl p-6">
-          <div>
-            <h2 className="font-semibold text-2xl">Magda Lorena:</h2>
-            <span className="text-lg text-gray-500 align-text-top">
-              Administrativo
-            </span>
+
+      {/* Sección para registrar bitácoras y actividades */}
+      <div className="flex gap-8">
+        {/* Sección para registrar bitácoras */}
+        <div className="flex-1 min-w-[300px]  p-4">
+        <h1 className="font-semibold mb-4 text-xl">Registrar Bitácora:</h1>
+        <div className="border shadow-medium rounded-2xl p-4 flex flex-col gap-4 relative">
+          <h2 className="font-semibold text-lg">Bitácora 1:</h2>
+          <div className="flex justify-center items-center gap-4">
+            <PDFUploader onFileSelect={handleBitacoraPdfSubmit} />
+            <ButtonEnviar onClick={handleSubmitBitacoras} />
           </div>
-          <p className="text-lg">Corregir Bitacora 4</p>
-          <div className="flex justify-end gap-5">
-            <p className="text-lg text-gray-500">20-12-2023</p>
-            <a href="#" className="text-lg">
-              Ver más
-            </a>
+          {estadoBitacoraVisible && (
+            <div className="absolute top-4 left-28 flex items-center gap-2">
+              <Chip
+                endContent={<v.solicitud size={20} />}
+                variant="flat"
+                color="warning"
+              >
+                Solicitud
+              </Chip>
+            </div>
+          )}
+          {estadoBitacoraVisible && (
+           <div className="ml-40 text-gray-500 text-sm top-2">
+             <p >{fecha}</p>
+           </div>
+          )}
+        </div>
+          
+        </div>
+
+        {/* Sección para actividades */}
+        <div className="flex-1 min-w-[300px]  p-4">
+          <h1 className="font-semibold mb-4 text-xl">Novedades:</h1>
+          <div className="border shadow-medium rounded-2xl p-4">
+           <div className="flex justify-between">
+           <div>
+           <h2 className="font-semibold text-lg">Magda Lorena:</h2>
+           <span className="text-gray-500 text-sm">Administrativo</span>
+           </div>
+            <ButtonActualizar/>
+           </div>
+            <p className=" text-sm mt-2">Corregir Bitacora 4</p>
+            <div className="flex justify-end items-center gap-4 mt-2">
+              <p className="text-gray-500 text-sm">20-12-2023</p>
+            </div>
           </div>
         </div>
       </div>
