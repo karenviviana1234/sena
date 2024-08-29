@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
 
-const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions, onAction }) => {
+const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions = [], onAction }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="w-auto max-w-fit">
       <ModalContent>
@@ -12,7 +12,7 @@ const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions, onA
               {bodyContent}
             </ModalBody>
             <ModalFooter className="flex justify-end gap-2">
-              {footerActions.map((action, index) => (
+              {footerActions.length > 0 && footerActions.map((action, index) => (
                 <Button
                   key={index}
                   color={action.color}

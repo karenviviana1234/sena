@@ -3,7 +3,6 @@ import FormUsuarios from './FormUsuarios.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
-import FormVinculaciones from './FormVinculaciones.jsx';
 import {
     Table,
     TableHeader,
@@ -18,6 +17,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
+import FormActividades from './FormActividades.jsx';
 
 function TableInstructores() {
     const [personas, setPersonas] = useState([]);
@@ -34,8 +34,8 @@ function TableInstructores() {
     const handleOpenModal = (formType, data = null) => {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios initialData={data} />);
-        } else if (formType === 'formVinculaciones') {
-            setBodyContent(<FormVinculaciones />);
+        } else if (formType === 'formActividades') {
+            setBodyContent(<FormActividades/>);
         }
         setIsModalOpen(true);
     };
@@ -155,10 +155,10 @@ function TableInstructores() {
                                 Registrar
                             </Button>
                             <Button
-                                onClick={() => handleOpenModal("formVinculaciones")}
+                                onClick={() => handleOpenModal("formActividades")}
                                 className="bg-[#5a851b] text-white"
                             >
-                                Vincular
+                                Añadir actividades
                             </Button>
                         </div>
                     </div>
