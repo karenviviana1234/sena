@@ -17,7 +17,6 @@ import EstadisticasPage from './components/pages/EstadisticasPage.jsx';
 import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
-import AsignacionPage from './components/pages/AsignacionesPage.jsx'
 
 export const App = () => {
   return (
@@ -49,11 +48,6 @@ export const App = () => {
           <Route path="/matriculas" element={
               <WithSidebar>
                 <MatriculasPage />
-              </WithSidebar>
-          } />
-           <Route path="/asignaciones" element={
-              <WithSidebar>
-                <AsignacionPage />
               </WithSidebar>
           } />
 
