@@ -1,9 +1,14 @@
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
 
-const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions = [], onAction }) => {
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} className="w-auto max-w-fit">
+// Componente GlobalModal
+const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions }) => {
+  return (      
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose}
+      className="w-auto max-w-fit"  // Ajusta el ancho del modal
+    >
       <ModalContent>
         {(onClose) => (
           <>

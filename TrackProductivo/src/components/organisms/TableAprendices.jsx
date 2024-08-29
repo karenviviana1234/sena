@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import FormEtapaPractica from './FormEtapaPractica.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
+import FormAprendices from './FormUsuarios.jsx';
 import FormUsuarios from './FormUsuarios.jsx';
 import axiosClient from '../../configs/axiosClient.jsx';
 import {

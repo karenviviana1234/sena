@@ -50,6 +50,16 @@ export const registrarProductiva = async (req, res) => {
         const arl = req.files?.arl?.[0]?.originalname || null;
         const consulta = req.files?.consulta?.[0]?.originalname || null;
 
+        // Verificar que la matrícula existe en la tabla matriculas
+        const sqlCheckMatricula = 'SELECT id_matricula FROM matriculas WHERE id_matricula = ?';
+        const [rowsMatricula] = await pool.query(sqlCheckMatricula, [matricula]);
+
+        if (rowsMatricula.length === 0) {
+            return res.status(400).json({
+                message: 'La matrícula no existe'
+            });
+        }
+
         // Registrar etapa productiva
         const sqlProductiva = `
             INSERT INTO productiva 
@@ -85,7 +95,7 @@ export const registrarProductiva = async (req, res) => {
                 format(fechaSeguimiento3, 'yyyy-MM-dd'), null, productivaId, instructor
             ]);
 
-            if (resultSeguimiento.affectedRows >= 3) { // Verifica si se insertaron los tres seguimientos
+            if (resultSeguimiento.affectedRows >= 3) { 
                 const seguimientoIds = [
                     resultSeguimiento.insertId,
                     resultSeguimiento.insertId + 1,
@@ -125,12 +135,11 @@ export const registrarProductiva = async (req, res) => {
                     fecha_inicio, seguimientoIds[2], null, instructor
                 ]);
 
-                if (resultBitacoras.affectedRows >= 12) { // Verifica si se insertaron las 12 bitácoras
+                if (resultBitacoras.affectedRows >= 12) {
                     res.status(200).json({
                         message: 'Etapa productiva, seguimientos y bitácoras registrados correctamente'
                     });
                 } else {
-                    // Si falla el registro de algunas bitácoras, eliminar los seguimientos y la etapa productiva recién creada
                     await pool.query('DELETE FROM seguimientos WHERE productiva = ?', [productivaId]);
                     await pool.query('DELETE FROM productiva WHERE id_productiva = ?', [productivaId]);
                     res.status(403).json({
@@ -138,7 +147,6 @@ export const registrarProductiva = async (req, res) => {
                     });
                 }
             } else {
-                // Si falla el registro de algún seguimiento, eliminar la etapa productiva recién creada
                 await pool.query('DELETE FROM productiva WHERE id_productiva = ?', [productivaId]);
                 res.status(403).json({
                     message: 'Error al registrar los seguimientos'

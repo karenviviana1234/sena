@@ -28,8 +28,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 export const cargarSeguimiento = upload.single('seguimientoPdf');
 
-// Función para listar seguimientos de aprendices
+
 export const listarSeguimientoAprendices = async (req, res) => {
+    const { sigla } = req.params; 
     try {
         const sql = `
             SELECT
@@ -38,8 +39,12 @@ export const listarSeguimientoAprendices = async (req, res) => {
                 f.codigo AS codigo,
                 prg.sigla AS sigla,
                 e.razon_social AS razon_social,
+                s.id_seguimiento AS id_seguimiento,
                 s.seguimiento AS seguimiento,
-                s.fecha AS fecha
+                s.fecha AS fecha,
+                COUNT(b.id_bitacora) AS total_bitacoras,
+                COUNT(b.pdf) AS bitacoras_con_pdf,
+                (COUNT(b.pdf) / 12) * 100 AS porcentaje
             FROM
                 seguimientos s
                 LEFT JOIN productiva pr ON s.productiva = pr.id_productiva
@@ -48,15 +53,17 @@ export const listarSeguimientoAprendices = async (req, res) => {
                 LEFT JOIN empresa e ON pr.empresa = e.id_empresa
                 LEFT JOIN fichas f ON m.ficha = f.codigo
                 LEFT JOIN programas prg ON f.programa = prg.id_programa
+                LEFT JOIN bitacoras b ON b.seguimiento = s.id_seguimiento
             WHERE
                 p.rol = 'Aprendiz'
+            GROUP BY
+                s.id_seguimiento, p.identificacion
             ORDER BY
                 p.identificacion, s.seguimiento;
         `;
         const [result] = await pool.query(sql);
 
         if (result.length > 0) {
-            // Agrupar resultados
             const aprendizMap = {};
 
             result.forEach(row => {
@@ -67,22 +74,31 @@ export const listarSeguimientoAprendices = async (req, res) => {
                         codigo: row.codigo,
                         sigla: row.sigla,
                         razon_social: row.razon_social,
+                        id_seguimiento1: null,
+                        id_seguimiento2: null,
+                        id_seguimiento3: null,
                         seguimiento1: null,
                         seguimiento2: null,
-                        seguimiento3: null
+                        seguimiento3: null,
+                        porcentaje: 0 // Inicializamos el porcentaje
                     };
                 }
 
                 if (row.seguimiento === '1') {
+                    aprendizMap[row.identificacion].id_seguimiento1 = row.id_seguimiento;
                     aprendizMap[row.identificacion].seguimiento1 = row.fecha;
                 } else if (row.seguimiento === '2') {
+                    aprendizMap[row.identificacion].id_seguimiento2 = row.id_seguimiento;
                     aprendizMap[row.identificacion].seguimiento2 = row.fecha;
                 } else if (row.seguimiento === '3') {
+                    aprendizMap[row.identificacion].id_seguimiento3 = row.id_seguimiento;
                     aprendizMap[row.identificacion].seguimiento3 = row.fecha;
                 }
+
+                // Asignamos el porcentaje calculado
+                aprendizMap[row.identificacion].porcentaje = row.porcentaje; 
             });
 
-            // Convertir el mapa a una lista
             const resultArray = Object.values(aprendizMap);
 
             res.status(200).json(resultArray);
@@ -93,6 +109,10 @@ export const listarSeguimientoAprendices = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor: ' + error.message });
     }
 };
+
+
+
+
 
 
 // Función para registrar seguimientos
@@ -121,6 +141,43 @@ export const registrarSeguimiento = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor: ' + error });
     }
 };
+
+/* Cargar PDF */
+export const uploadPdfToSeguimiento = async (req, res) => {
+    try {
+        const { id_seguimiento } = req.params;  // Obtener el ID del seguimiento desde los parámetros de la URL
+        const pdf = req.file?.originalname || null;  // Obtener el nombre del archivo PDF cargado
+
+        if (!pdf) {
+            return res.status(400).json({
+                message: 'No se ha cargado ningún archivo'
+            });
+        }
+
+        // Actualizar el campo 'pdf' en la tabla 'seguimientos' con la ruta o el nombre del archivo
+        const sqlUpdateSeguimiento = `
+            UPDATE seguimientos 
+            SET pdf = ? 
+            WHERE id_seguimiento = ?
+        `;
+        const [result] = await pool.query(sqlUpdateSeguimiento, [pdf, id_seguimiento]);
+
+        if (result.affectedRows > 0) {
+            res.status(200).json({
+                message: 'PDF cargado exitosamente en el seguimiento'
+            });
+        } else {
+            res.status(404).json({
+                message: 'Seguimiento no encontrado'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error.message
+        });
+    }
+};
+
 
 // Función para actualizar seguimientos
 export const actualizarSeguimiento = async (req, res) => {

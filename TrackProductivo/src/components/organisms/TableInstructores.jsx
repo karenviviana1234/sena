@@ -3,6 +3,8 @@ import FormUsuarios from './FormUsuarios.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
+import FormVinculaciones from './FormVinculaciones.jsx';
+import { format } from 'date-fns';
 import {
     Table,
     TableHeader,
@@ -28,6 +30,7 @@ function TableInstructores() {
         direction: "ascending",
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
+    /* Se define una constante para manejar el contenido dinamico */
     const [bodyContent, setBodyContent] = useState(null);
     const [page, setPage] = useState(1);
 
@@ -40,15 +43,16 @@ function TableInstructores() {
         setIsModalOpen(true);
     };
 
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
 
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axiosClient.get('/personas/listarI');
-                console.log('Datos recibidos:', response.data);
+                const response = await axiosClient.get('/personas/listarI'); // Ajusta la ruta del endpoint
                 setPersonas(response.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -57,6 +61,7 @@ function TableInstructores() {
 
         fetchData();
     }, []);
+  
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -231,8 +236,11 @@ function TableInstructores() {
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
+                    title="Registro de Instructores"
+d
                     bodyContent={bodyContent}
                 />
+
             </div>
         </div>
     );
