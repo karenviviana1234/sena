@@ -5,6 +5,7 @@ import axiosClient from '../../axiosClient';
 import BotonRegistrar from '../atomos/BotonRegistrar';
 import Modal_Global from '../moleculas/Modal_Global'; // Asegúrate de que esta ruta sea correcta
 import FormNovedad from '../moleculas/FormNovedad';
+import FormEmpresa from '../moleculas/FormEmpresa';
 
 const Empresas = () => {
   const [empresas, setEmpresas] = useState([]);
@@ -82,7 +83,7 @@ const Empresas = () => {
           visible={modalVisible}
           onClose={handleCloseModal}
         >
-          <FormNovedad></FormNovedad>
+          <FormEmpresa/>
         </Modal_Global>
       </View>
     </Layout>
