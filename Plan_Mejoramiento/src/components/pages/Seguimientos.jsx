@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import Layout from '../Template/Layout';
-import axiosClient from '../../axiosClient';
-import Modal_Global from '../moleculas/Modal_Global'; // Importa el Modal_Global
-import BotonRegistrar from '../atomos/BotonRegistrar';
-import FormNovedad from '../moleculas/FormNovedad';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import Layout from "../Template/Layout";
+import axiosClient from "../../axiosClient";
+import Modal_Global from "../moleculas/Modal_Global"; // Importa el Modal_Global
+import BotonRegistrar from "../atomos/BotonRegistrar";
+import FormNovedad from "../moleculas/FormNovedad";
+import { usePersonas } from "../../Context/ContextPersonas.jsx";
+import { useEffect, useState } from "react";
 
 const Seguimientos = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -13,6 +20,8 @@ const Seguimientos = () => {
   const [seguimientos, setSeguimientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const {rol} = usePersonas();
 
   useEffect(() => {
     const obtenerSeguimientos = async () => {
@@ -65,36 +74,42 @@ const Seguimientos = () => {
   return (
     <Layout title={"Seguimientos"}>
       <View style={styles.container}>
-        <BotonRegistrar 
-          titulo="Subir Novedad" 
-          onPress={() => setModalVisible(true)} // Abre el Modal_Global
-        />
+        {rol !== "Aprendiz" && (
+          <BotonRegistrar
+            titulo="Subir Novedad"
+            onPress={() => setModalVisible(true)} // Abre el Modal_Global
+          />
+        )}
         <FlatList
           data={seguimientos}
-          keyExtractor={(item) => (item.id_seguimiento ? item.id_seguimiento.toString() : Math.random().toString())}
+          keyExtractor={(item) =>
+            item.id_seguimiento
+              ? item.id_seguimiento.toString()
+              : Math.random().toString()
+          }
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text style={styles.itemText}>
-                Aprendiz: {item.nombres}
-              </Text>
-              <Text style={styles.itemText}>
-                Código: {item.codigo}
-              </Text>
-              <Text style={styles.itemText}>
-                Empresa: {item.razon_social}
-              </Text>
+              <Text style={styles.itemText}>Aprendiz: {item.nombres}</Text>
+              <Text style={styles.itemText}>Código: {item.codigo}</Text>
+              <Text style={styles.itemText}>Empresa: {item.razon_social}</Text>
               <View style={styles.buttonContainer}>
-                {['seguimiento1', 'seguimiento2', 'seguimiento3'].map((seguimiento, index) => (
-                  <TouchableOpacity
-                    key={seguimiento}
-                    style={styles.button}
-                    onPress={() => handleOpenModal(item[`id_${seguimiento}`], seguimiento)}
-                  >
-                    <Text style={styles.buttonText}>
-                      {new Date(item[seguimiento]).toLocaleDateString('es-ES')}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {["seguimiento1", "seguimiento2", "seguimiento3"].map(
+                  (seguimiento) => (
+                    <TouchableOpacity
+                      key={seguimiento}
+                      style={styles.button}
+                      onPress={() =>
+                        handleOpenModal(item[seguimiento], seguimiento)
+                      }
+                    >
+                      <Text style={styles.buttonText}>
+                        {new Date(item[seguimiento]).toLocaleDateString(
+                          "es-ES"
+                        )}
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                )}
               </View>
             </View>
           )}
