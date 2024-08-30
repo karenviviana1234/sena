@@ -109,6 +109,7 @@ const FormMatriculas = ({ onClose }) => {
         style={styles.picker}
         onValueChange={(itemValue) => setEstado(itemValue)}
       >
+        
         {estados.map((estado, index) => (
           <Picker.Item 
             key={index} 
