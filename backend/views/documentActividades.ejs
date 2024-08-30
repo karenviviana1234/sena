@@ -8,10 +8,10 @@
 <body>
 
     <hr>
-    <h2> Módulo de vinculaciones </h2>
+    <h2> Módulo de actividades </h2>
     <hr>
 
-    <h3> Registrar vinculaciones </h3>
+    <h3> Registrar actividades </h3>
 
     <table>
         <tr>
@@ -20,15 +20,15 @@
         </tr>
         <tr>
             <td> Nombre del servicio </td>
-            <td> Registrar vinculaciones </td>
+            <td> Registrar actividades </td>
         </tr>
         <tr>
             <td> URL </td>
-            <td> /vinculaciones/registrar </td>
+            <td> /actividades/registrar </td>
         </tr>
         <tr>
             <td> Descripción </td>
-            <td> Permite registrar vinculaciones en la base de datos </td>
+            <td> Permite registrar actividades en la base de datos </td>
         </tr>
         <tr>
             <td> Verbo HTTP </td>
@@ -39,7 +39,7 @@
             <td> token: token </td>
         </tr>
         <tr>
-            <td> Uusario </td>
+            <td> Usuario </td>
             <td> Coordinador, seguimiento </td>
         </tr>
         <tr>
@@ -47,10 +47,13 @@
             <td>
                 
             Json: {
-                    "instructor": 10,
-                    "tipo": 2,
-                    "sede": 1,
-                    "area": 1
+                "fecha_inicio": "2024-02-29",
+                "fecha_fin": "2024-07-29",
+                "instructor": 2,
+                "horario": 2,
+                "productiva": 1,
+                "tipo": 1,
+                "solicitud": 1
             }
 
             </td>
@@ -61,13 +64,13 @@
                 Correcto: 
                 Json: {
                     Status: 200,
-                    Message: "Vinculación registrada correctamente"
+                    Message: "Actividad registrada correctamente"
                 },
 
                 Incorrecto: 
                 Json: {
                     Status: 403,
-                    Message: "Error al registrar la vinculacion"
+                    Message: "Error al registrar la actividad"
                 },
 
                 Error: 
@@ -85,7 +88,7 @@
 
     <hr>
 
-    <h3> Listar vinculaciones </h3>
+    <h3> Listar actividades </h3>
 
     <table>
         <tr>
@@ -94,15 +97,15 @@
         </tr>
         <tr>
             <td> Nombre del servicio </td>
-            <td> Listar vinculaciones </td>
+            <td> Listar actividades </td>
         </tr>
         <tr>
             <td> URL </td>
-            <td> /vinculaciones/listar </td>
+            <td> /actividades/listar </td>
         </tr>
         <tr>
             <td> Descripción </td>
-            <td> Permite listar las vinculaciones que existen en la base de datos </td>
+            <td> Permite listar las actividades que existen en la base de datos </td>
         </tr>
         <tr>
             <td> Verbo HTTP </td>
@@ -128,19 +131,22 @@
                     Status: 200,
                     Message: 
                         {
-                            "id_vinculacion": 4,
-                            "instructor": 10,
-                            "tipo": "contratisca",
-                            "sede": "yamboro",
-                            "area": 1,
-                            "estado": "Activo"
+                            "id_actividad": 5,
+                            "estado": "Activo",
+                            "fecha_inicio": "2024-02-29T05:00:00.000Z",
+                            "fecha_fin": "2024-07-29T05:00:00.000Z",
+                            "instructor": 2,
+                            "horario": 2,
+                            "productiva": 1,
+                            "tipo": "Formacion",
+                            "solicitud": "Solicitado"
                         }
                 },
 
                 Incorrecto: 
                 Json: {
                     Status: 404,
-                    Message: "No hay vinculaciones registradas"
+                    Message: "No hay actividades registradas"
                 },
 
                 Error: 
@@ -158,7 +164,7 @@
 
     <hr>
 
-    <h3> Actualizar vinculaciones </h3>
+    <h3> Actualizar actividades </h3>
 
     <table>
         <tr>
@@ -167,15 +173,15 @@
         </tr>
         <tr>
             <td> Nombre del servicio </td>
-            <td> Actualizar vinculaciones </td>
+            <td> Actualizar actividades </td>
         </tr>
         <tr>
             <td> URL </td>
-            <td> /vinculaciones/actualizar/1 </td>
+            <td> /actividades/actualizar/1 </td>
         </tr>
         <tr>
             <td> Descripción </td>
-            <td> Permite actualizar las vinculaciones que existen en la base de datos </td>
+            <td> Permite actualizar las actividades que existen en la base de datos </td>
         </tr>
         <tr>
             <td> Verbo HTTP </td>
@@ -193,7 +199,7 @@
             <td> Petición body-form-data </td>
             <td>
                 Json: {
-                    "sede": 2
+                    "tipo": 2
                 }
             </td>
         </tr>
@@ -203,13 +209,13 @@
                 Correcto: 
                 Json: {
                     Status: 200,
-                    Message: "Vinculacion actualizada correctamente"
+                    Message: "Actividad actualizada correctamente"
                 },
 
                 Incorrecto: 
                 Json: {
                     Status: 403,
-                    Message: "Error al actualizar la vinculacion"
+                    Message: "Error al actualizar la actividad"
                 },
 
                 Error: 
@@ -227,7 +233,7 @@
 
     <hr>
 
-    <h3> Desactivar vinculaciones </h3>
+    <h3> Desactivar actividades </h3>
 
     <table>
         <tr>
@@ -236,15 +242,15 @@
         </tr>
         <tr>
             <td> Nombre del servicio </td>
-            <td> Desactivar vinculaciones </td>
+            <td> Desactivar actividades </td>
         </tr>
         <tr>
             <td> URL </td>
-            <td> /vinculaciones/inactivar/1 </td>
+            <td> /actividades/desactivar/1 </td>
         </tr>
         <tr>
             <td> Descripción </td>
-            <td> Permite desactivar las vinculaciones que existen en la base de datos </td>
+            <td> Permite desactivar las actividades que existen en la base de datos </td>
         </tr>
         <tr>
             <td> Verbo HTTP </td>
@@ -268,13 +274,13 @@
                 Correcto: 
                 Json: {
                     Status: 200,
-                    Message: "Vinculacion desactivada correctamente"
+                    Message: "Actividad desactivada correctamente"
                 },
 
                 Incorrecto: 
                 Json: {
                     Status: 403,
-                    Message: "Error al desactivar la vinculacion"
+                    Message: "Error al desactivar la actividad"
                 },
 
                 Error: 
@@ -292,7 +298,7 @@
 
     <hr>
 
-    <h3> Activar vinculaciones </h3>
+    <h3> Activar actividades </h3>
 
     <table>
         <tr>
@@ -301,15 +307,15 @@
         </tr>
         <tr>
             <td> Nombre del servicio </td>
-            <td> Activar vinculaciones </td>
+            <td> Activar actividades </td>
         </tr>
         <tr>
             <td> URL </td>
-            <td> /vinculaciones/activar/1 </td>
+            <td> /actividades/activar/1 </td>
         </tr>
         <tr>
             <td> Descripción </td>
-            <td> Permite activar las vinculaciones que existen en la base de datos </td>
+            <td> Permite activar las actividades que existen en la base de datos </td>
         </tr>
         <tr>
             <td> Verbo HTTP </td>
@@ -333,13 +339,13 @@
                 Correcto: 
                 Json: {
                     Status: 200,
-                    Message: "Vinculacion activada correctamente"
+                    Message: "Actividad activada correctamente"
                 },
 
                 Incorrecto: 
                 Json: {
                     Status: 403,
-                    Message: "Error al activar la vinculacion"
+                    Message: "Error al activar la actividad"
                 },
 
                 Error: 

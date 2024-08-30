@@ -186,3 +186,45 @@ export const rechazarBitacora = async (req, res) => {
         })
     }
 }
+
+export const bitacoraSeguimiento = async (req, res) => {
+    try {
+        const {id} = req.params
+
+        let sql = `SELECT * FROM bitacoras WHERE seguimiento = ?`
+        const [result] = await pool.query(sql, [id])
+
+        if(result.length>0){
+            res.status(200).json(result)
+        }else{
+            res.status(404).json({
+                message: 'No hay bitacoras asociadas al seguimiento'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor' + error
+        })
+    }
+}
+
+export const buscarBitacora = async (req, res) => {
+    try {
+        const {id} = req.params
+        let sql = `SELECT * FROM bitacoras WHERE id_bitacora =?`
+
+        const [result] = await pool.query(sql, [id])
+
+        if(result.length>0){
+            res.status(200).json(result)
+        }else{
+            res.status(404).json({
+                message: 'Bitacora no encontrada'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error en el servidor' + error
+        })
+    }
+}

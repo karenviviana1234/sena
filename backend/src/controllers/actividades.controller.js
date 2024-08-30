@@ -92,21 +92,45 @@ export const actualizarActividad = async (req, res) => {
     }
 };
 
-export const eliminarActividad = async (req, res) => {
+export const desactivarActividad = async (req, res) => {
     try {
         const { id } = req.params;
 
-        let sql = `DELETE FROM actividades WHERE id_actividad = ?`;
+        let sql = `UPDATE actividades SET estado = 2 WHERE id_actividad = ?`;
 
         const [rows] = await pool.query(sql, [id]);
 
         if (rows.affectedRows > 0) {
             res.status(200).json({
-                message: 'Actividad eliminada exitosamente'
+                message: 'Actividad desactivada exitosamente'
             });
         } else {
             res.status(403).json({
-                message: 'Error al eliminar la actividad'
+                message: 'Error al desactivar la actividad'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error
+        });
+    }
+};
+
+export const activarActividad = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        let sql = `UPDATE actividades SET estado = 1 WHERE id_actividad = ?`;
+
+        const [rows] = await pool.query(sql, [id]);
+
+        if (rows.affectedRows > 0) {
+            res.status(200).json({
+                message: 'Actividad activada exitosamente'
+            });
+        } else {
+            res.status(403).json({
+                message: 'Error al activar la actividad'
             });
         }
     } catch (error) {

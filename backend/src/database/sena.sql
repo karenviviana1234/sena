@@ -24,12 +24,12 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `activiades`
+-- Estructura de tabla para la tabla `actividades`
 --
 
 CREATE TABLE `actividades` (
   `id_actividad` int NOT NULL,
-  `estado` enum('Activo','Inactivo') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `estado` enum('Activo','Inactivo') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `fecha_inicio` date DEFAULT NULL,
   `fecha_fin` date DEFAULT NULL,
   `instructor` int DEFAULT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE `actividades` (
   `productiva` int DEFAULT NULL,
   `tipo` enum('Formacion','Seguimiento','Administrativo') DEFAULT NULL,
   `solicitud` enum('Solicitado','Aprobado','No Aprobado') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -51,7 +51,7 @@ CREATE TABLE `ambientes` (
   `municipio` int DEFAULT NULL,
   `sede` enum('centro','yamboro') DEFAULT NULL,
   `estado` enum('activo','inactivo') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -62,7 +62,7 @@ CREATE TABLE `ambientes` (
 CREATE TABLE `areas` (
   `id_area` int NOT NULL,
   `nombre_area` varchar(80) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `areas`
@@ -80,12 +80,12 @@ INSERT INTO `areas` (`id_area`, `nombre_area`) VALUES
 CREATE TABLE `bitacoras` (
   `id_bitacora` int NOT NULL,
   `fecha` date DEFAULT NULL,
-  `bitacora` enum('1','2','3','4','5','6','7','8','9','10','11','12') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `bitacora` enum('1','2','3','4','5','6','7','8','9','10','11','12') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `seguimiento` int DEFAULT NULL,
-  `pdf` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `pdf` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `estado` enum('solicitud','aprobado','no aprobado') DEFAULT NULL,
   `instructor` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -102,7 +102,7 @@ CREATE TABLE `empresa` (
   `municipio` int DEFAULT NULL,
   `jefe_inmediato` varchar(50) DEFAULT NULL,
   `estado` enum('Activo','Inactivo') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `empresa`
@@ -124,8 +124,8 @@ CREATE TABLE `fichas` (
   `fin_ficha` datetime DEFAULT NULL,
   `programa` int DEFAULT NULL,
   `sede` enum('centro','yamboro') DEFAULT NULL,
-  `estado` enum('Lecttiva','Electiva','Finalizado') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `estado` enum('Lecttiva','Electiva','Finalizado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `fichas`
@@ -148,8 +148,8 @@ CREATE TABLE `horarios` (
   `horas` int DEFAULT NULL,
   `ficha` int DEFAULT NULL,
   `ambiente` int DEFAULT NULL,
-  `estado` enum('Activo','Inactivo') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `estado` enum('Activo','Inactivo') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -161,11 +161,11 @@ CREATE TABLE `matriculas` (
   `id_matricula` int NOT NULL,
   `ficha` int DEFAULT NULL,
   `aprendiz` int DEFAULT NULL,
-  `estado` enum('Inducción','Formación','Condicionado','Cancelado','Retiro Voluntario','Por Certificar','Certificado') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `estado` enum('Inducción','Formación','Condicionado','Cancelado','Retiro Voluntario','Por Certificar','Certificado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `pendiente_tecnicos` int DEFAULT NULL,
   `pendiente_transversales` int DEFAULT NULL,
   `pendiente_ingles` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `matriculas`
@@ -184,7 +184,7 @@ CREATE TABLE `municipios` (
   `id_municipio` int NOT NULL,
   `nombre_mpio` varchar(80) DEFAULT NULL,
   `departamento` varchar(80) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `municipios`
@@ -203,10 +203,10 @@ CREATE TABLE `novedades` (
   `id_novedad` int NOT NULL,
   `descripcion` varchar(200) DEFAULT NULL,
   `fecha` date DEFAULT NULL,
-  `foto` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `foto` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `seguimiento` int DEFAULT NULL,
   `instructor` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -221,14 +221,14 @@ CREATE TABLE `personas` (
   `correo` varchar(80) DEFAULT NULL,
   `telefono` varchar(40) DEFAULT NULL,
   `password` varchar(25) DEFAULT NULL,
-  `rol` enum('Instructor','Coordinador','Lider','Seguimiento','Aprendiz') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `rol` enum('Instructor','Coordinador','Lider','Seguimiento','Aprendiz') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `cargo` enum('Instructor','Aprendiz','Coordinador','Administrativo') DEFAULT NULL,
   `municipio` int DEFAULT NULL,
   `tipo` enum('contratista','planta') DEFAULT NULL,
   `sede` enum('centro','yamboro') DEFAULT NULL,
   `area` int DEFAULT NULL,
   `estado` enum('Activo','Inactivo') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `personas`
@@ -251,12 +251,12 @@ CREATE TABLE `productiva` (
   `fecha_inicio` date DEFAULT NULL,
   `fecha_fin` date DEFAULT NULL,
   `alternativa` enum('Contrato de Aprendizaje','Proyecto Productivo','Pasantias','Monitoria') DEFAULT NULL,
-  `estado` enum('Inicio','Renuncia','Terminado') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `estado` enum('Inicio','Renuncia','Terminado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `acuerdo` varchar(100) DEFAULT NULL,
   `arl` varchar(100) DEFAULT NULL,
-  `consulta` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `consulta` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `aprendiz` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `productiva`
@@ -277,7 +277,7 @@ CREATE TABLE `programas` (
   `sigla` varchar(20) DEFAULT NULL,
   `nivel` enum('Tecnico','Tecnólogo') DEFAULT NULL,
   `estado` enum('activo','inactivo') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `programas`
@@ -295,12 +295,12 @@ INSERT INTO `programas` (`id_programa`, `nombre_programa`, `sigla`, `nivel`, `es
 CREATE TABLE `seguimientos` (
   `id_seguimiento` int NOT NULL,
   `fecha` date DEFAULT NULL,
-  `seguimiento` enum('1','2','3') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `seguimiento` enum('1','2','3') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `estado` enum('solicitud','aprobado','no aprobado') DEFAULT NULL,
-  `pdf` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `pdf` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `productiva` int DEFAULT NULL,
-  `instructor` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `instructor` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `seguimientos`
@@ -314,7 +314,7 @@ INSERT INTO `seguimientos` (`id_seguimiento`, `fecha`, `seguimiento`, `estado`, 
 --
 
 --
--- Indices de la tabla `activiades`
+-- Indices de la tabla `actividades`
 --
 ALTER TABLE `actividades`
   ADD PRIMARY KEY (`id_actividad`),
@@ -421,9 +421,9 @@ ALTER TABLE `seguimientos`
 --
 
 --
--- AUTO_INCREMENT de la tabla `activiades`
+-- AUTO_INCREMENT de la tabla `actividades`
 --
-ALTER TABLE `activiades`
+ALTER TABLE `actividades`
   MODIFY `id_actividad` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
@@ -503,9 +503,9 @@ ALTER TABLE `seguimientos`
 --
 
 --
--- Filtros para la tabla `activiades`
+-- Filtros para la tabla `actividades`
 --
-ALTER TABLE `activiades`
+ALTER TABLE `actividades`
   ADD CONSTRAINT `horario_vinculacion` FOREIGN KEY (`horario`) REFERENCES `horarios` (`id_horario`),
   ADD CONSTRAINT `productiva_actividad` FOREIGN KEY (`productiva`) REFERENCES `productiva` (`id_productiva`),
   ADD CONSTRAINT `vinculacion_instructor` FOREIGN KEY (`instructor`) REFERENCES `personas` (`id_persona`);
