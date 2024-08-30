@@ -13,7 +13,7 @@ const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions = []
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-            <ModalBody className="w-auto">
+            <ModalBody className='overflow-y-auto max-h-[80vh] w-auto'>
               {bodyContent}
             </ModalBody>
             <ModalFooter className="flex justify-end gap-2">
