@@ -7,13 +7,11 @@ function FormActividades() {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [horario, setHorario] = useState("");
-  const [productiva, setProductiva] = useState("");
   const [tipo, setTipo] = useState("Formacion");
   const [solicitud, setSolicitud] = useState("Solicitado");
 
   const [instructores, setInstructores] = useState([]);
   const [horarios, setHorarios] = useState([]);
-  const [productivas, setProductivas] = useState([]);
 
   const [errors, setErrors] = useState({
     fechaInicio: "",
@@ -49,7 +47,7 @@ function FormActividades() {
     fetchHorarios();
   }, []);
 
-  useEffect(() => {
+/*   useEffect(() => {
     const fetchProductivas = async () => {
       try {
         const response = await axiosClient.get("/productiva/listar");
@@ -60,7 +58,7 @@ function FormActividades() {
     };
 
     fetchProductivas();
-  }, []);
+  }, []); */
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -94,7 +92,7 @@ function FormActividades() {
       fecha_inicio: fechaInicio,
       fecha_fin: fechaFin,
       horario: parseInt(horario, 10) || null,
-      productiva: parseInt(productiva, 10) || null,
+/*       productiva: parseInt(productiva, 10) || null, */
       tipo: tipos.indexOf(tipo) + 1, // Convertir a número basado en el índice + 1
       solicitud: solicitudes.indexOf(solicitud) + 1, // Convertir a número basado en el índice + 1
     };
@@ -195,8 +193,8 @@ function FormActividades() {
             />
           </div>
 
+{/*             <Select
           <div className="flex flex-col">
-            <Select
               name="productiva"
               placeholder="Selecciona la productiva"
               value={productiva}
@@ -224,7 +222,7 @@ function FormActividades() {
               readOnly
               color={productiva ? "success" : "default"}
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-4">

@@ -241,7 +241,7 @@ function TableSeguimientos() {
         { key: "seguimiento3", label: "Seguimiento 3" },
         { key: "porcentajes", label: "Porcentajes" },
     ];
-
+    
     return (
         <div className="overflow-hidden flex-1 bg-dark p-2">
             <div className="flex flex-col">

@@ -4,7 +4,7 @@ import { validarToken } from "../controllers/seguridad.controller.js";
 
 const rutaEmpresas = Router();
 
-rutaEmpresas.get("/listar", validarToken, listarEmpresas);
+rutaEmpresas.get("/listar", /* validarToken,  */listarEmpresas);
 rutaEmpresas.post("/registrar", /* validarToken,  */registrarEmpresas);
 rutaEmpresas.put("/actualizar/:id", validarToken, actualizarEmpresas);
 rutaEmpresas.put("/inactivar/:id", validarToken, inactivarEmpresa);

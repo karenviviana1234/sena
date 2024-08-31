@@ -2,7 +2,7 @@ import { pool } from "../database/conexion.js";
 
 export const listarEmpresas = async (req, res) => {
     try {
-        let sql = `SELECT * FROM empresa`
+        let sql = `SELECT * FROM empresas`
 
         const [results] = await pool.query(sql)
 

@@ -2,11 +2,11 @@ import { pool } from './../database/conexion.js'
 
 export const registrarActividad = async (req, res) => {
     try {
-        const { fecha_inicio, fecha_fin, instructor, horario, productiva, tipo, solicitud } = req.body;
+        const { fecha_inicio, fecha_fin, instructor, horario,  tipo, solicitud } = req.body;
 
-        let sql = `INSERT INTO actividades (estado, fecha_inicio, fecha_fin, instructor, horario, productiva, tipo, solicitud) VALUES (1, ?, ?, ?, ?, ?, ?, ?)`;
+        let sql = `INSERT INTO actividades (estado, fecha_inicio, fecha_fin, instructor, horario,  tipo, solicitud) VALUES (1, ?, ?, ?, ?, ?, ?)`;
 
-        const [rows] = await pool.query(sql, [ fecha_inicio, fecha_fin, instructor, horario, productiva, tipo, solicitud]);
+        const [rows] = await pool.query(sql, [ fecha_inicio, fecha_fin, instructor, horario,  tipo, solicitud]);
 
         if (rows.affectedRows > 0) {
             res.status(200).json({
@@ -47,7 +47,7 @@ export const listarActividades = async (req, res) => {
 export const actualizarActividad = async (req, res) => {
     try {
         const { id } = req.params;
-        const { estado, fecha_inicio, fecha_fin, instructor, horario, productiva, tipo, solicitud } = req.body;
+        const { estado, fecha_inicio, fecha_fin, instructor, horario,  tipo, solicitud } = req.body;
 
         const [anterior] = await pool.query(`SELECT * FROM actividades WHERE id_actividad = ?`, [id]);
 
@@ -57,7 +57,6 @@ export const actualizarActividad = async (req, res) => {
                     fecha_fin = ?,
                     instructor = ?,
                     horario = ?,
-                    productiva = ?,
                     tipo = ?,
                     solicitud = ?
                     WHERE id_actividad = ?`;
@@ -68,7 +67,6 @@ export const actualizarActividad = async (req, res) => {
             fecha_fin || anterior[0].fecha_fin,
             instructor || anterior[0].instructor,
             horario || anterior[0].horario,
-            productiva || anterior[0].productiva,
             tipo || anterior[0].tipo,
             solicitud || anterior[0].solicitud,
             id
