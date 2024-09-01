@@ -1,61 +1,70 @@
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import Layout from "../Template/Layout";
 import Modal_Global from "../moleculas/Modal_Global";
 import BotonRegistrar from "../atomos/BotonRegistrar";
-import FormNovedad from "../moleculas/FormNovedad";
 import { usePersonas } from "../../Context/ContextPersonas.jsx";
-import { useEffect, useState } from "react";
-import axiosClient from "../../axiosClient.js";
+import FormNovedad from "../moleculas/FormNovedad.jsx";
 import ComponentSeguimiento from "../moleculas/ComponentSeguimiento.jsx";
+import SeguimientosContext from "../../Context/ContextSeguimiento.jsx";
 
 const Seguimientos = () => {
+  const { rol } = usePersonas();
+  const { seguimientos, getSeguimientos, getSeguimiento } = useContext(SeguimientosContext);
+
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedComponent, setSelectedComponent] = useState(null); // Estado para controlar el componente que se renderiza
+  const [selectedComponent, setSelectedComponent] = useState(null);
   const [selectedSeguimiento, setSelectedSeguimiento] = useState(null);
   const [bitacoras, setBitacoras] = useState([]);
-  const [seguimientos, setSeguimientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const { rol } = usePersonas();
 
   useEffect(() => {
     const obtenerSeguimientos = async () => {
       try {
-        const response = await axiosClient.get(`/seguimientos/listarA`);
-        setSeguimientos(response.data);
+        await getSeguimientos();
         setLoading(false);
       } catch (error) {
+        console.error("Error al obtener seguimientos:", error);
         setError(error.message);
         setLoading(false);
       }
     };
-
     obtenerSeguimientos();
-  }, []);
+  }, [getSeguimientos]);
 
-  const handleOpenModal = (id_seguimiento, component) => {
-    setSelectedSeguimiento(id_seguimiento);
+  const handleOpenModal = async (id_seguimiento, component) => {
+    console.log("handleOpenModal llamado con id_seguimiento:", id_seguimiento);
+    console.log("Componente seleccionado:", component.name);
+  
     setSelectedComponent(component);
     setModalVisible(true);
-
+  
     if (component === ComponentSeguimiento) {
-      const bitacorasFiltradas = bitacoras.filter(
-        (bitacora) => bitacora.id_seguimiento === id_seguimiento
+      setSelectedSeguimiento(id_seguimiento);
+      console.log(
+        "ComponenteSeguimiento seleccionado con id_seguimiento:",
+        id_seguimiento
       );
-      setBitacoras(bitacorasFiltradas);
+  
+      const seguimiento = await getSeguimiento(id_seguimiento);
+      if (seguimiento && seguimiento.bitacoras) {
+        const bitacorasFiltradas = seguimiento.bitacoras.filter(
+          (bitacora) => bitacora.id_seguimiento === id_seguimiento
+        );
+        setBitacoras(bitacorasFiltradas);
+        console.log("Bitácoras filtradas:", bitacorasFiltradas);
+      } else {
+        console.error("El seguimiento no contiene bitácoras o es inválido.");
+      }
     }
   };
+  
 
   const handleCloseModal = () => {
     setModalVisible(false);
-    setSelectedComponent(null); // Resetea el componente seleccionado al cerrar el modal
+    setSelectedComponent(null);
+    setSelectedSeguimiento(null);
   };
 
   if (loading) {
@@ -84,7 +93,7 @@ const Seguimientos = () => {
         {rol !== "Aprendiz" && (
           <BotonRegistrar
             titulo="Subir Novedad"
-            onPress={() => handleOpenModal(null, FormNovedad)} // Abre el Modal_Global con FormNovedad
+            onPress={() => handleOpenModal(null, FormNovedad)}
           />
         )}
         <FlatList
@@ -106,7 +115,7 @@ const Seguimientos = () => {
                       key={seguimiento}
                       style={styles.button}
                       onPress={() =>
-                        handleOpenModal(item[seguimiento], ComponentSeguimiento) // Abre el Modal_Global con ComponentSeguimiento
+                        handleOpenModal(item[seguimiento], ComponentSeguimiento)
                       }
                     >
                       <Text style={styles.buttonText}>
@@ -121,14 +130,14 @@ const Seguimientos = () => {
             </View>
           )}
         />
-        <Modal_Global
-          visible={modalVisible}
-          onClose={handleCloseModal}
-        >
-          {selectedComponent === ComponentSeguimiento && (
+        <Modal_Global visible={modalVisible} onClose={handleCloseModal}>
+          {selectedComponent === ComponentSeguimiento && selectedSeguimiento ? (
             <ComponentSeguimiento seguimiento={selectedSeguimiento} />
+          ) : selectedComponent === FormNovedad ? (
+            <FormNovedad />
+          ) : (
+            <Text>No se ha seleccionado ningún componente</Text>
           )}
-          {selectedComponent === FormNovedad && <FormNovedad />}
         </Modal_Global>
       </View>
     </Layout>

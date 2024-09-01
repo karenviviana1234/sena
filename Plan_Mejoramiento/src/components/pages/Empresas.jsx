@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import Layout from '../Template/Layout';
 import axiosClient from '../../axiosClient';
 import BotonRegistrar from '../atomos/BotonRegistrar';
 import Modal_Global from '../moleculas/Modal_Global'; // Asegúrate de que esta ruta sea correcta
-import FormNovedad from '../moleculas/FormNovedad';
 import FormEmpresa from '../moleculas/FormEmpresa';
 
 const Empresas = () => {
@@ -77,13 +76,13 @@ const Empresas = () => {
           style={styles.floatingButton}
           onPress={handleOpenModal}
           titulo={"registrar"}
-        >
-        </BotonRegistrar>
+        />
         <Modal_Global
           visible={modalVisible}
           onClose={handleCloseModal}
         >
-          <FormEmpresa/>
+          {/* Paso de la función onClose al FormEmpresa */}
+          <FormEmpresa onClose={handleCloseModal} />
         </Modal_Global>
       </View>
     </Layout>

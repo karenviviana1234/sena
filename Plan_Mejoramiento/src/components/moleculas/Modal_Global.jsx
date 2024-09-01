@@ -3,6 +3,8 @@ import { View, Modal, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Modal_Global = ({ visible, onClose, children }) => {
+  console.log("Contenido recibido" , children);
+  
   return (
     <Modal
       animationType="slide"

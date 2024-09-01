@@ -4,7 +4,7 @@ import axiosClient from '../../axiosClient'; // Asegúrate de que esta ruta sea 
 import { Picker } from '@react-native-picker/picker';
 import BotonRegistrar from '../atomos/BotonRegistrar';
 
-const FormEmpresa = ({ onClose }) => {
+const FormEmpresa = ({ onClose = () => {} }) => {
   const [razonSocial, setRazonSocial] = useState('');
   const [direccion, setDireccion] = useState('');
   const [telefono, setTelefono] = useState('');
@@ -44,6 +44,8 @@ const FormEmpresa = ({ onClose }) => {
         Alert.alert('Error', 'Error al registrar la empresa');
       }
     } catch (error) {
+      console.log('error del server',error);
+      
       Alert.alert('Error', 'Error del servidor: ' + error.message);
     }
   };
@@ -73,6 +75,7 @@ const FormEmpresa = ({ onClose }) => {
         style={styles.input}
         placeholder="Teléfono"
         value={telefono}
+        keyboardType='numeric'
         onChangeText={setTelefono}
       />
 

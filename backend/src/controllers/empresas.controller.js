@@ -24,7 +24,7 @@ export const registrarEmpresas = async (req, res) => {
     try {
         const { razon_social, direccion, telefono, correo, municipio, jefe_inmediato } = req.body
 
-        let sql = `INSERT INTO empresa (razon_social, direccion, telefono, correo, municipio, jefe_inmediato, estado) VALUES (?, ?, ?, ?, ?, ?, 1)`
+        let sql = `INSERT INTO empresas (razon_social, direccion, telefono, correo, municipio, jefe_inmediato, estado) VALUES (?, ?, ?, ?, ?, ?, 1)`
 
         const [rows] = await pool.query(sql, [razon_social, direccion, telefono, correo, municipio, jefe_inmediato])
 

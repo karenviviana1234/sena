@@ -5,7 +5,7 @@ import { validarToken } from '../controllers/seguridad.controller.js'
 const rutaMatriculas = Router()
 
 rutaMatriculas.get('/listar', validarToken, listarMatriculas)
-rutaMatriculas.post('/registrar', validarToken, registrarMatriculas)
+rutaMatriculas.post('/registrar', /* validarToken, */ registrarMatriculas)
 rutaMatriculas.put('/actualizar/:id', validarToken, actualizarMatriculas)
 rutaMatriculas.put('/formacion/:id', validarToken, formacionMatricula)
 rutaMatriculas.put('/condicionada/:id', validarToken, condicionadaMatricula)
