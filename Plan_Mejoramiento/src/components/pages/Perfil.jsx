@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "black",
     fontWeight: "bold",
+    fontFamily: 'poppins',
     marginBottom: 20,
   },
   text: {
