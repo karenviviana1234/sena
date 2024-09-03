@@ -1,8 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import React from 'react';
 import Icon from "react-native-vector-icons/FontAwesome";
+import DocumentPicker from 'react-native-document-picker';
+import { usePersonas } from '../../Context/ContextPersonas';
 
-const ComponentSeguimiento = () => {
+const ComponentSeguimiento = ({ seguimiento }) => {
+  const { rol } = usePersonas();
+  
   const bitacoras = [
     { title: 'Bitácora 9', status: 'Completado', date: '01-03-2024', file: 'bitacora9.pdf', color: '#4CAF50' },
     { title: 'Bitácora 10', status: 'No aprobado', date: '01-03-2024', file: 'bitacora10.pdf', color: '#F44336' },
@@ -12,58 +16,130 @@ const ComponentSeguimiento = () => {
 
   const actividades = [
     { title: 'Corregir Bitácora 1' },
-    { title: 'Corregir Bitácora 1' },
-    { title: 'Corregir Bitácora 1' },
+    { title: 'Corregir Bitácora 2' },
+    { title: 'Corregir Bitácora 3' },
   ];
 
-  return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.mainTitle}>Seguimiento 3</Text>
-        <View style={styles.downloadContainer}>
-          <Text style={styles.downloadText}>actaseguimiento3.pdf</Text>
-          <Icon name="download" size={24} color="green" />
-        </View>
+  const handleFileUpload = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.pdf],
+      });
+      console.log(res);
+      // Aquí puedes manejar el archivo seleccionado (res)
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        console.log('User cancelled the picker');
+      } else {
+        console.log('Unknown error: ', err);
+      }
+    }
+  };
 
-        <View style={styles.sectionsContainer}>
-          {/* Bitácoras */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Bitácoras</Text>
-            {bitacoras.map((bitacora, index) => (
-              <View key={index} style={styles.bitacoraContainer}>
-                <View style={[styles.statusBadge, { backgroundColor: bitacora.color }]}>
-                  <Text style={styles.statusText}>{bitacora.status}</Text>
-                </View>
-                <Text style={styles.bitacoraTitle}>{bitacora.title}</Text>
-                <Text style={styles.bitacoraDate}>{bitacora.date}</Text>
-                {bitacora.file ? (
-                  <TouchableOpacity>
-                    <Text style={styles.fileLink}>{bitacora.file}</Text>
+  const handleAccept = () => {
+    Alert.alert('Acta aceptada');
+  };
+
+  const handleReject = () => {
+    Alert.alert('Acta rechazada');
+  };
+
+  const handleEdit = () => {
+    Alert.alert('Editar bitácora');
+  };
+
+  const handleDownload = (fileName) => {
+    Alert.alert(`Descargar ${fileName}`);
+    // Aquí puedes manejar la descarga del archivo
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.mainTitle}>Seguimiento {seguimiento?.id_seguimiento}</Text>
+      <View style={styles.downloadContainer}>
+        <Text style={styles.downloadText}>actaseguimiento{seguimiento?.id_seguimiento}.pdf</Text>
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity onPress={() => handleDownload(`actaseguimiento${seguimiento?.id_seguimiento}.pdf`)}>
+            <Icon name="download" size={24} color="green" />
+          </TouchableOpacity>
+          {rol === 'Instructor' && (
+            <TouchableOpacity onPress={handleFileUpload} style={styles.uploadButton}>
+              <Icon name="upload" size={24} color="green" />
+            </TouchableOpacity>
+          )}
+          
+        </View>
+          <View style={styles.buttonsActa}>
+                    <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
+                    <Icon name="check" size={20} color="white" />
                   </TouchableOpacity>
+                  <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+                    <Icon name="close" size={20} color="white" />
+                  </TouchableOpacity>     
+          </View>
+      </View>
+
+      <View style={styles.sectionsContainer}>
+        {/* Bitácoras */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Bitácoras</Text>
+          {bitacoras.map((bitacora, index) => (
+            <View key={index} style={styles.bitacoraContainer}>
+              <View style={[styles.statusBadge, { backgroundColor: bitacora.color }]}>
+                <Text style={styles.statusText}>{bitacora.status}</Text>
+              </View>
+              <Text style={styles.bitacoraTitle}>{bitacora.title}</Text>
+              <Text style={styles.bitacoraDate}>{bitacora.date}</Text>
+              <View style={styles.bitacoraActionsContainer}>
+                {bitacora.file ? (
+                  <View style={styles.fileActionsContainer}>
+                    <TouchableOpacity onPress={() => handleDownload(bitacora.file)}>
+                      <Icon name="download" size={24} color="green" />
+                    </TouchableOpacity>
+                    {rol !== 'Seguimiento' && (
+                      <TouchableOpacity onPress={handleFileUpload} style={styles.uploadButton}>
+                        <Icon name="upload" size={24} color="green" />
+                      </TouchableOpacity>
+                    )}
+                    <TouchableOpacity onPress={handleEdit} style={styles.editButton}>
+                      <Icon name="edit" size={24} color="orange" />
+                    </TouchableOpacity>
+                  </View>
                 ) : (
                   <View style={styles.uploadContainer}>
                     <Text style={styles.uploadText}>Cargar Archivo</Text>
                     <Icon name="upload" size={24} color="green" />
-                    <Icon name="check-circle" size={24} color="green" />
                   </View>
                 )}
               </View>
-            ))}
-          </View>
-
-          {/* Actividades */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Actividades</Text>
-            {actividades.map((actividad, index) => (
-              <View key={index} style={styles.actividadContainer}>
-                <Text style={styles.actividadTitle}>{actividad.title}</Text>
-                <TouchableOpacity>
-                  <Text style={styles.verMasLink}>Ver más</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
+              {rol === 'Seguimiento' && (
+                <View style={styles.seguimientoButtonsContainer}>
+                  <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
+                    <Icon name="check" size={20} color="white" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+                    <Icon name="close" size={20} color="white" />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          ))}
         </View>
-      </ScrollView>
+
+        {/* Actividades */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Actividades</Text>
+          {actividades.map((actividad, index) => (
+            <View key={index} style={styles.actividadContainer}>
+              <Text style={styles.actividadTitle}>{actividad.title}</Text>
+              <TouchableOpacity>
+                <Text style={styles.verMasLink}>Ver más</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -78,9 +154,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   downloadContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#f0f0f0',
     padding: 8,
     borderRadius: 8,
@@ -89,6 +164,20 @@ const styles = StyleSheet.create({
   downloadText: {
     fontSize: 16,
     color: '#333',
+    marginBottom: 8,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buttonsActa: {
+    display: 'flex',
+    marginTop: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  uploadButton: {
+    marginLeft: 16,
   },
   sectionsContainer: {
     flexDirection: 'row',
@@ -129,9 +218,18 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 8,
   },
-  fileLink: {
-    fontSize: 14,
-    color: '#007bff',
+  bitacoraActionsContainer: {
+    marginBottom: 16,
+  },
+  fileActionsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 16,
   },
   uploadContainer: {
     flexDirection: 'row',
@@ -141,6 +239,24 @@ const styles = StyleSheet.create({
   uploadText: {
     fontSize: 14,
     color: '#555',
+  },
+  seguimientoButtonsContainer: {
+    flexDirection: 'row',
+    marginTop: 16,
+    justifyContent: 'center',
+  },
+  acceptButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  rejectButton: {
+    backgroundColor: '#F44336',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
   },
   actividadContainer: {
     backgroundColor: '#f0f0f0',

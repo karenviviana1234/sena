@@ -26,7 +26,7 @@ const Seguimientos = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error al obtener seguimientos:", error);
-        setError(error.message);
+        setError("error al obtneer los seguimientos",error.message);
         setLoading(false);
       }
     };
@@ -83,9 +83,12 @@ const Seguimientos = () => {
   }
 
   const componentsMap = {
-    ComponentSeguimiento: <ComponentSeguimiento seguimiento={selectedSeguimiento} />,
+    ComponentSeguimiento: (
+      <ComponentSeguimiento seguimiento={selectedSeguimiento} />
+    ),
     FormNovedad: <FormNovedad />,
   };
+  
 
   return (
     <Layout title={"Seguimientos"}>
