@@ -1,11 +1,14 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import Icon from "react-native-vector-icons/FontAwesome";
 import DocumentPicker from 'react-native-document-picker';
 import { usePersonas } from '../../Context/ContextPersonas';
+import Modal_Global from './Modal_Global';
+import FormNovedad from './FormNovedad';
 
-const ComponentSeguimiento = ({ seguimiento }) => {
+const ComponentSeguimiento = ({ seguimiento, onClose }) => {
   const { rol } = usePersonas();
+  const [modalVisible, setModalVisible] = useState(false)
   
   const bitacoras = [
     { title: 'Bitácora 9', status: 'Completado', date: '01-03-2024', file: 'bitacora9.pdf', color: '#4CAF50' },
@@ -40,6 +43,12 @@ const ComponentSeguimiento = ({ seguimiento }) => {
     Alert.alert('Acta aceptada');
   };
 
+  const handleOpenModal = () =>  {
+    setModalVisible(true)
+  }
+  const handleCloseModal = () =>  {
+    setModalVisible(false)
+  }
   const handleReject = () => {
     Alert.alert('Acta rechazada');
   };
@@ -69,14 +78,16 @@ const ComponentSeguimiento = ({ seguimiento }) => {
           )}
           
         </View>
+        {rol === 'Seguimiento' && (
           <View style={styles.buttonsActa}>
-                    <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
-                    <Icon name="check" size={20} color="white" />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
-                    <Icon name="close" size={20} color="white" />
-                  </TouchableOpacity>     
+            <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
+              <Icon name="check" size={20} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+              <Icon name="close" size={20} color="white" />
+            </TouchableOpacity>     
           </View>
+        )}
       </View>
 
       <View style={styles.sectionsContainer}>
@@ -112,7 +123,7 @@ const ComponentSeguimiento = ({ seguimiento }) => {
                   </View>
                 )}
               </View>
-              {rol === 'Seguimiento' && (
+              {rol !== 'Aprendiz' && (
                 <View style={styles.seguimientoButtonsContainer}>
                   <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
                     <Icon name="check" size={20} color="white" />
@@ -128,12 +139,15 @@ const ComponentSeguimiento = ({ seguimiento }) => {
 
         {/* Actividades */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Actividades</Text>
+          <Text style={styles.sectionTitle}>Novedades</Text>
           {actividades.map((actividad, index) => (
             <View key={index} style={styles.actividadContainer}>
               <Text style={styles.actividadTitle}>{actividad.title}</Text>
-              <TouchableOpacity>
-                <Text style={styles.verMasLink}>Ver más</Text>
+              <TouchableOpacity onPress={handleOpenModal}>
+                <Modal_Global visible={modalVisible} onClose={handleCloseModal}>
+                  <FormNovedad/>
+                </Modal_Global>
+                <Text style={styles.verMasLink} >Ver más</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -234,29 +248,9 @@ const styles = StyleSheet.create({
   uploadContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   uploadText: {
-    fontSize: 14,
-    color: '#555',
-  },
-  seguimientoButtonsContainer: {
-    flexDirection: 'row',
-    marginTop: 16,
-    justifyContent: 'center',
-  },
-  acceptButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
     marginRight: 8,
-  },
-  rejectButton: {
-    backgroundColor: '#F44336',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
   },
   actividadContainer: {
     backgroundColor: '#f0f0f0',
@@ -266,11 +260,29 @@ const styles = StyleSheet.create({
   },
   actividadTitle: {
     fontSize: 16,
-    marginBottom: 8,
+    fontWeight: 'bold',
   },
   verMasLink: {
-    fontSize: 14,
-    color: '#007bff',
+    color: 'blue',
+    textDecorationLine: 'underline',
+    marginTop: 8,
+  },
+  seguimientoButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 8,
+  },
+  acceptButton: {
+    backgroundColor: '#4CAF50',
+    padding: 8,
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  rejectButton: {
+    backgroundColor: '#F44336',
+    padding: 8,
+    borderRadius: 4,
+    marginLeft: 8,
   },
 });
 

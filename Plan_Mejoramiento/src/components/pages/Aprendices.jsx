@@ -2,15 +2,27 @@ import { View, Text, StyleSheet, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Layout from '../Template/Layout';
 import axiosClient from '../../axiosClient';
+import BotonRegistrar from '../atomos/BotonRegistrar';
+import Modal_Global from '../moleculas/Modal_Global';
+import FormAprendiz from '../moleculas/FormAprendiz';
 
-const Aprendices = () => {
-  const [personas, setPersonas] = useState([]); // Estado para almacenar la lista de personas
-  const [loading, setLoading] = useState(true); // Estado para manejar la carga
 
+const Aprendices = (onClose) => {
+  const [personas, setPersonas] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [modalVisible, setModalVisible] = useState(false)
+
+  const handleOpenModal = () =>  {
+    setModalVisible(true)
+  }
+  const handleCloseModal = () =>  {
+    setModalVisible(false)
+  }
   useEffect(() => {
     const fetchPersonas = async () => {
       try {
         const response = await axiosClient.get('/personas/listarA');
+        /* Solo se estan listando los aprendices registrados no como tal los que asignan */
         setPersonas(response.data); 
         console.log(response.data);
         
@@ -45,7 +57,12 @@ const Aprendices = () => {
             renderItem={renderPersona}
           />
         )}
+        <BotonRegistrar titulo= 'Registrar' onPress={handleOpenModal}/>
+        <Modal_Global onClose={handleCloseModal} visible={modalVisible}>
+          <FormAprendiz/>
+        </Modal_Global>
       </View>
+
     </Layout>
   );
 };
