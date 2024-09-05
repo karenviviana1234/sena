@@ -66,16 +66,14 @@ export default function AsignacionPage() {
             }
             handleCloseModal();
         } catch (error) {
-            console.error('Error al registrar o actualizar la asignación:', error);
-            alert('Ocurrió un error al registrar o actualizar la asignación.');
         }
     };
 
     const handleToggle = (initialData) => {
         setInitialData(initialData);
+        setAsignacionId(initialData.id_asignacion); 
         handleOpenModal('asignacion', initialData);
     };
-
     const peticionGet = async () => {
         try {
             const response = await axiosClient.get('/listar');

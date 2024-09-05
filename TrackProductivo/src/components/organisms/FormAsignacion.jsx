@@ -10,7 +10,7 @@ const FormAsignacion = ({ onSubmit, onClose, actionLabel, mode, initialData }) =
   const [selectedActividad, setSelectedActividad] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { idAsignacion } = useContext(AsignacionContext);
+  const { id_asignacion } = useContext(AsignacionContext);
 
   useEffect(() => {
     const fetchProductiva = async () => {
@@ -39,50 +39,36 @@ const FormAsignacion = ({ onSubmit, onClose, actionLabel, mode, initialData }) =
 
   useEffect(() => {
     if (mode === 'update' && initialData) {
-      setSelectedProductiva(initialData.id_asignacion);
-      setSelectedProductiva(initialData.productiva);
-      setSelectedActividad(initialData.actividad);
+        setSelectedProductiva(initialData.productiva);
+        setSelectedActividad(initialData.actividad);
     }
-  }, [mode, initialData]);
+}, [mode, initialData]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage('');
-  
-    if (mode === 'update' && !idAsignacion) {
-      setErrorMessage('ID de asignación no disponible.');
-      return;
-    }
-  
-    const dataToSend = {
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setErrorMessage('');
+
+  const dataToSend = {
       actividad: selectedActividad,
-      productiva: selectedProductiva
-    };
-  
-    try {
+      productiva: selectedProductiva,
+      id_asignacion: mode === 'update' ? initialData.id_asignacion : undefined // Agrega esto
+  };
+
+  try {
       if (mode === 'update') {
-        await axiosClient.put(`/actualizar/${idAsignacion.id_asignacion}`, dataToSend);
+          await axiosClient.put(`/actualizar/${initialData.id_asignacion}`, dataToSend);
       } else {
-        await axiosClient.post('/registrar', dataToSend);
+          await axiosClient.post('/registrar', dataToSend);
       }
+      // Limpiar los campos después de la operación
       setSelectedProductiva('');
       setSelectedActividad('');
       onSubmit();
       onClose();
-    } catch (error) {
-      if (error.response) {
-        console.error("Error del servidor:", error.response.data);
-        setErrorMessage(`Error del servidor (${error.response.status}): ${error.response.data}`);
-      } else if (error.request) {
-        console.error("Error de solicitud:", error.request);
-        setErrorMessage("Error de solicitud. Intenta de nuevo más tarde.");
-      } else {
-        console.error("Error:", error.message);
-        setErrorMessage(`Error: ${error.message}`);
-      }
-    }
-  };
-  
+  } catch (error) {
+      // Manejo de errores...
+  }
+};
 
   return (
     <form method="post" onSubmit={handleSubmit}>
