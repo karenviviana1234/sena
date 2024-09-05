@@ -44,12 +44,19 @@ function TableSeguimientos() {
         if (type === 'formNovedades') {
             setBodyContent(<FormNovedades />);
         } else if (type === 'componentSeguimiento') {
-            setBodyContent(<ComponentSeguimiento idSeguimiento={id_seguimiento} />);
+            setBodyContent(<ComponentSeguimiento
+                id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado
+                mode="create"
+                handleSubmit={() => console.log("Submit")}
+                onClose={() => console.log("Close")}
+                actionLabel="Enviar"
+                onIdSend={(id) => console.log("ID de seguimiento enviado:", id)} />);
         }
-        console.log("datos enviados", id_seguimiento )
+        console.log("datos enviados", id_seguimiento)
         setSelectedSeguimientoId(id_seguimiento);
         setIsModalOpen(true);
     };
+
 
     // Function to close the modal
     const handleCloseModal = () => {

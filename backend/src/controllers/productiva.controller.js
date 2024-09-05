@@ -62,7 +62,7 @@ export const registrarProductiva = async (req, res) => {
 
         // Registrar etapa productiva
         const sqlProductiva = `
-            INSERT INTO productiva 
+            INSERT INTO productivas
             (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
             VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
         `;

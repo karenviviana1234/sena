@@ -38,20 +38,21 @@ function ComponentSeguimiento({
     const currentDate = new Date().toISOString().slice(0, 10);
     setFecha(currentDate);
   
-    const userString = localStorage.getItem("user");
-    if (userString) {
+    // Verificar si el valor existe y es un JSON válido
+    const userJson = localStorage.getItem("user");
+    if (userJson) {
       try {
-        const user = JSON.parse(userString);
-        if (user) {
+        const user = JSON.parse(userJson);
+        if (user && user.id_persona) {
           setIdPersona(user.id_persona);
         }
       } catch (error) {
-        console.error("Error al parsear el usuario desde localStorage:", error);
+        console.error("Error al parsear JSON:", error);
       }
     }
-  
+
     // Llama al callback para enviar el ID cuando el componente se monta
-    if (onIdSend) {
+    if (onIdSend && id_seguimiento) {
       onIdSend(id_seguimiento);
     }
   }, [id_seguimiento, onIdSend]);
