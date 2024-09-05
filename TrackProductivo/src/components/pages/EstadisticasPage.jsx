@@ -1,14 +1,12 @@
-import React from "react";
+import React from 'react'
+import Grafica from '../organisms/Grafica'
 
-
-function EstadisticasPage() {
-    return ( 
-        <>
-        <main className='w-full p-3'>
-        EstadisticasPage
-        </main>
-      </>
-     );
+function HomePage() {
+  return (
+    <div className='bg-slate-200 m-20 h-96 rounded-2xl'>
+      <Grafica/>
+    </div>
+  )
 }
 
-export default EstadisticasPage;
+export default HomePage

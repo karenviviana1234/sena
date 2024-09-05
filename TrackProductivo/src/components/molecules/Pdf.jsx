@@ -3,7 +3,6 @@ import ButtonDescargar from "../atoms/ButtonDescargar.jsx";
 
 const PDFUploader = ({ onFileSelect }) => {
   const [file, setFile] = useState(null);
-  const [fileName, setFileName] = useState("");
 
   const handleFileUpload = (event) => {
     const uploadedFile = event.target.files[0];
@@ -15,9 +14,8 @@ const PDFUploader = ({ onFileSelect }) => {
       return;
     }
 
-    setFile(uploadedFile); // Guardar el archivo en el estado
-    setFileName(uploadedFile.name); // Guardar el nombre del archivo
-    onFileSelect(uploadedFile); // Pasar el archivo al componente padre
+    setFile(uploadedFile);
+    onFileSelect(uploadedFile);
   };
 
   const downloadFile = () => {
@@ -28,7 +26,7 @@ const PDFUploader = ({ onFileSelect }) => {
     a.href = url;
     a.download = file.name;
     a.click();
-    URL.revokeObjectURL(url); // Limpiar el objeto URL después de la descarga
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -50,7 +48,7 @@ const PDFUploader = ({ onFileSelect }) => {
       )}
 
       {file && (
-        <ButtonDescargar onClick={downloadFile}/>
+        <ButtonDescargar onClick={downloadFile} />
       )}
     </div>
   );
