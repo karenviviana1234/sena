@@ -90,7 +90,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
               <Text style={styles.menuText}>Inicio</Text>
             </View>
           </TouchableOpacity>
-
+{/* 
         {rol === "Instructor" && (
           <TouchableOpacity
             style={styles.menuItem}
@@ -122,7 +122,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
               <Text style={styles.menuText}>Empresas</Text>
             </View>
           </TouchableOpacity>
-        )}
+        )} */}
         {rol === "Instructor" && (
           <TouchableOpacity
             style={styles.menuItem}
