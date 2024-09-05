@@ -9,31 +9,28 @@ import { usePersonas } from "../../Context/ContextPersonas";
 const Perfil = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [userData, setUserData] = useState(null); 
-  const { id_persona } = usePersonas();
+  const { id_persona, rol } = usePersonas();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axiosClient.get(`/personas/buscar/${id_persona}`);
-        console.log("Datos del usuario recibidos:", response.data); // Verifica los datos obtenidos
-  
-        // Si los datos vienen como un array, acceder al primer elemento
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          setUserData(response.data[0]);
-        } else {
+        // Ajusta la ruta según el backend
+        const response = await axiosClient.get(`/personas/perfil/${id_persona}`);
+        console.log("Datos del usuario recibidos:", response.data);
+
+        if (response.data) {
           setUserData(response.data);
+        } else {
+          console.log("No se encontraron datos del usuario.");
         }
-  
-        console.log("id persona", id_persona);
         
       } catch (error) {
         console.error("Error al obtener los datos del usuario:", error.response ? error.response.data : error.message);
       }
     };
-  
+
     fetchUserData();
   }, [id_persona]);
-  
 
   const handleEditProfile = () => {
     setModalVisible(true);
@@ -52,9 +49,7 @@ const Perfil = () => {
           <>
             <View style={styles.infoContainer}>
               <Icon name="id-card" size={24} color="black" />
-              <Text style={styles.text}>
-                Identificación: {userData.identificacion}
-              </Text>
+              <Text style={styles.text}>Identificación: {userData.identificacion}</Text>
             </View>
             <View style={styles.infoContainer}>
               <Icon name="user" size={24} color="black" />
@@ -72,6 +67,12 @@ const Perfil = () => {
               <Icon name="check-circle" size={24} color="black" />
               <Text style={styles.text}>Rol: {userData.rol}</Text>
             </View>
+            {rol === 'Aprendiz' && (
+            <View style={styles.infoContainer}>
+              <Icon name="map-marker" size={24} color="black" />
+              <Text style={styles.text}>Municipio: {userData.id_municipio}</Text>
+            </View>
+            ) }
           </>
         ) : (
           <Text>Cargando datos del usuario...</Text>
@@ -86,7 +87,12 @@ const Perfil = () => {
           source={require("../../../public/logoTic.png")}
         />
 
-        <PersonasModal visible={modalVisible} onClose={handleCloseModal} />
+        {/* Pasar los datos del usuario al modal */}
+        <PersonasModal 
+          visible={modalVisible} 
+          onClose={handleCloseModal} 
+          userData={userData} 
+        />
       </View>
     </Layout>
   );

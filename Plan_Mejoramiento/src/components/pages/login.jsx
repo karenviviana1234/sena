@@ -41,21 +41,26 @@ const Login = () => {
           await AsyncStorage.setItem("token", token);
           const storedToken = await AsyncStorage.getItem("token");
           console.log("Token almacenado:", storedToken);
+          
 
           SetRol(user.rol);
           SetId_persona(user.id_persona);
 
           const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
-
           if (allowedRoles.includes(user.rol)) {
             console.log("rol", user.rol, "id", user.id_persona);
-            navigation.navigate("seguimiento");
+            if (user.rol === "Aprendiz") {
+              navigation.navigate("principal"); 
+            } else {
+              navigation.navigate("seguimiento"); 
+            }  
           } else {
             Alert.alert(
               "Acceso denegado",
               "Los roles permitidos son seguimiento, instructor, y aprendiz."
             );
           }
+          
         }
       }
     } catch (error) {

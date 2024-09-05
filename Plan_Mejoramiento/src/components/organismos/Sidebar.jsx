@@ -75,7 +75,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
           />
         </View>
         {/* Vistas por roles */}
-        {rol === 'Aprendiz' && (
+        {rol !== 'Instructor' && (
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate("principal")}
