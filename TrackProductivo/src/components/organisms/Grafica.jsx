@@ -50,24 +50,27 @@ function Grafica() {
       },
       series: [
         {
-          name: 'Browsers',
+          name: 'Seguimientos',
           colorByPoint: true,
           data: [
             {
-              name: 'Other',
+              name: 'Aprobados',
               y: 1.582,
+              color: '#28a745', // Verde
               drilldown: null,
             },
             {
-                name: 'New',
-                y: 1.582,
-                drilldown: null,
-              },
-              {
-                name: 'Access',
-                y: 1.582,
-                drilldown: null,
-              },
+              name: 'En Proceso',
+              y: 1.582,
+              color: '#fd7e14', // Naranja
+              drilldown: null,
+            },
+            {
+              name: 'Desaprobados',
+              y: 1.582,
+              color: '#dc3545', // Rojo
+              drilldown: null,
+            },
           ],
         },
       ],
