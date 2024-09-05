@@ -87,8 +87,6 @@ export const listarMunicipios = async (req, res) => {
   }
 }
 
-
-
 /* Registrar Aprendices */
 export const registrarAprendiz = async (req, res) => {
   try {
@@ -308,50 +306,4 @@ export const eliminarPersona = async (req, res) => {
     })
   }
 }
-
-export const perfil = async (req, res) => {
-  const { id_persona } = req.params;
-  try {
-    const query = `
-     SELECT 
-    p.nombres, 
-    p.correo, 
-    p.telefono, 
-    p.rol,
-    p.sede,
-    p.area,
-    p.municipio,
-    m.nombre_mpio AS id_municipio
-FROM personas p
-LEFT JOIN municipios m ON p.municipio = m.id_municipio
-WHERE p.id_persona = ?;
-    `;
-
-    const [rows] = await pool.query(query, [id_persona]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Persona no encontrada' });
-    }
-
-    const persona = rows[0];
-
-    if (persona.rol !== 'aprendiz') {
-      delete persona.municipio;
-    }
-
-    if (persona.rol !== 'instructor') {
-      delete persona.tipo_sede;
-      delete persona.area;
-    }
-
-    res.json(persona);
-
-  } catch (error) {
-    res.status(500).json({
-      status: 500,
-      message: 'Error en el sistema: ' + error.message
-    });
-  }
-};
-
 

@@ -1,5 +1,5 @@
 import Router from 'express'
-import { registrarAprendiz, actualizarPersona, eliminarPersona, listarPersonas, buscarPersonas, listarAprendices, listarInstructores, registrarInstructor, listarMunicipios, perfil } from '../controllers/personas.controller.js'
+import { registrarAprendiz, actualizarPersona, eliminarPersona, listarPersonas, buscarPersonas, listarAprendices, listarInstructores, registrarInstructor, listarMunicipios } from '../controllers/personas.controller.js'
 import { validarToken } from '../controllers/seguridad.controller.js'
 
 const rutaPersona = Router()
@@ -13,5 +13,4 @@ rutaPersona.post('/registrarA', registrarAprendiz)
 rutaPersona.post('/registrarI', registrarInstructor)
 rutaPersona.put('/actualizar/:id_persona', /* validarToken, */ actualizarPersona)
 rutaPersona.delete('/eliminar/:id_persona', validarToken, eliminarPersona)
-rutaPersona.get('/perfil/:id_persona',validarToken,perfil)
 export default rutaPersona

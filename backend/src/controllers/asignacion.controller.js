@@ -5,19 +5,15 @@ export const listarasignaciones = async (req, res) => {
         const [result] = await pool.query(`
             SELECT 
                 p.id_asignacion, 
-                p.fecha_inicio,
-                p.fecha_fin,
-                p.estado,
-                u.instructor,
-                a.id_productiva
+                a.id_productiva AS productiva, 
+                act.id_actividad AS actividad
             FROM 
                 asignaciones AS p
             LEFT JOIN 
-                vinculacion AS u ON p.instructor = u.instructor
+                productivas AS a ON p.productiva = a.id_productiva
             LEFT JOIN 
-                productiva AS a ON p.productiva = a.id_productiva;
+                actividades AS act ON p.actividad = act.id_actividad;
         `);
-
 
         if (result.length > 0) {
             return res.status(200).json(result);
@@ -36,38 +32,37 @@ export const listarasignaciones = async (req, res) => {
 };
 
 
+
 export const registrarasignacion = async (req, res) => {
     try {
-        const {
-            fecha_inicio,
-            fecha_fin,
-            productiva,
-            instructor,
-            estado
-        } = req.body;
+        const { productiva, actividad } = req.body;
 
-        if (!estado) {
+        if (!actividad || !productiva) {
             return res.status(400).json({
                 status: 400,
-                message: "El campo 'estado' es obligatorio"
+                message: "Datos incompletos. Por favor, envíe actividad y productiva."
             });
         }
 
-        const [instructorExist] = await pool.query(
-            "SELECT * FROM vinculacion WHERE id_vinculacion = ?",
-            [instructor]
+        console.log('Valores recibidos:', { productiva, actividad });
+
+        const [actividadExist] = await pool.query(
+            "SELECT * FROM actividades WHERE id_actividad = ? AND estado = 'Activo'",
+            [actividad]
         );
-        if (instructorExist.length === 0) {
+
+        if (actividadExist.length === 0) {
             return res.status(404).json({
                 status: 404,
-                message: "El instructor no existe. Registre primero un Instructor."
+                message: "La actividad no existe o no está activa."
             });
         }
 
         const [productivaExist] = await pool.query(
-            "SELECT * FROM productiva WHERE id_productiva = ?",
+            "SELECT * FROM productivas WHERE id_productiva = ?",
             [productiva]
         );
+
         if (productivaExist.length === 0) {
             return res.status(404).json({
                 status: 404,
@@ -76,37 +71,14 @@ export const registrarasignacion = async (req, res) => {
         }
 
         const [result] = await pool.query(
-            "INSERT INTO asignaciones (fecha_inicio, fecha_fin, estado, productiva, instructor) VALUES (?,?,?,?,?)",
-            [fecha_inicio, fecha_fin, estado, productiva, instructor]
+            "INSERT INTO asignaciones (productiva, actividad) VALUES (?, ?)",
+            [productiva, actividad]
         );
 
         if (result.affectedRows > 0) {
-            // const [instructores] = await pool.query(
-            //     "SELECT nombres FROM instructor WHERE id_instructor = ?",
-            //     [instructor]
-            // );
-            // const [productivas] = await pool.query(
-            //     "SELECT nombre FROM productiva WHERE id_productiva = ?",
-            //     [productiva]
-            // );
-
-            // sendNotificationToEmployee(instructorExist[0].correo, `
-            //     ¡Hola ${instructorExist[0].nombres}!
-            //     ¡Buenas noticias! Se ha programado una nueva actividad para ti.
-            //     Detalles de la actividad:
-            //     - Fecha de inicio: ${fecha_inicio}
-            //     - Fecha de finalización: ${fecha_fin}
-            //     - Instructores: ${instructores[0].nombres}
-            //     - Productiva: ${productivas[0].nombre}
-
-            //     ¡Estamos seguros de que harás un trabajo excelente! ¡Sigue así!
-
-            //     Para más información, ingresa a la App.
-            // `);
-
             return res.status(200).json({
                 status: 200,
-                message: "Se registró con éxito."
+                message: "Asignación registrada con éxito."
             });
         } else {
             return res.status(403).json({
@@ -122,26 +94,27 @@ export const registrarasignacion = async (req, res) => {
     }
 };
 
+
 export const actualizarasignacion = async (req, res) => {
     try {
         const { id } = req.params;
-        const { fecha_inicio, fecha_fin, productiva, instructor, estado } = req.body;
+        const { productiva, actividad } = req.body;
 
         // Verificar si el instructor existe
-        const [instructorExist] = await pool.query(
-            "SELECT * FROM vinculacion WHERE id_vinculacion = ?",
-            [instructor]
+        const [actividadExist] = await pool.query(
+            "SELECT * FROM actividades WHERE id_actividad = ?",
+            [actividad]
         );
-        if (instructorExist.length === 0) {
+        if (actividadExist.length === 0) {
             return res.status(404).json({
                 status: 404,
-                message: "El instructor no existe. Registre primero un Instructor."
+                message: "La actividad no existe. Registre primero una actividad."
             });
         }
 
         // Verificar si la productiva existe
         const [productivaExist] = await pool.query(
-            "SELECT * FROM productiva WHERE id_productiva = ?",
+            "SELECT * FROM productivas WHERE id_productiva = ?", 
             [productiva]
         );
         if (productivaExist.length === 0) {
@@ -166,9 +139,9 @@ export const actualizarasignacion = async (req, res) => {
         // Realizar la actualización
         const [result] = await pool.query(
             `UPDATE asignaciones 
-             SET fecha_inicio = ?, fecha_fin = ?, productiva = ?, instructor = ?, estado = ? 
+             SET productiva = ?, actividad = ?
              WHERE id_asignacion = ?`,
-            [fecha_inicio, fecha_fin, productiva, instructor, estado, id]
+            [productiva, actividad, id]
         );
 
         if (result.affectedRows > 0) {
@@ -197,24 +170,21 @@ export const buscarasignacion = async (req, res) => {
         const [result] = await pool.query(
             `SELECT 
                 p.id_asignacion, 
-                p.fecha_inicio AS asignacion_fecha_inicio,
-                p.fecha_fin,
-                p.estado,
-                u.instructor,
-                a.id_productiva
+                a.id_productiva AS productiva, 
+                act.id_actividad AS actividad
             FROM 
                 asignaciones AS p
             LEFT JOIN 
-                vinculacion AS u ON p.instructor = u.instructor
-            LEFT JOIN 
                 productiva AS a ON p.productiva = a.id_productiva
+            LEFT JOIN 
+                actividades AS act ON p.actividad = act.id_actividad
             WHERE 
-                p.id_asignacion = ?`, // Elimina el punto y coma aquí
+                p.id_asignacion = ?`,
             [id]
         );
 
         if (result.length > 0) {
-            res.status(200).json(result);
+            res.status(200).json(result[0]); // Devuelve solo el primer resultado
         } else {
             res.status(404).json({
                 status: 404,

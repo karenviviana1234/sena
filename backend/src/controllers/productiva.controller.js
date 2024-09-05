@@ -5,7 +5,7 @@ import { format, addMonths } from 'date-fns';
 
 export const listarProductiva = async (req, res) => {
     try {
-        let sql = `SELECT * FROM productiva`
+        let sql = `SELECT * FROM productivas`
 
         const [results] = await pool.query(sql)
 
