@@ -123,7 +123,7 @@ const ComponentSeguimiento = ({ seguimiento, onClose }) => {
                   </View>
                 )}
               </View>
-              {rol !== 'Aprendiz' && (
+{/*               {rol !== 'Aprendiz' && (
                 <View style={styles.seguimientoButtonsContainer}>
                   <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
                     <Icon name="check" size={20} color="white" />
@@ -132,7 +132,7 @@ const ComponentSeguimiento = ({ seguimiento, onClose }) => {
                     <Icon name="close" size={20} color="white" />
                   </TouchableOpacity>
                 </View>
-              )}
+              )} */}
             </View>
           ))}
         </View>

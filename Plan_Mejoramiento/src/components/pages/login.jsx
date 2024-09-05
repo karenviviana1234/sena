@@ -49,11 +49,7 @@ const Login = () => {
           const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
           if (allowedRoles.includes(user.rol)) {
             console.log("rol", user.rol, "id", user.id_persona);
-            if (user.rol === "Aprendiz") {
-              navigation.navigate("principal"); 
-            } else {
-              navigation.navigate("seguimiento"); 
-            }  
+            navigation.navigate("principal"); 
           } else {
             Alert.alert(
               "Acceso denegado",

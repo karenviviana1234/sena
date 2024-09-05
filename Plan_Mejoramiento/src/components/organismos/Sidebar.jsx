@@ -75,7 +75,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
           />
         </View>
         {/* Vistas por roles */}
-        {rol !== 'Instructor' && (
+
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate("principal")}
@@ -90,7 +90,6 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
               <Text style={styles.menuText}>Inicio</Text>
             </View>
           </TouchableOpacity>
-        )}
 
         {rol === "Instructor" && (
           <TouchableOpacity
