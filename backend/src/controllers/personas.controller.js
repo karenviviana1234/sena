@@ -87,8 +87,6 @@ export const listarMunicipios = async (req, res) => {
   }
 }
 
-
-
 /* Registrar Aprendices */
 export const registrarAprendiz = async (req, res) => {
   try {

@@ -15,4 +15,5 @@ rutaPersona.put('/actualizar/:id_persona', /* validarToken, */ actualizarPersona
 rutaPersona.delete('/eliminar/:id_persona', validarToken, eliminarPersona)
 rutaPersona.get('/perfil/:id_persona',/* validarToken, */perfil)
 rutaPersona.put('/perfilActualizar/:id_persona',/* validarToken, */actualizarPerfil)
+
 export default rutaPersona
