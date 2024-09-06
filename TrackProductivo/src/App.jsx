@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSearch2, UserCheck, BookText } from 'lucide-react';
+import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSearch2, UserCheck, BookText, BarChart3Icon } from 'lucide-react';
 import Sidebar, { SidebarItem, SidebarAccordion } from './components/Sidebar';
 import { LoginPage } from '../src/components/pages/LoginPage';
 import { Navbar2 } from './components/Navbar';
@@ -107,7 +107,7 @@ const WithSidebar = ({ children }) => (
 
       <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimineto" />
       <SidebarItem nav="/reportes" icon={<BookText size={20} />} text="Reportes" />
-      <SidebarItem nav="/estadisticas" text="Estadisticas" />
+      <SidebarItem nav="/estadisticas"icon={<BarChart3Icon size={20}/>} text="Estadisticas" />
 
 
       {/* <SidebarAccordion icon={<FolderSearch2 size={20} />} text="Seguimientos">
