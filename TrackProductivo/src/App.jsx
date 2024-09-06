@@ -98,7 +98,7 @@ const WithSidebar = ({ children }) => (
     <Sidebar>
       {/* estas son las secciones de el rol de Coordinador */}
       <SidebarItem nav="/" icon={<Home size={20} />} text="Home" />
-      <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Nomina" />
+      <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
       <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
       <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
       <SidebarItem nav="/asignaciones" icon={<UserCheck size={20} />} text="Asignaciones" />

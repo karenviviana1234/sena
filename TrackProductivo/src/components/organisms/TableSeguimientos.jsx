@@ -23,6 +23,9 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
+import ButtonRegistrarNovedad from '../atoms/ButtonRegistrarNovedades.jsx';
+import ButtonEliminar from '../atoms/ButtonEliminar.jsx';
+import { Tooltip } from '@nextui-org/react';
 
 function TableSeguimientos() {
     const [seguimientos, setSeguimientos] = useState([]);
@@ -114,7 +117,21 @@ function TableSeguimientos() {
     const renderCell = useCallback((item, columnKey) => {
         const cellValue = item[columnKey];
 
+
+
         switch (columnKey) {
+            case "acciones":
+                return (
+                    <div className="flex justify-around items-center">
+                        <ButtonRegistrarNovedad
+                            onClick={() => handleOpenModal(null, 'formNovedades')}
+
+                        />
+                        <ButtonEliminar/>
+                    </div>
+
+                );
+
             case "seguimiento1":
             case "seguimiento2":
             case "seguimiento3":
@@ -210,12 +227,6 @@ function TableSeguimientos() {
                     onClear={onClear}
                     onValueChange={onSearchChange}
                 />
-                <Button
-                    onClick={() => handleOpenModal(null, 'formNovedades')}
-                    className="bg-[#90d12c] text-white mr-10 "
-                >
-                    Registrar Novedades
-                </Button>
             </div>
             <div className="flex items-center justify-between">
                 <span className="text-default-400 text-small my-5">
@@ -247,8 +258,9 @@ function TableSeguimientos() {
         { key: "seguimiento2", label: "Seguimiento 2" },
         { key: "seguimiento3", label: "Seguimiento 3" },
         { key: "porcentajes", label: "Porcentajes" },
+        { key: "acciones", label: "Acciones" },
     ];
-    
+
     return (
         <div className="overflow-hidden flex-1 bg-dark p-2">
             <div className="flex flex-col">
