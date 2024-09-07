@@ -52,7 +52,6 @@ function TableSeguimientos() {
                 actionLabel="Enviar"
                 onIdSend={(id) => console.log("ID de seguimiento enviado:", id)} />);
         }
-        console.log("datos enviados", id_seguimiento)
         setSelectedSeguimientoId(id_seguimiento);
         setIsModalOpen(true);
     };

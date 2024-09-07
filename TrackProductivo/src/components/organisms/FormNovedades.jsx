@@ -2,55 +2,61 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
 
-function FormNovedades() {
+function FormNovedades() {  // Recibe onClose como prop
   const [descripcion, setDescripcion] = useState("");
   const [fecha, setFecha] = useState("");
-const [foto, setFoto] = useState("");
-const [instructor, setInstructor] = useState("");
+  const [foto, setFoto] = useState("");
+  const [instructor, setInstructor] = useState("");
   const [seguimientos, setSeguimientos] = useState([]);
   const [selectedSeguimiento, setSelectedSeguimiento] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
 
-useEffect(() => {
-  const fetchSeguimiento = async () => {
-    try {
-      const response = await axiosClient.get("/seguimientos/listarA");
-      console.log("Datos recibidos:", response.data);
-      
-      const data = response.data[0]; // Acceder al primer elemento del array recibido
 
-      // Asegúrate de que las claves coinciden con los datos recibidos
-      const seguimientoList = [
-        { id_seguimiento: 1, seguimiento: data.seguimiento1 },
-        { id_seguimiento: 2, seguimiento: data.seguimiento2 },
-        { id_seguimiento: 3, seguimiento: data.seguimiento3 },
-      ];
-      
-      console.log("Seguimiento transformado:", seguimientoList);
-      setSeguimientos(seguimientoList);
-    } catch (error) {
-      console.error("Error al obtener seguimientos", error);
-    }
-  };
 
-  fetchSeguimiento();
-}, []);
+  useEffect(() => {
+    const fetchSeguimiento = async () => {
+      try {
+        const response = await axiosClient.get("/seguimientos/listarA");
+
+        const data = response.data[0]; // Acceder al primer elemento del array recibido
+
+        const seguimientoList = [
+          { id_seguimiento: 1, seguimiento: data.seguimiento1 },
+          { id_seguimiento: 2, seguimiento: data.seguimiento2 },
+          { id_seguimiento: 3, seguimiento: data.seguimiento3 },
+        ];
+
+        setSeguimientos(seguimientoList);
+      } catch (error) {
+        console.error("Error al obtener seguimientos", error);
+      }
+      setModalOpen(true);
+
+    };
+
+    fetchSeguimiento();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSend = {
-      descripcion,
-      fecha,
-      foto,
-      instructor,
-      seguimiento: selectedSeguimiento,
-    };
 
-    console.log("Datos a enviar:", dataToSend);
+    // Crear un objeto FormData
+    const formData = new FormData();
+    formData.append("descripcion", descripcion);
+    formData.append("fecha", fecha);
+    formData.append("foto", foto); // Asegúrate de que 'foto' tenga un archivo
+    formData.append("instructor", instructor);
+    formData.append("seguimiento", selectedSeguimiento);
 
     try {
-      const response = await axiosClient.post("/novedad/registrar", dataToSend);
+      const response = await axiosClient.post("/novedad/registrar", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Especifica el tipo de contenido
+        },
+      });
       if (response.status === 200) {
         alert("Novedad registrada correctamente");
+        handleCloseModal(); // Cierra el modal después de registrar
       } else {
         alert("Error al registrar la novedad");
       }
@@ -60,10 +66,14 @@ useEffect(() => {
     }
   };
 
+  const handleCloseModal = async () => {
+    setModalOpen(false);
+  };
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <form method="post" onSubmit={handleSubmit}>
+    <form method="post" onSubmit={handleSubmit} onClose={handleCloseModal}
+    >
       <div className="ml-5 align-items-center">
         <div className="flex flex-col">
           <Input
@@ -95,7 +105,12 @@ useEffect(() => {
             className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             id='foto'
             name="foto"
-            onChange={(e) => setFoto(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                setFoto(file); // Asegúrate de que se esté guardando el archivo correctamente
+              }
+            }}
           />
         </div>
 
@@ -115,7 +130,7 @@ useEffect(() => {
         <div className='py-2'>
           <Input
             type="text"
-            label="Insstructor"
+            label="Instructor"
             className="max-w-xs"
             id='instructor'
             name="instructor"
@@ -125,7 +140,10 @@ useEffect(() => {
           />
         </div>
         <div className="py-2">
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="bg-[#5a851b] hover:bg-[#4c7016] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out"
+          >
             Registrar
           </button>
         </div>
