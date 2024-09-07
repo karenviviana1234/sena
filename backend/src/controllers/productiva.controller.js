@@ -5,7 +5,7 @@ import { format, addMonths } from 'date-fns';
 
 export const listarProductiva = async (req, res) => {
     try {
-        let sql = `SELECT * FROM productiva`
+        let sql = `SELECT * FROM productivas`
 
         const [results] = await pool.query(sql)
 
@@ -26,7 +26,7 @@ export const listarProductiva = async (req, res) => {
 const storage = multer.diskStorage(
     {
         destination: function(req,file,cb){
-            cb(null, "public/productiva")
+            cb(null, "public/productivas")
         },
         filename: function(req,file,cb){
             cb(null, file.originalname)
@@ -51,7 +51,7 @@ export const registrarProductiva = async (req, res) => {
         const consulta = req.files?.consulta?.[0]?.originalname || null;
 
         // Verificar que la matrícula existe en la tabla matriculas
-        const sqlCheckMatricula = 'SELECT id_matricula FROM matriculas WHERE id_matricula = ?';
+        const sqlCheckMatricula = 'SELECT id_matricula FROM matriculas WHERE id_matricula =?';
         const [rowsMatricula] = await pool.query(sqlCheckMatricula, [matricula]);
 
         if (rowsMatricula.length === 0) {
@@ -60,11 +60,21 @@ export const registrarProductiva = async (req, res) => {
             });
         }
 
+        // Verificar si el aprendiz está disponible
+        const sqlIsAprendizAvailable = 'SELECT COUNT(*) as count FROM actividades WHERE id_aprendiz = ? AND fecha BETWEEN ? AND ?';
+        const [resultIsAprendizAvailable] = await pool.query(sqlIsAprendizAvailable, [aprendiz, fecha_inicio, fecha_fin]);
+
+        if (resultIsAprendizAvailable[0].count > 0) {
+            return res.status(400).json({
+                message: 'El aprendiz ya tiene una actividad programada en este período'
+            });
+        }
+
         // Registrar etapa productiva
         const sqlProductiva = `
-            INSERT INTO productiva 
+            INSERT INTO productivas 
             (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
-            VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
+            VALUES (?,?,?,?,?, 1,?,?,?,?)
         `;
         const [resultProductiva] = await pool.query(sqlProductiva, [
             matricula, empresa, fecha_inicio, fecha_fin, alternativa, acuerdo, arl, consulta, aprendiz
@@ -84,9 +94,9 @@ export const registrarProductiva = async (req, res) => {
             // Insertar tres seguimientos asociados a la etapa productiva
             const sqlSeguimiento = `
                 INSERT INTO seguimientos (fecha, seguimiento, estado, pdf, productiva, instructor) 
-                VALUES (?, 1, 1, ?, ?, ?),
-                       (?, 2, 1, ?, ?, ?),
-                       (?, 3, 1, ?, ?, ?)
+                VALUES (?, 1, 1,?,?,?),
+                       (?, 2, 1,?,?,?),
+                       (?, 3, 1,?,?,?)
             `;
 
             const [resultSeguimiento] = await pool.query(sqlSeguimiento, [
@@ -106,18 +116,18 @@ export const registrarProductiva = async (req, res) => {
                 const sqlBitacoras = `
                     INSERT INTO bitacoras (fecha, bitacora, seguimiento, pdf, estado, instructor) 
                     VALUES 
-                        (?, '1', ?, ?, 1, ?),
-                        (?, '2', ?, ?, 1, ?),
-                        (?, '3', ?, ?, 1, ?),
-                        (?, '4', ?, ?, 1, ?),
-                        (?, '5', ?, ?, 1, ?),
-                        (?, '6', ?, ?, 1, ?),
-                        (?, '7', ?, ?, 1, ?),
-                        (?, '8', ?, ?, 1, ?),
-                        (?, '9', ?, ?, 1, ?),
-                        (?, '10', ?, ?, 1, ?),
-                        (?, '11', ?, ?, 1, ?),
-                        (?, '12', ?, ?, 1, ?)
+                        (?, '1',?,?, 1,?),
+                        (?, '2',?,?, 1,?),
+                        (?, '3',?,?, 1,?),
+                        (?, '4',?,?, 1,?),
+                        (?, '5',?,?, 1,?),
+                        (?, '6',?,?, 1,?),
+                        (?, '7',?,?, 1,?),
+                        (?, '8',?,?, 1,?),
+                        (?, '9',?,?, 1,?),
+                        (?, '10',?,?, 1,?),
+                        (?, '11',?,?, 1,?),
+                        (?, '12',?,?, 1,?)
                 `;
 
                 const [resultBitacoras] = await pool.query(sqlBitacoras, [
@@ -131,7 +141,6 @@ export const registrarProductiva = async (req, res) => {
                     fecha_inicio, seguimientoIds[1], null, instructor,
                     fecha_inicio, seguimientoIds[2], null, instructor,
                     fecha_inicio, seguimientoIds[2], null, instructor,
-                    fecha_inicio, seguimientoIds[2], null, instructor,
                     fecha_inicio, seguimientoIds[2], null, instructor
                 ]);
 
@@ -140,14 +149,14 @@ export const registrarProductiva = async (req, res) => {
                         message: 'Etapa productiva, seguimientos y bitácoras registrados correctamente'
                     });
                 } else {
-                    await pool.query('DELETE FROM seguimientos WHERE productiva = ?', [productivaId]);
-                    await pool.query('DELETE FROM productiva WHERE id_productiva = ?', [productivaId]);
+                    await pool.query('DELETE FROM seguimientos WHERE productivas =?', [productivaId]);
+                    await pool.query('DELETE FROM productivas WHERE id_productiva =?', [productivaId]);
                     res.status(403).json({
                         message: 'Error al registrar las bitácoras'
                     });
                 }
             } else {
-                await pool.query('DELETE FROM productiva WHERE id_productiva = ?', [productivaId]);
+                await pool.query('DELETE FROM productivas WHERE id_productiva =?', [productivaId]);
                 res.status(403).json({
                     message: 'Error al registrar los seguimientos'
                 });
@@ -159,7 +168,7 @@ export const registrarProductiva = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor: ' + error.message
+            message: 'Error del servidor:' + error.message
         });
     }
 };
@@ -177,9 +186,9 @@ export const actualizarProductiva = async (req, res) => {
         let arl = req.files && req.files.arl ? req.files.arl[0].originalname : null
         let consulta = req.files && req.files.consulta ? req.files.consulta[0].originalname : null
 
-        const [anterior] = await pool.query('SELECT * FROM productiva WHERE id_productiva = ?', [id])
+        const [anterior] = await pool.query('SELECT * FROM productivas WHERE id_productiva = ?', [id])
 
-        let sql = `UPDATE productiva SET
+        let sql = `UPDATE productivas SET
                     matricula = ?,
                     empresa =?,
                     fecha_inicio =?,
@@ -228,7 +237,7 @@ export const actualizarProductiva = async (req, res) => {
 export const renunciarProductiva = async (req, res) => {
     try {
         const {id} = req.params
-        let sql = `UPDATE productiva SET estado = 2 WHERE id_productiva =?`
+        let sql = `UPDATE productivas SET estado = 2 WHERE id_productiva =?`
 
         const [rows] = await pool.query(sql, [id])
 
@@ -251,7 +260,7 @@ export const renunciarProductiva = async (req, res) => {
 export const terminarProductiva = async(req, res) => {
     try {
         const {id} = req.params
-        let sql = `UPDATE productiva SET estado = 3 WHERE id_productiva =?`
+        let sql = `UPDATE productivas SET estado = 3 WHERE id_productiva =?`
 
         const [rows] = await pool.query(sql, [id])
 
