@@ -9,7 +9,7 @@ rutaBitacoras.post('/registrar', /* validarToken,  */cargarBitacora, registrarBi
 
 rutaBitacoras.post('/cargarpdf/:id_bitacora', /* validarToken,  */cargarBitacora,uploadPdfToBitacoras)
 
-rutaBitacoras.put('/actualizar/:id', validarToken, cargarBitacora, actualizarBitacora)
+rutaBitacoras.put('/actualizar/:id', /* validarToken, */ cargarBitacora, actualizarBitacora)
 rutaBitacoras.put('/aprobar/:id', validarToken, aprobarBitacora)
 rutaBitacoras.put('/rechazar/:id', validarToken, rechazarBitacora)
 rutaBitacoras.get('/bitacorasSeguimiento/:id',/*  validarToken, */ bitacoraSeguimiento)

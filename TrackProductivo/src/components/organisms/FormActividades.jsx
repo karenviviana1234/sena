@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Button, Select, SelectItem, Input } from "@nextui-org/react";
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
 
-function FormActividades() {
+function FormActividades({ selectedInstructor, onClose }) {
   const [instructor, setInstructor] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
@@ -10,7 +10,6 @@ function FormActividades() {
   const [tipo, setTipo] = useState("Formacion");
   const [solicitud, setSolicitud] = useState("Solicitado");
 
-  const [instructores, setInstructores] = useState([]);
   const [horarios, setHorarios] = useState([]);
 
   const [errors, setErrors] = useState({
@@ -21,18 +20,12 @@ function FormActividades() {
   const tipos = ["Formacion", "Seguimiento", "Administrativo"];
   const solicitudes = ["Solicitado", "Aprobado", "No Aprobado"];
 
+  // Al cargar el componente, establece el nombre del instructor seleccionado
   useEffect(() => {
-    const fetchInstructores = async () => {
-      try {
-        const response = await axiosClient.get("/personas/listarI");
-        setInstructores(response.data);
-      } catch (error) {
-        console.error("Error al obtener instructores", error);
-      }
-    };
-
-    fetchInstructores();
-  }, []);
+    if (selectedInstructor) {
+      setInstructor(selectedInstructor.nombres);
+    }
+  }, [selectedInstructor]);
 
   useEffect(() => {
     const fetchHorarios = async () => {
@@ -46,19 +39,6 @@ function FormActividades() {
 
     fetchHorarios();
   }, []);
-
-/*   useEffect(() => {
-    const fetchProductivas = async () => {
-      try {
-        const response = await axiosClient.get("/productiva/listar");
-        setProductivas(response.data);
-      } catch (error) {
-        console.error("Error al obtener productivas", error);
-      }
-    };
-
-    fetchProductivas();
-  }, []); */
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -88,22 +68,16 @@ function FormActividades() {
     }
 
     const dataToSend = {
-      instructor: parseInt(instructor, 10) || null,
+      instructor: selectedInstructor.id_persona, // El ID del instructor seleccionado
       fecha_inicio: fechaInicio,
       fecha_fin: fechaFin,
       horario: parseInt(horario, 10) || null,
-/*       productiva: parseInt(productiva, 10) || null, */
       tipo: tipos.indexOf(tipo) + 1, // Convertir a número basado en el índice + 1
       solicitud: solicitudes.indexOf(solicitud) + 1, // Convertir a número basado en el índice + 1
     };
 
-    console.log("Datos a enviar:", dataToSend); // Depuración
-
     try {
-      const response = await axiosClient.post(
-        "/actividades/registrar",
-        dataToSend
-      );
+      const response = await axiosClient.post("/actividades/registrar", dataToSend);
       if (response.status === 200) {
         alert("Actividad registrada correctamente");
       } else {
@@ -119,21 +93,12 @@ function FormActividades() {
     <div>
       <h2 className="text-xl font-bold mb-4">Formulario de Actividades</h2>
       <form onSubmit={handleSubmit}>
-        <Select
-          name="instructor"
-          placeholder="Selecciona el instructor"
+        {/* Mostrar el nombre del instructor en lugar de un Select */}
+        <Input
+          readOnly
+          label="Instructor"
           value={instructor}
-          onChange={(e) => setInstructor(e.target.value)}
-        >
-          {instructores.map((inst) => (
-            <SelectItem
-              key={inst.id_persona}
-              value={inst.id_persona.toString()}
-            >
-              {inst.nombres}
-            </SelectItem>
-          ))}
-        </Select>
+        />
 
         <div className="grid grid-cols-2 gap-4 mb-5 mt-5">
           <div className="flex flex-col">
@@ -155,7 +120,7 @@ function FormActividades() {
               label="Fecha de Fin"
               value={fechaFin}
               onChange={(e) => setFechaFin(e.target.value)}
-              min={fechaInicio || today} // Ajustar mínimo a la fecha de inicio o a hoy si no se ha seleccionado
+              min={fechaInicio || today} 
               helperText={errors.fechaFin}
               helperColor={errors.fechaFin ? "danger" : "default"}
             />
@@ -193,7 +158,7 @@ function FormActividades() {
             />
           </div>
 
-{/*             <Select
+          {/*             <Select
           <div className="flex flex-col">
               name="productiva"
               placeholder="Selecciona la productiva"
@@ -225,7 +190,7 @@ function FormActividades() {
           </div> */}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
+{/*         <div className="grid grid-cols-2 gap-4 mb-4">
           <Select
             name="tipo"
             placeholder="Selecciona el tipo"
@@ -251,13 +216,13 @@ function FormActividades() {
               </SelectItem>
             ))}
           </Select>
-        </div>
+        </div> */}
 
         <div className="flex justify-end gap-5 mt-5">
-          <Button type="button" color="danger">
+          <Button type="button" color="danger" onClick={onClose}>
             Cerrar
           </Button>
-          <Button type="submit" color="success">
+          <Button type="submit" color="success" onClick={onClose}>
             Registrar
           </Button>
         </div>
