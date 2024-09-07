@@ -167,7 +167,7 @@ function ComponentSeguimiento({
       <h1 className="font-semibold text-xl">Acta:</h1>
       <div className="border shadow-medium rounded-2xl p-4 flex flex-col gap-4 relative h-32">
         <h2 className="font-semibold text-lg absolute top-4 left-4">
-          Acta N° 1:
+          Acta N° {seguimientoNumeros[id_seguimiento] || 1}{" "}:
         </h2>
         <div className="flex justify-center items-center h-full">
           <PDFUploader onFileSelect={handleActaPdfSubmit} />

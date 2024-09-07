@@ -20,6 +20,7 @@ import {
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import FormActividades from './FormActividades.jsx';
+import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad.jsx';
 
 function TableInstructores() {
     const [personas, setPersonas] = useState([]);
@@ -38,7 +39,7 @@ function TableInstructores() {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios initialData={data} />);
         } else if (formType === 'formActividades') {
-            setBodyContent(<FormActividades/>);
+            setBodyContent(<FormActividades />);
         }
         setIsModalOpen(true);
     };
@@ -61,18 +62,18 @@ function TableInstructores() {
 
         fetchData();
     }, []);
-  
+
 
     const hasSearchFilter = Boolean(filterValue);
 
-  const filteredItems = useMemo(() => {
-    let filteredPersonas = personas;
+    const filteredItems = useMemo(() => {
+        let filteredPersonas = personas;
 
-    if (hasSearchFilter) {
-      filteredPersonas = filteredPersonas.filter((seg) =>
-        seg.nombres.toLowerCase().includes(filterValue.toLowerCase())
-      );
-    }
+        if (hasSearchFilter) {
+            filteredPersonas = filteredPersonas.filter((seg) =>
+                seg.nombres.toLowerCase().includes(filterValue.toLowerCase())
+            );
+        }
 
         return filteredPersonas;
     }, [personas, filterValue]);
@@ -95,43 +96,47 @@ function TableInstructores() {
         });
     }, [sortDescriptor, items]);
 
-  const renderCell = useCallback(
-    (item, columnKey) => {
-      const cellValue = item[columnKey];
+    const renderCell = useCallback(
+        (item, columnKey) => {
+            const cellValue = item[columnKey];
 
-        switch (columnKey) {
-            case "acciones":
-                return (
-                    <div className="flex justify-around items-center">
-                        <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
-                    </div>
-                );
+            switch (columnKey) {
+                case "acciones":
+                    return (
+                        <div className="flex justify-around items-center">
+                            <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
+                            <ButtonRegistrarActividad
+                                onClick={() => handleOpenModal("formActividades")}
+                            />
+                        </div>
 
-            case "nombres":
-                return (
-                    <User
-                        name={cellValue}
-                        avatarSrc="https://via.placeholder.com/150"
-                        bordered
-                        as="button"
-                        size="sm"
-                        color="primary"
-                    />
-                );
-            default:
-                return cellValue;
-        }
+                    );
+
+                case "nombres":
+                    return (
+                        <User
+                            name={cellValue}
+                            avatarSrc="https://via.placeholder.com/150"
+                            bordered
+                            as="button"
+                            size="sm"
+                            color="primary"
+                        />
+                    );
+                default:
+                    return cellValue;
+            }
+        }, []);
+
+    const onRowsPerPageChange = useCallback((e) => {
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
     }, []);
 
-  const onRowsPerPageChange = useCallback((e) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
-
-  const onSearchChange = useCallback((value) => {
-    setFilterValue(value || "");
-    setPage(1);
-  }, []);
+    const onSearchChange = useCallback((value) => {
+        setFilterValue(value || "");
+        setPage(1);
+    }, []);
 
     const onClear = useCallback(() => {
         setFilterValue("");
@@ -155,16 +160,11 @@ function TableInstructores() {
                         <div>
                             <Button
                                 onClick={() => handleOpenModal("formUsuarios")}
-                                className="bg-[#90d12c] text-white mr-10"
+                                className="bg-[#90d12c] text-white"
                             >
-                                Registrar
+                                Registrar Instructor
                             </Button>
-                            <Button
-                                onClick={() => handleOpenModal("formActividades")}
-                                className="bg-[#5a851b] text-white"
-                            >
-                                Añadir actividades
-                            </Button>
+
                         </div>
                     </div>
                 </div>
@@ -236,7 +236,7 @@ function TableInstructores() {
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-/*                     title="Registro de Instructores" */
+                    /*                     title="Registro de Instructores" */
                     bodyContent={bodyContent}
                 />
 
