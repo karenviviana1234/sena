@@ -26,41 +26,36 @@ const Seguimientos = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error al obtener seguimientos:", error);
-        setError(error.message);
+        setError("error al obtneer los seguimientos",error.message);
         setLoading(false);
       }
     };
     obtenerSeguimientos();
   }, [getSeguimientos]);
 
-  const handleOpenModal = async (id_seguimiento, component) => {
+  const handleOpenModal = async (id_seguimiento, componentName) => {
     console.log("handleOpenModal llamado con id_seguimiento:", id_seguimiento);
-    console.log("Componente seleccionado:", component.name);
+    console.log("Componente seleccionado:", componentName);
   
-    setSelectedComponent(component);
+    setSelectedComponent(componentName);
     setModalVisible(true);
   
-    if (component === ComponentSeguimiento) {
+    if (componentName === "ComponentSeguimiento") {
       setSelectedSeguimiento(id_seguimiento);
-      console.log(
-        "ComponenteSeguimiento seleccionado con id_seguimiento:",
-        id_seguimiento
-      );
+      
+      console.log("ComponenteSeguimiento seleccionado con id_seguimiento:", id_seguimiento);
   
-      const seguimiento = await getSeguimiento(id_seguimiento);
-      if (seguimiento && seguimiento.bitacoras) {
-        const bitacorasFiltradas = seguimiento.bitacoras.filter(
-          (bitacora) => bitacora.id_seguimiento === id_seguimiento
-        );
-        setBitacoras(bitacorasFiltradas);
-        console.log("Bitácoras filtradas:", bitacorasFiltradas);
-      } else {
-        console.error("El seguimiento no contiene bitácoras o es inválido.");
+      try {
+        const seguimiento = await getSeguimiento(id_seguimiento);
+        if (seguimiento) {
+          setBitacoras(seguimiento.bitacoras || []);
+          setSelectedSeguimiento(seguimiento); // Pasar el objeto completo
+        }
+      } catch (error) {
+        console.error("Error al obtener el seguimiento:", error);
       }
     }
   };
-  
-
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedComponent(null);
@@ -87,13 +82,21 @@ const Seguimientos = () => {
     );
   }
 
+  const componentsMap = {
+    ComponentSeguimiento: (
+      <ComponentSeguimiento seguimiento={selectedSeguimiento} />
+    ),
+    FormNovedad: <FormNovedad />,
+  };
+  
+
   return (
     <Layout title={"Seguimientos"}>
       <View style={styles.container}>
         {rol !== "Aprendiz" && (
           <BotonRegistrar
             titulo="Subir Novedad"
-            onPress={() => handleOpenModal(null, FormNovedad)}
+            onPress={() => handleOpenModal(null, "FormNovedad")}
           />
         )}
         <FlatList
@@ -115,7 +118,7 @@ const Seguimientos = () => {
                       key={seguimiento}
                       style={styles.button}
                       onPress={() =>
-                        handleOpenModal(item[seguimiento], ComponentSeguimiento)
+                        handleOpenModal(item[seguimiento], "ComponentSeguimiento")
                       }
                     >
                       <Text style={styles.buttonText}>
@@ -131,13 +134,7 @@ const Seguimientos = () => {
           )}
         />
         <Modal_Global visible={modalVisible} onClose={handleCloseModal}>
-          {selectedComponent === ComponentSeguimiento && selectedSeguimiento ? (
-            <ComponentSeguimiento seguimiento={selectedSeguimiento} />
-          ) : selectedComponent === FormNovedad ? (
-            <FormNovedad />
-          ) : (
-            <Text>No se ha seleccionado ningún componente</Text>
-          )}
+          {componentsMap[selectedComponent] || <Text>No se ha seleccionado ningún componente</Text>}
         </Modal_Global>
       </View>
     </Layout>

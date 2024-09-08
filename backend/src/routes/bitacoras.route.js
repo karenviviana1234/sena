@@ -12,7 +12,7 @@ rutaBitacoras.post('/cargarpdf/:id_bitacora', /* validarToken,  */cargarBitacora
 rutaBitacoras.put('/actualizar/:id', /* validarToken, */ cargarBitacora, actualizarBitacora)
 rutaBitacoras.put('/aprobar/:id', validarToken, aprobarBitacora)
 rutaBitacoras.put('/rechazar/:id', validarToken, rechazarBitacora)
-rutaBitacoras.get('/bitacorasSeguimiento/:id', validarToken, bitacoraSeguimiento)
+rutaBitacoras.get('/bitacorasSeguimiento/:id',/*  validarToken, */ bitacoraSeguimiento)
 rutaBitacoras.get('/buscar/:id', validarToken, buscarBitacora)
 
 export default rutaBitacoras

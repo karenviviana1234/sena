@@ -58,7 +58,7 @@ function ComponentSeguimiento({
   }, [id_seguimiento, onIdSend]);
   
   useEffect(() => {
-    axiosClient.get(`/bitacoras/bitacorasSeguimiento/${1}`).then((response) => {
+    axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id_seguimiento}`).then((response) => {
       console.log(response.data);
       setBitacorasPdfs(response.data);
     })
@@ -127,7 +127,7 @@ function ComponentSeguimiento({
 
     try {
       const response = await axiosClient.post(
-        "/bitacoras/registrar",
+        `/bitacoras/cargarpdf/${bitacora}`,
         formData,
         {
           headers: {
@@ -197,7 +197,7 @@ function ComponentSeguimiento({
         <div className="flex-1 min-w-[300px]  p-4">
           <h1 className="font-semibold mb-4 text-xl">Registrar Bitácora:</h1>
           <div className="border shadow-medium rounded-2xl p-4 flex flex-col gap-4 relative">
-            <h2 className="font-semibold text-lg">Bitácora 1:</h2>
+            <h2 className="font-semibold text-lg">Bitácoras:</h2>
             <select name="bitacora" id="" value={bitacora} onChange={(e) => setBitacora(e.target.value)}>
               <option hidden  > Código de la bitacora: </option>
               <option value="1">Bitácora 1</option>
@@ -246,7 +246,7 @@ function ComponentSeguimiento({
           </div>
         </div>
       </div>
-      <div className="flex flex-col w-[600px]">
+{/*       <div className="flex flex-col w-[600px]">
         <h2 className="font-semibold mb-4 text-xl"> Bitacoras asociadas al seguimiento: </h2>
             {bitacorasPdfs.map((bita) => (
               <div key={bita.id_bitacora} className="flex flex-row">
@@ -255,7 +255,7 @@ function ComponentSeguimiento({
                 <button className="bg-[#6fb12d] text-white p-2 rounded-xl mb-3 font-semibold" onClick={() => [handleBuscar(bita.id_bitacora), setModalBitacora(true)]}> Editar </button>
               </div>
             ))}
-      </div>
+      </div> */}
       <Modal isOpen={modalBitacora} onClose={() => setModalBitacora(false)}>
       <ModalContent>
         <ModalHeader>

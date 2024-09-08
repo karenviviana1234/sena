@@ -75,6 +75,22 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
           />
         </View>
         {/* Vistas por roles */}
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("principal")}
+          >
+            <View style={styles.menuItemContent}>
+              <Icon
+                name="book"
+                size={20}
+                color="black"
+                style={styles.menuIcon}
+              />
+              <Text style={styles.menuText}>Inicio</Text>
+            </View>
+          </TouchableOpacity>
+{/* 
         {rol === "Instructor" && (
           <TouchableOpacity
             style={styles.menuItem}
@@ -106,7 +122,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
               <Text style={styles.menuText}>Empresas</Text>
             </View>
           </TouchableOpacity>
-        )}
+        )} */}
         {rol === "Instructor" && (
           <TouchableOpacity
             style={styles.menuItem}

@@ -39,7 +39,7 @@ function TableInstructores() {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios initialData={data} />);
         } else if (formType === 'formActividades') {
-            setBodyContent(<FormActividades />);
+            setBodyContent(<FormActividades selectedInstructor = {data} />);
         }
         setIsModalOpen(true);
     };
@@ -106,7 +106,7 @@ function TableInstructores() {
                         <div className="flex justify-around items-center">
                             <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
                             <ButtonRegistrarActividad
-                                onClick={() => handleOpenModal("formActividades")}
+                                onClick={() => handleOpenModal("formActividades", item)}
                             />
                         </div>
 
@@ -236,7 +236,7 @@ function TableInstructores() {
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
-                    /*                     title="Registro de Instructores" */
+ /*                 title="Registro de Instructores" */
                     bodyContent={bodyContent}
                 />
 
