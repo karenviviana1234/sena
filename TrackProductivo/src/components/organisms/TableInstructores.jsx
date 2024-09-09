@@ -21,6 +21,7 @@ import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import FormActividades from './FormActividades.jsx';
 import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad.jsx';
+import ButtonDesactivar from '../atoms/ButtonDesactivar.jsx';
 
 function TableInstructores() {
     const [personas, setPersonas] = useState([]);
@@ -31,38 +32,88 @@ function TableInstructores() {
         direction: "ascending",
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
-    /* Se define una constante para manejar el contenido dinamico */
     const [bodyContent, setBodyContent] = useState(null);
     const [page, setPage] = useState(1);
+    const [areas, setAreas] = useState([]);
+
+
+    const fetchData = async () => {
+        try {
+            const response = await axiosClient.get('/personas/listarI'); // Ajusta la ruta del endpoint
+            setPersonas(response.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+  
 
     const handleOpenModal = (formType, data = null) => {
         if (formType === 'formUsuarios') {
-            setBodyContent(<FormUsuarios initialData={data} />);
+            setBodyContent(<FormUsuarios initialData={data} onSuccess={handleUpdateData}/>);
         } else if (formType === 'formActividades') {
-            setBodyContent(<FormActividades selectedInstructor = {data} />);
+            setBodyContent(<FormActividades />);
         }
         setIsModalOpen(true);
     };
 
+    const handleUpdateData = useCallback(() => {
+        fetchData();
+    }, [fetchData]);
+    
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
 
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axiosClient.get('/personas/listarI'); // Ajusta la ruta del endpoint
-                setPersonas(response.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
 
+    const fetchAreas = async () => {
+        try {
+            const response = await axiosClient.get('/areas/listar');
+            setAreas(response.data);
+        } catch (error) {
+            console.error('Error fetching areas:', error);
+        }
+    };
+    useEffect(() => {
         fetchData();
+        fetchAreas();
     }, []);
 
+    const handleDesactivar = async (id_persona) => {
+        // Mostrar una alerta de confirmación
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¿Quieres desactivar este usuario?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, desactivar',
+            cancelButtonText: 'No, cancelar',
+            reverseButtons: true,
+            customClass: {
+                confirmButton: 'bg-[#90d12c] text-white hover:bg-green-600 border-green-500',
+                cancelButton: 'bg-[#f31260] text-white hover:bg-red-600 border-red-500'
+            }
+        });
+    
+        // Si el usuario confirma, proceder con la desactivación
+        if (result.isConfirmed) {
+            try {
+                const response = await axiosClient.post(`/personas/desactivar/${id_persona}`);
+                Swal.fire('Desactivado', response.data.message, 'success');
+                fetchData(); // Refrescar la lista de personas
+            } catch (error) {
+                console.error('Error desactivando usuario:', error);
+                Swal.fire('Error', 'No se pudo desactivar el usuario', 'error');
+            }
+        }
+    };
+    
+    
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -101,15 +152,20 @@ function TableInstructores() {
             const cellValue = item[columnKey];
 
             switch (columnKey) {
+                case "area":
+                    // Busca el nombre del área utilizando el id_area
+                    const area = areas.find(area => area.id_area === item.area);
+                    return area ? area.nombre_area : "";
+
                 case "acciones":
                     return (
                         <div className="flex justify-around items-center">
                             <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
+                            <ButtonDesactivar onClick={() => handleDesactivar(item.id_persona)} />
                             <ButtonRegistrarActividad
-                                onClick={() => handleOpenModal("formActividades", item)}
+                                onClick={() => handleOpenModal("formActividades")}
                             />
                         </div>
-
                     );
 
                 case "nombres":
@@ -123,10 +179,11 @@ function TableInstructores() {
                             color="primary"
                         />
                     );
+                    
                 default:
                     return cellValue;
             }
-        }, []);
+        }, [handleDesactivar, handleOpenModal]);
 
     const onRowsPerPageChange = useCallback((e) => {
         setRowsPerPage(Number(e.target.value));
@@ -164,7 +221,6 @@ function TableInstructores() {
                             >
                                 Registrar Instructor
                             </Button>
-
                         </div>
                     </div>
                 </div>
@@ -196,6 +252,9 @@ function TableInstructores() {
         { key: "correo", label: "Correo" },
         { key: "telefono", label: "Teléfono" },
         { key: "rol", label: "Rol" },
+        { key: "tipo", label: "Tipo" },
+        { key: "sede", label: "Sede" },
+        { key: "area", label: "Area" },
         { key: "acciones", label: "Acciones" },
     ];
 
@@ -236,10 +295,8 @@ function TableInstructores() {
                 <ModalAcciones
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
- /*                 title="Registro de Instructores" */
                     bodyContent={bodyContent}
                 />
-
             </div>
         </div>
     );
