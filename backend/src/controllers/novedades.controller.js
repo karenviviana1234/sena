@@ -46,22 +46,25 @@ export const registrarNovedad = async (req, res) => {
 
 export const listarnovedades = async (req, res) => {
     try {
-        let sql = `SELECT * FROM novedades`
+        const { id_seguimiento } = req.params; // Obtén el ID del seguimiento desde los parámetros de la solicitud
+        let sql = `SELECT * FROM novedades WHERE seguimiento = ?`;
 
-        const [results] = await pool.query(sql)
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        const [results] = await pool.query(sql, [id_seguimiento]);
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
-                message: 'No hay novedades registradas'
-            })
+                message: 'No hay novedades registradas para este seguimiento'
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
 }
+
+
 
 export const actualizarNovedades = async (req, res) => {
     try {

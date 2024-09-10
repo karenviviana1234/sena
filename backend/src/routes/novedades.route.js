@@ -4,7 +4,7 @@ import { validarToken } from '../controllers/seguridad.controller.js';
 
 const rutaNovedades = Router();
 
-rutaNovedades.get('/listar', validarToken, listarnovedades);
+rutaNovedades.get('/listar/:id_seguimiento', validarToken, listarnovedades);
 rutaNovedades.post('/registrar', validarToken, cargarImage, registrarNovedad);
 rutaNovedades.put('/actualizar/:id', validarToken, cargarImage, actualizarNovedades);
 rutaNovedades.delete('/eliminar/:id', validarToken, eliminarNovedad);
