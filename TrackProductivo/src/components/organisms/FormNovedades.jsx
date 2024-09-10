@@ -2,20 +2,22 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
 
-function FormNovedades({ novedadId = null, initialData = {}, onClose }) {
-  const [descripcion, setDescripcion] = useState(initialData.descripcion || "");
-  const [fecha, setFecha] = useState(initialData.fecha || "");
-  const [selectedSeguimiento, setSelectedSeguimiento] = useState(initialData.seguimiento || "");
-  const [instructor, setInstructor] = useState(initialData.instructor || "");
-  const [foto, setfoto] = useState(initialData.foto || "");
-  
+function FormNovedades() {  // Recibe onClose como prop
+  const [descripcion, setDescripcion] = useState("");
+  const [fecha, setFecha] = useState("");
+  const [foto, setFoto] = useState("");
+  const [instructor, setInstructor] = useState("");
+  const [seguimientos, setSeguimientos] = useState([]);
+  const [selectedSeguimiento, setSelectedSeguimiento] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+
 
 
   useEffect(() => {
     const fetchSeguimiento = async () => {
       try {
         const response = await axiosClient.get("/seguimientos/listarA");
+
         const data = response.data[0]; // Acceder al primer elemento del array recibido
 
         const seguimientoList = [
@@ -24,11 +26,12 @@ function FormNovedades({ novedadId = null, initialData = {}, onClose }) {
           { id_seguimiento: 3, seguimiento: data.seguimiento3 },
         ];
 
-        setSelectedSeguimiento(seguimientoList);
+        setSeguimientos(seguimientoList);
       } catch (error) {
         console.error("Error al obtener seguimientos", error);
       }
       setModalOpen(true);
+
     };
 
     fetchSeguimiento();
@@ -37,36 +40,25 @@ function FormNovedades({ novedadId = null, initialData = {}, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Crear un objeto FormData
     const formData = new FormData();
     formData.append("descripcion", descripcion);
     formData.append("fecha", fecha);
-    formData.append("foto", foto);
+    formData.append("foto", foto); // Asegúrate de que 'foto' tenga un archivo
     formData.append("instructor", instructor);
     formData.append("seguimiento", selectedSeguimiento);
 
     try {
-      let response;
-
-      if (novedadId) {
-        // Modo de actualización
-        response = await axiosClient.put(`/novedad/actualizar/${novedadId}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-      } else {
-        // Modo de creación
-        response = await axiosClient.post("/novedad/registrar", formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        setIsModalOpen(true);
-
-      }
-
-
+      const response = await axiosClient.post("/novedad/registrar", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Especifica el tipo de contenido
+        },
+      });
       if (response.status === 200) {
-        alert(`Novedad ${novedadId ? 'actualizada' : 'registrada'} correctamente`);
-        if (onClose) onClose(); // Cierra el modal después de registrar/actualizar
+        alert("Novedad registrada correctamente");
+        handleCloseModal(); // Cierra el modal después de registrar
       } else {
-        alert(`Error al ${novedadId ? 'actualizar' : 'registrar'} la novedad`);
+        alert("Error al registrar la novedad");
       }
     } catch (error) {
       console.error("Error del servidor:", error);
@@ -74,10 +66,14 @@ function FormNovedades({ novedadId = null, initialData = {}, onClose }) {
     }
   };
 
+  const handleCloseModal = async () => {
+    setModalOpen(false);
+  };
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <form method="post" onSubmit={handleSubmit}>
+    <form method="post" onSubmit={handleSubmit} onClose={handleCloseModal}
+    >
       <div className="ml-5 align-items-center">
         <div className="flex flex-col">
           <Input
@@ -112,7 +108,7 @@ function FormNovedades({ novedadId = null, initialData = {}, onClose }) {
             onChange={(e) => {
               const file = e.target.files[0];
               if (file) {
-                setFoto(file);
+                setFoto(file); // Asegúrate de que se esté guardando el archivo correctamente
               }
             }}
           />
@@ -148,7 +144,7 @@ function FormNovedades({ novedadId = null, initialData = {}, onClose }) {
             type="submit"
             className="bg-[#5a851b] hover:bg-[#4c7016] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out"
           >
-            {novedadId ? 'Actualizar' : 'Registrar'}
+            Registrar
           </button>
         </div>
       </div>
