@@ -231,7 +231,7 @@ function ComponentSeguimiento({
               </div>
             )}
             {estadoBitacoraVisible && (
-              <div className="ml-40 text-gray-500 text-sm top-2">
+              <div className="flex-1 ml-40 text-gray-500 text-sm top-2">
                 <p>{fecha}</p>
               </div>
             )}
