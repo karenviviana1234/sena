@@ -4,7 +4,6 @@ import v from "../../styles/Variables.jsx";
 import PDFUploader from "../molecules/Pdf.jsx";
 import axiosClient from "../../configs/axiosClient.jsx";
 import ButtonEnviar from "../atoms/ButtonEnviar.jsx";
-import Icons from "../../styles/Variables.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import axios from "axios";
 import ModalAcciones from "./ModalAcciones.jsx";
@@ -59,11 +58,15 @@ function ComponentSeguimiento({
   }, [id_seguimiento, onIdSend]);
   
   useEffect(() => {
-    axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id_seguimiento}`).then((response) => {
-      console.log(response.data);
-      setBitacorasPdfs(response.data);
-    })
-  }, [])
+    if (id_seguimiento) {
+      axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id_seguimiento}`).then((response) => {
+        setBitacorasPdfs(response.data);  // Guardamos las bitácoras obtenidas en el estado
+      }).catch(error => {
+        console.error("Error al obtener las bitácoras:", error);
+      });
+    }
+  }, [id_seguimiento]);
+
   // Función para manejar la carga del archivo de acta
   const handleActaPdfSubmit = (file) => {
     setSeguimientoPdf(file);
@@ -199,13 +202,19 @@ function ComponentSeguimiento({
           <h1 className="font-semibold mb-4 text-xl">Registrar Bitácora:</h1>
           <div className="border shadow-medium rounded-2xl p-4 flex  gap-4 relative">
             <h2 className="font-semibold text-lg">Bitácoras:</h2>
-            <select name="bitacora" id="" value={bitacora} onChange={(e) => setBitacora(e.target.value)}>
-              <option hidden  > Código de la bitacora: </option>
-              <option value="1">Bitácora 1</option>
-              <option value="2">Bitácora 2</option>
-              <option value="3">Bitácora 3</option>
-              <option value="4">Bitácora 4</option>
-            </select>
+          {/* Select dinámico */}
+          <select name="bitacora" value={bitacora} onChange={(e) => setBitacora(e.target.value)}>
+            <option hidden>Código de la bitácora:</option>
+            {bitacorasPdfs.length > 0 ? (
+              bitacorasPdfs.map((bita) => (
+                <option key={bita.id_bitacora} value={bita.id_bitacora}>
+                  Bitácora {bita.id_bitacora}
+                </option>
+              ))
+            ) : (
+              <option disabled>No hay bitácoras disponibles</option>
+            )}
+          </select>
             <div className="flex justify-center items-center gap-4">
               <PDFUploader onFileSelect={handleBitacoraPdfSubmit} />
               <ButtonEnviar onClick={handleSubmitBitacoras} />
