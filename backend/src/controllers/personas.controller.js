@@ -24,15 +24,16 @@ export const listarPersonas = async (req, res) => {
 
 export const listarInstructores = async (req, res) => {
   try {
-    // Asegúrate de tener la tabla 'personas' con la columna 'rol'
-    const sql = `SELECT * FROM personas WHERE cargo = 'Instructor'`;
-    const [results] = await pool.query(sql);
+    // Asegúrate de tener la columna 'estado' en la tabla 'personas'
+    const sql = 'SELECT * FROM personas WHERE cargo = ? AND estado = ?';
+    const values = ['Instructor', 'Activo'];
+    const [results] = await pool.query(sql, values);
 
     if (results.length > 0) {
       res.status(200).json(results);
     } else {
       res.status(404).json({
-        message: 'No hay instructores registrados',
+        message: 'No hay instructores activos registrados',
       });
     }
   } catch (error) {
@@ -41,6 +42,7 @@ export const listarInstructores = async (req, res) => {
     });
   }
 };
+
 
 
 export const listarAprendices = async (req, res) => {
@@ -87,12 +89,10 @@ export const listarMunicipios = async (req, res) => {
   }
 }
 
-
-
 /* Registrar Aprendices */
 export const registrarAprendiz = async (req, res) => {
   try {
-    const { identificacion, nombres, correo, telefono, password, municipio } = req.body;
+    const { identificacion, nombres, correo, telefono, municipio } = req.body;
 
     if (!municipio) {
       return res.status(400).json({
@@ -101,10 +101,11 @@ export const registrarAprendiz = async (req, res) => {
       });
     }
 
-    const bcryptPassword = bcrypt.hashSync(password, 12);
+    // Usar la identificación como contraseña por defecto
+    const bcryptPassword = bcrypt.hashSync(identificacion.toString(), 12);
 
-    /* rol y cargo como 'Aprendiz' */
-    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo, municipio) VALUES (?, ?, ?, ?, ?, 'Aprendiz', 'Aprendiz', ?)`;
+    /* rol, cargo como 'Aprendiz' y estado como 'Activo' */
+    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo, municipio, estado) VALUES (?, ?, ?, ?, ?, 'Aprendiz', 'Aprendiz', ?, 'Activo')`;
     const params = [identificacion, nombres, correo, telefono, bcryptPassword, municipio];
 
     const [result] = await pool.query(query, params);
@@ -128,13 +129,29 @@ export const registrarAprendiz = async (req, res) => {
   }
 };
 
+
 /* Registrar Instructores */
 export const registrarInstructor = async (req, res) => {
   try {
-    const { identificacion, nombres, correo, telefono, rol, password } = req.body;
+    const { identificacion, nombres, correo, telefono, rol, tipo, sede, area } = req.body;
+
+    const sedeValida = ['Yamboro', 'Centro'];
+    if (sede && !sedeValida.includes(sede)) {
+        return res.status(400).json({
+            message: 'Sede no válido'
+        });
+    }
+
+    const tipoValida = ['Contratista', 'Planta'];
+    if (tipo && !tipoValida.includes(tipo)) {
+        return res.status(400).json({
+            message: 'Tipo no válido'
+        });
+    }
+
 
     // Validar campos requeridos
-    if (!identificacion || !nombres || !correo || !telefono || !password || !rol) {
+    if (!identificacion || !nombres || !correo || !telefono || !rol || !tipo ||!sede ||!area) {
       return res.status(400).json({
         status: 400,
         message: 'Todos los campos son obligatorios.',
@@ -152,12 +169,13 @@ export const registrarInstructor = async (req, res) => {
       });
     }
 
-    // Hash de la contraseña
-    const bcryptPassword = bcrypt.hashSync(password, 12);
+    // Usar identificacion como contraseña por defecto y hacer el hash
+    const defaultPassword = identificacion.toString(); // Convertir a string si no es ya una cadena
+    const bcryptPassword = bcrypt.hashSync(defaultPassword, 12);
 
     // Consulta SQL para insertar datos
-    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, cargo) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol, 'Instructor'];
+    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol,  tipo, sede, area, cargo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)`;
+    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol,  tipo, sede, area, 'Instructor', 'Activo'];
 
     const [result] = await pool.query(query, params);
 
@@ -186,9 +204,11 @@ export const registrarInstructor = async (req, res) => {
 export const actualizarPersona = async (req, res) => {
   try {
     const { id_persona } = req.params;
-    const { identificacion, nombres, correo, telefono, password, rol, cargo, municipio } = req.body;
+    const { identificacion, nombres, correo, telefono, rol, cargo, municipio } = req.body;
 
-    if (!identificacion || !nombres || !correo || !telefono || !password || !rol) {
+  
+
+    if (!identificacion || !nombres || !correo || !telefono || !rol) {
       return res.status(400).json({
         status: 400,
         message: 'Todos los campos son obligatorios.',
@@ -196,7 +216,6 @@ export const actualizarPersona = async (req, res) => {
     }
 
     const [oldPersona] = await pool.query("SELECT * FROM personas WHERE id_persona = ?", [id_persona]);
-    const bcryptPassword = bcrypt.hashSync(password, 12);
 
     if (oldPersona.length === 0) {
       return res.status(404).json({
@@ -210,7 +229,6 @@ export const actualizarPersona = async (req, res) => {
       nombres: nombres || oldPersona[0].nombres,
       correo: correo || oldPersona[0].correo,
       telefono: telefono || oldPersona[0].telefono,
-      password: bcryptPassword,
       rol: rol || oldPersona[0].rol,
       cargo: cargo || oldPersona[0].cargo,
       municipio: municipio || oldPersona[0].municipio,
@@ -222,7 +240,6 @@ export const actualizarPersona = async (req, res) => {
           nombres = ?, 
           correo = ?, 
           telefono = ?, 
-          password = ?, 
           rol = ?, 
           cargo = ?, 
           municipio = ? 
@@ -232,7 +249,6 @@ export const actualizarPersona = async (req, res) => {
         updatedUsuario.nombres,
         updatedUsuario.correo,
         updatedUsuario.telefono,
-        updatedUsuario.password,
         updatedUsuario.rol,
         updatedUsuario.cargo,
         updatedUsuario.municipio,
@@ -309,49 +325,19 @@ export const eliminarPersona = async (req, res) => {
   }
 }
 
-export const perfil = async (req, res) => {
-  const { id_persona } = req.params;
+export const desactivarPersona = async (req, res) => {
   try {
-    const query = `
-     SELECT 
-    p.nombres, 
-    p.correo, 
-    p.telefono, 
-    p.rol,
-    p.sede,
-    p.area,
-    p.municipio,
-    m.nombre_mpio AS id_municipio
-FROM personas p
-LEFT JOIN municipios m ON p.municipio = m.id_municipio
-WHERE p.id_persona = ?;
-    `;
+    const { id_persona } = req.params;
+    const sql = 'UPDATE personas SET estado = ? WHERE id_persona = ?';
+    const values = ['Inactivo', id_persona];
+    const [result] = await pool.query(sql, values);
 
-    const [rows] = await pool.query(query, [id_persona]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Persona no encontrada' });
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: 'Estado actualizado a Inactivo' });
+    } else {
+      res.status(404).json({ message: 'Persona no encontrada' });
     }
-
-    const persona = rows[0];
-
-    if (persona.rol !== 'aprendiz') {
-      delete persona.municipio;
-    }
-
-    if (persona.rol !== 'instructor') {
-      delete persona.tipo_sede;
-      delete persona.area;
-    }
-
-    res.json(persona);
-
   } catch (error) {
-    res.status(500).json({
-      status: 500,
-      message: 'Error en el sistema: ' + error.message
-    });
+    res.status(500).json({ message: 'Error del servidor: ' + error.message });
   }
 };
-
-

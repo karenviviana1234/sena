@@ -1,67 +1,123 @@
-import { useState, useEffect } from 'react';
-import { Table, TableHeader, TableCell, TableRow, TableBody } from '@nextui-org/react';
-import CustomFileInput from '../NextIU/molecules/CustomFileInput';
-import PropTypes from 'prop-types';
-import ErrorBoundary from '../NextIU/Error/ErrorBoundary';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button } from "@nextui-org/react";
+import ModalProductiva from './ModalRegisterEtapa';
+import axiosClient from '../../configs/axiosClient';
 
-const TablePractica = ({ productivas }) => {
-    const [error, setError] = useState(null);
+function TableProductiva() {
+    const [productivas, setProductivas] = useState([]);
+    const [selectedProductiva, setSelectedProductiva] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        setError("Ocurrió un error");
+        fetchProductivas();
     }, []);
 
-    if (error) {
-        return <div>Error: {error.message}</div>;
-    }
+    const fetchProductivas = async () => {
+        try {
+            const response = await axiosClient.get('/productiva/listar');
+            setProductivas(response.data);
+        } catch (error) {
+            console.error('Error fetching productivas:', error);
+        }
+    };
+
+    const handleOpenModal = (productiva) => {
+        setSelectedProductiva(productiva);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedProductiva(null);
+    };
+
+    const handleSaveProductiva = async (productiva) => {
+        if (selectedProductiva) {
+            await axiosClient.put(`/productiva/actualizar/${selectedProductiva.id_productiva}`, productiva);
+        } else {
+            await axiosClient.post('/productiva/registrar', productiva);
+        }
+        fetchProductivas();
+        handleCloseModal();
+    };
+
+    const handleRenunciarProductiva = async (productId) => {
+        const confirmacion = window.confirm(`¿Estás seguro de querer renunciar la productiva ${productId}?`);
+        if (confirmacion) {
+            await axiosClient.put(`/productiva/renunciar/${productId}`);
+            fetchProductivas();
+        }
+    };
+
+    const handleTerminarProductiva = async (productId) => {
+        const confirmacion = window.confirm(`¿Estás seguro de querer terminar la productiva ${productId}?`);
+        if (confirmacion) {
+            await axiosClient.put(`/productiva/terminar/${productId}`);
+            fetchProductivas();
+        }
+    };
+
+    const columns = [
+        { key: "matricula", label: "Matrícula" },
+        { key: "empresa", label: "Empresa" },
+        { key: "fecha_inicio", label: "Fecha de inicio" },
+        { key: "fecha_fin", label: "Fecha de fin" },
+        { key: "alternativa", label: "Alternativa" },
+        { key: "aprendiz", label: "Aprendiz" },
+        { key: "instructor", label: "Instructor" },
+        { key: "estado", label: "Estado" },
+        { key: "acciones", label: "Acciones" },
+    ];
 
     return (
-        <ErrorBoundary fallback={<div>Algo salió mal</div>}>
-            <Table aria-label="Table with custom cells">
-                <TableHeader>
-                    <TableRow>
-                        <TableCell>ID</TableCell>
-                        <TableCell>Nombre</TableCell>
-                        <TableCell>Edad</TableCell>
-                        <TableCell>Rol</TableCell>
-                        <TableCell>Equipo</TableCell>
-                        <TableCell>Correo electrónico</TableCell>
-                        <TableCell>Estado</TableCell>
-                        <TableCell>Acciones</TableCell>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {productivas.map((productiva) => (
-                        <TableRow key={productiva.id}>
-                            <TableCell>{productiva.id}</TableCell>
-                            <TableCell>{productiva.name}</TableCell>
-                            <TableCell>{productiva.age}</TableCell>
-                            <TableCell>{productiva.role}</TableCell>
-                            <TableCell>{productiva.team}</TableCell>
-                            <TableCell>{productiva.email}</TableCell>
-                            <TableCell>{productiva.status}</TableCell>
-                            <TableCell>
-                                <CustomFileInput onChange={(e) => console.log(e.target.files[0])} />
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </ErrorBoundary>
+        <>
+            <div>
+                <Table aria-label="Productivas">
+                    <TableHeader>
+                        {columns.map((column) => (
+                            <TableColumn key={column.key}>{column.label}</TableColumn>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {productivas.map((productiva) => (
+                            <TableRow key={productiva.id_productiva}>
+                                <TableCell>{productiva.matricula}</TableCell>
+                                <TableCell>{productiva.empresa}</TableCell>
+                                <TableCell>{productiva.fecha_inicio}</TableCell>
+                                <TableCell>{productiva.fecha_fin}</TableCell>
+                                <TableCell>{productiva.alternativa}</TableCell>
+                                <TableCell>{productiva.aprendiz}</TableCell>
+                                <TableCell>{productiva.instructor}</TableCell>
+                                <TableCell>{productiva.estado}</TableCell>
+                                <TableCell>
+                                    <Button onClick={() => handleOpenModal(productiva)} size="sm" color="primary">
+                                        Editar
+                                    </Button>
+                                    {' '}
+                                    {(productiva.estado === 1) && (
+                                        <>
+                                            <Button onClick={() => handleRenunciarProductiva(productiva.id_productiva)} size="sm" color="danger">
+                                                Renunciar
+                                            </Button>
+                                            <Button onClick={() => handleTerminarProductiva(productiva.id_productiva)} size="sm" color="success">
+                                                Terminar
+                                            </Button>
+                                        </>
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            <ModalProductiva
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                productiva={selectedProductiva}
+                onSave={handleSaveProductiva}
+            />
+        </>
     );
-};
+}
 
-TablePractica.propTypes = {
-    productivas: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired,
-        age: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-        role: PropTypes.string.isRequired,
-        team: PropTypes.string.isRequired,
-        email: PropTypes.string.isRequired,
-        status: PropTypes.oneOf(['active', 'paused', 'vacation']).isRequired,
-    })).isRequired,
-    onRefresh: PropTypes.func.isRequired,
-};
-
-export default TablePractica;
+export default TableProductiva;
