@@ -13,13 +13,12 @@ const ButtonDesactivar = ({ estado, onClick }) => {
   let iconComponent = null;
 
   if (estado === "activo") {
-    tooltipContent = "Desactivar";
-    tooltipColor = "danger";
-    iconComponent = <v.aprobado className="text-danger" />; // Ícono para desactivar
-  } else {
     tooltipContent = "Activar";
-    tooltipColor = "success";
-    iconComponent = <v.aprobado className="text-success" />; // Ícono para activar
+    tooltipColor = "danger";
+    iconComponent = <v.aprobado className="text-success" />; // Ícono para desactivar
+  } else {
+    tooltipContent = "Desactivar";
+    iconComponent = <v.noAprobado className="text-danger" />; // Ícono para activar
   }
 
   return (

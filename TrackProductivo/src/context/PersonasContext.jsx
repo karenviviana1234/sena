@@ -1,58 +1,96 @@
-import React, { createContext, useState, useCallback } from 'react';
-import axiosClient from '../configs/axiosClient';
+import React, { createContext, useState, useEffect } from "react";
+import axiosClient from "../configs/axiosClient";
 
+// Crear el contexto
 const PersonasContext = createContext();
 
 export const PersonasProvider = ({ children }) => {
-    const [personas, setPersonas] = useState([]);
-    const [persona, setPersona] = useState(null); // Cambiado a null
-    const [idPersona, setPersonaId] = useState(null); // Cambiado a null
+  const [personas, setPersonas] = useState([]);
+  const [loading, setLoading] = useState(false); // Para manejar el estado de carga
+  const [error, setError] = useState(null); // Para manejar errores
+  const [aprendices, setAprendices] = useState([]); // Estado para los aprendices
 
-    const getPersonas = useCallback(() => {
-        axiosClient.get('/personas/listarA').then((response) => {
-            console.log(response.data);
-            setPersonas(response.data);
-        }).catch((error) => {
-            console.log('Error del servidor: ' + error);
-        });
-    }, []);
+  // Función para obtener la lista de personas
+  const getPersonas = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosClient.get("/personas/listarI");
+      setPersonas(response.data);
+    } catch (error) {
+      console.error("Error al obtener personas:", error);
+      setError("Error al obtener la lista de personas.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const getPersona = useCallback((id_persona) => {
-        if (id_persona == null) return; // Validación básica
-        axiosClient.get(`/personas/buscar/${id_persona}`).then((response) => {
-            console.log(response.data);
-            setPersona(response.data);
-        }).catch((error) => {
-            console.log('Error: ' + error);
-        });
-    }, []);
+  // Función para registrar un nuevo instructor
+  const registrarInstructor = async (formData) => {
+    setLoading(true);
+    try {
+      const response = await axiosClient.post("/personas/registrarI", formData);
+      setPersonas((prevPersonas) => [...prevPersonas, response.data]); // Actualiza el estado con el nuevo instructor
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error al registrar instructor:", error);
+      setError("Error al registrar el instructor.");
+      throw error; // Opcional: lanzar el error si quieres manejarlo en otro lugar
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const registrarInstructor = async (data) => {
-        try {
-            const response = await axiosClient.post('/personas/registrarI', data);
-            console.log(response.data);
-        } catch (error) {
-            console.log('Error al registrar instructor: ' + error);
-        }
-    };
+  // Función para obtener la lista de aprendices
+  const getAprendices = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosClient.get("/personas/listarA");
+      setAprendices(response.data);
+    } catch (error) {
+      console.error("Error al obtener aprendices:", error);
+      setError("Error al obtener la lista de aprendices.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <PersonasContext.Provider
-            value={{
-                personas,
-                persona,
-                idPersona,
-                setPersonas,
-                setPersona,
-                setPersonaId,
-                getPersonas,
-                getPersona,
-                registrarInstructor
-            }}
-        >
-            {children}
-        </PersonasContext.Provider>
-    );
+  // **Función para registrar un nuevo aprendiz**
+  const registrarAprendiz = async (formData) => {
+    setLoading(true);
+    try {
+      const response = await axiosClient.post("/personas/registrarA", formData);
+      setAprendices((prevAprendices) => [...prevAprendices, response.data]); // Actualiza el estado con el nuevo aprendiz
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error al registrar aprendiz:", error);
+      setError("Error al registrar el aprendiz.");
+      throw error; // Opcional: lanzar el error si quieres manejarlo en otro lugar
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar las personas cuando el componente se monta
+  useEffect(() => {
+    getPersonas();
+  }, []);
+
+  return (
+    <PersonasContext.Provider
+      value={{
+        personas,
+        getPersonas,
+        registrarInstructor,
+        getAprendices,
+        registrarAprendiz, // Añadir esta función al contexto
+        aprendices,
+        loading,
+        error,
+      }}
+    >
+      {children}
+    </PersonasContext.Provider>
+  );
 };
 
 export default PersonasContext;
