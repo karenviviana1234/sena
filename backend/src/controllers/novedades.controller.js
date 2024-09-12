@@ -16,7 +16,12 @@ export const cargarImage = upload.single('foto');
 export const registrarNovedad = async (req, res) => {
     try {
         let foto = req.file ? req.file.originalname : null;
-        const { descripcion, fecha, seguimiento, instructor } = req.body;
+        let { descripcion, fecha, seguimiento, instructor } = req.body;
+
+        // Validar que la fecha esté en el formato correcto 'YYYY-MM-DD'
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+            return res.status(400).json({ message: 'Formato de fecha incorrecto' });
+        }
 
         if (!descripcion || !fecha || !seguimiento || !instructor) {
             return res.status(400).json({ message: 'Faltan datos en la solicitud' });
@@ -27,20 +32,39 @@ export const registrarNovedad = async (req, res) => {
 
         if (rows.affectedRows > 0) {
             res.status(200).json({
-                message: 'Actividad registrada exitosamente'
+                message: 'Novedad registrada exitosamente'
             });
         } else {
             res.status(403).json({
-                message: 'Error al registrar la actividad'
+                message: 'Error al registrar la novedad'
             });
         }
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            message: 'Error del servidor'+ error
+            message: 'Error del servidor: ' + error.message
         });
     }
 };
+
+
+export const obtenerNovedadPorId = async (req, res) => {
+    const { id_novedad } = req.params;
+  
+    try {
+      const [rows] = await pool.query('SELECT * FROM Novedades WHERE id_novedad = ?', [id_novedad]);
+  
+      if (rows.length > 0) {
+        res.json(rows[0]);
+      } else {
+        res.status(404).json({ message: 'Novedad no encontrada' });
+      }
+    } catch (error) {
+      console.error('Error al obtener la novedad:', error);
+      res.status(500).json({ message: 'Error al obtener la novedad', error });
+    }
+  };
+  
 
 
 
@@ -73,7 +97,7 @@ export const actualizarNovedades = async (req, res) => {
         let foto = req.file ? req.file.originalname : null;
         const {descripcion, fecha, seguimiento, instructor} = req.body
 
-        const [anterior] = await pool.query(`SELECT * FROM novedades WHERE id_actividad = ?`, [id])
+        const [anterior] = await pool.query(`SELECT * FROM novedades WHERE id_seguimiento = ?`, [id])
 
         let sql = `UPDATE novedades SET
                     descripcion = ?,
@@ -88,18 +112,18 @@ export const actualizarNovedades = async (req, res) => {
             params.push(foto);
         }
 
-        sql += ` WHERE id_actividad = ?`;
+        sql += ` WHERE id_novedad = ?`;
         params.push(id);
         
         const [rows] = await pool.query(sql, params)
 
         if(rows.affectedRows>0){
             res.status(200).json({
-                message: 'Actividad actualizada exitosamente'
+                message: 'Novedad actualizada exitosamente'
             })
         }else{
             res.status(403).json({
-                message: 'Error al actualizar la actividad'
+                message: 'Error al actualizar la novedad'
             })
         }
     } catch (error) {

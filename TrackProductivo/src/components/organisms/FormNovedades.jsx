@@ -11,20 +11,42 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
   const [selectedSeguimiento, setSelectedSeguimiento] = useState(initialData?.id_seguimiento || "");
   const [errorMessage, setErrorMessage] = useState("");
 
-
   useEffect(() => {
-    const fetchSeguimiento = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await axiosClient.get("/seguimientos/listarA");
+        if (mode === 'update' && initialData.id_novedad) {
+          await loadInitialData();
+        }
+        const response = await axiosClient.get("/seguimientos/listar");
         setSeguimientos(response.data);
       } catch (error) {
-        console.error("Error al obtener seguimientos", error);
-        setErrorMessage("Error al cargar seguimientos. Intenta de nuevo más tarde.");
+        console.error("Error al cargar datos", error);
+        setErrorMessage("Error al cargar datos. Intenta de nuevo más tarde.");
       }
     };
 
-    fetchSeguimiento();
+    fetchInitialData();
   }, []);
+
+  const loadInitialData = async () => {
+    try {
+      const response = await axiosClient.get(`/novedad/listarN/${initialData.id_novedad}`);
+      const novedad = response.data;
+  
+      setFecha(new Date(novedad.fecha));
+      setDescripcion(novedad.descripcion);
+      setInstructor(novedad.instructor);
+      setSelectedSeguimiento(novedad.id_seguimiento);
+  
+      if (novedad.foto) {
+        setFoto(novedad.foto);
+      }
+    } catch (error) {
+      console.error("Error al cargar datos iniciales:", error);
+      setErrorMessage("Error al cargar datos iniciales. Intenta de nuevo más tarde.");
+    }
+  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,68 +77,41 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
         });
       }
 
-      onSubmit();
-      onClose();
+      // Mostrar alerta de éxito
+      alert("Registro exitoso!");
+
+      if (onSubmit) {
+        onSubmit(); // Asegúrate de que onSubmit sea una función
+      }
+      if (onClose) {
+        onClose(); // Asegúrate de que onClose sea una función
+      }
     } catch (error) {
       console.error("Error del servidor:", error);
       setErrorMessage("Error del servidor: " + error.message);
     }
   };
-
-  const today = new Date().toISOString().split('T')[0];
-  
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    return new Date(dateString).toISOString().split('T')[0];
-  };
-  
-  // Al obtener los datos, transforma la fecha
-  const fetchNovedades = async () => {
-    try {
-      const response = await axiosClient.get(`/novedad/listar/${id_seguimiento}`);
-      if (response.data) {
-        const novedades = response.data.map(novedad => ({
-          ...novedad,
-          fecha: formatDate(novedad.fecha)
-        }));
-        setNovedades(novedades);
-      }
-    } catch (error) {
-      console.error('Error al obtener los datos:', error);
-    }
-  };
-  
-
+  const formattedFecha = typeof fecha === 'string' ? fecha : new Date(fecha).toISOString().split('T')[0];
   return (
     <form method="post" onSubmit={handleSubmit}>
       <div className="ml-5 align-items-center">
         {errorMessage && <div className="text-red-500">{errorMessage}</div>}
 
-        <div className="flex flex-col">
-          <Input
-            name="fecha"
-            type="date"
-            label="Fecha"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-            min={today}
-          />
-
-        </div>
         <div className="py-2">
-          <Input
-            type="text"
-            label="Descripción"
-            className="max-w-xs"
-            id="descripcion"
-            name="descripcion"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            required
-          />
+        <Input
+  type="date"
+  label="Fecha"
+  value={formattedFecha}
+  onChange={(e) => setFecha(e.target.value)}
+  readOnly={mode === 'update'}
+/>
+
         </div>
 
         <div className="py-2">
+          {mode === 'update' && foto && (
+            <img src={foto instanceof File ? URL.createObjectURL(foto) : foto} alt="Foto actual" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+          )}
           <Input
             type="file"
             label="Foto"
@@ -132,19 +127,36 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
           />
         </div>
 
-        <select
-          className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-          value={selectedSeguimiento}
-          onChange={(e) => setSelectedSeguimiento(e.target.value)}
-          required
-        >
-          <option value="">Selecciona un seguimiento</option>
-          {seguimientos.map((seguimiento) => (
-            <option key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
-              {seguimiento.seguimiento}
-            </option>
-          ))}
-        </select>
+        <div className="py-2">
+          <Input
+            type="text"
+            label="Descripción"
+            className="max-w-xs"
+            id="descripcion"
+            name="descripcion"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <select
+            className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            onChange={(e) => setSelectedSeguimiento(e.target.value)}
+            value={selectedSeguimiento}
+            required
+            id="id_seguimiento"
+            name="id_seguimiento"
+          >
+            <option value="">Selecciona un seguimiento</option>
+            {seguimientos.map((seguimiento) => (
+              <option key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
+                {seguimiento.descripcion || seguimiento.id_seguimiento}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="py-2">
           <Input
