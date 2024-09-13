@@ -45,7 +45,7 @@ CREATE TABLE `actividades` (
 --
 
 CREATE TABLE `ambientes` (
-  `id_ambiente` int NOT NULL,
+  `id_ambiente` int NOT NULL AUTO_INCREMENT,
   `nombre_amb` varchar(80) DEFAULT NULL,
   `municipio` int DEFAULT NULL,
   `sede` enum('centro','yamboro') DEFAULT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE `asignaciones` (
 --
 
 CREATE TABLE `bitacoras` (
-  `id_bitacora` int NOT NULL,
+  `id_bitacora` int NOT NULL AUTO_INCREMENT,
   `fecha` date DEFAULT NULL,
   `bitacora` enum('1','2','3','4','5','6','7','8','9','10','11','12') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `seguimiento` int DEFAULT NULL,
@@ -188,7 +188,7 @@ CREATE TABLE `horarios` (
 --
 
 CREATE TABLE `matriculas` (
-  `id_matricula` int NOT NULL,
+  `id_matricula` int NOT NULL AUTO_INCREMENT,
   `ficha` int DEFAULT NULL,
   `aprendiz` int DEFAULT NULL,
   `estado` enum('Inducción','Formación','Condicionado','Cancelado','Retiro Voluntario','Por Certificar','Certificado') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
@@ -204,14 +204,12 @@ CREATE TABLE `matriculas` (
 INSERT INTO `matriculas` (`id_matricula`, `ficha`, `aprendiz`, `estado`, `pendiente_tecnicos`, `pendiente_transversales`, `pendiente_ingles`) VALUES
 (1, 2692929, 1, 'Formación', 0, 0, 0);
 
--- --------------------------------------------------------
+/*Table structure for table `municipios` */
 
---
--- Estructura de tabla para la tabla `municipios`
---
+DROP TABLE IF EXISTS `municipios`;
 
 CREATE TABLE `municipios` (
-  `id_municipio` int NOT NULL,
+  `id_municipio` int NOT NULL AUTO_INCREMENT,
   `nombre_mpio` varchar(80) DEFAULT NULL,
   `departamento` varchar(80) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -245,7 +243,7 @@ CREATE TABLE `novedades` (
 --
 
 CREATE TABLE `personas` (
-  `id_persona` int NOT NULL,
+  `id_persona` int NOT NULL AUTO_INCREMENT,
   `identificacion` bigint DEFAULT NULL,
   `nombres` varchar(80) DEFAULT NULL,
   `correo` varchar(80) DEFAULT NULL,
@@ -294,35 +292,29 @@ CREATE TABLE `productivas` (
 INSERT INTO `productivas` (`id_productiva`, `matricula`, `empresa`, `fecha_inicio`, `fecha_fin`, `alternativa`, `estado`, `acuerdo`, `arl`, `consulta`, `aprendiz`) VALUES
 (1, 1, 1, '2024-01-07', '2024-07-07', 'Contrato de Aprendizaje', 'Inicio', NULL, NULL, NULL, 2);
 
--- --------------------------------------------------------
+/*Table structure for table `programas` */
 
---
--- Estructura de tabla para la tabla `programas`
---
+DROP TABLE IF EXISTS `programas`;
 
 CREATE TABLE `programas` (
-  `id_programa` int NOT NULL,
+  `id_programa` int NOT NULL AUTO_INCREMENT,
   `nombre_programa` varchar(80) DEFAULT NULL,
   `sigla` varchar(20) DEFAULT NULL,
   `nivel` enum('Tecnico','Tecnólogo') DEFAULT NULL,
   `estado` enum('activo','inactivo') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `programas`
---
+/*Data for the table `programas` */
 
 INSERT INTO `programas` (`id_programa`, `nombre_programa`, `sigla`, `nivel`, `estado`) VALUES
 (1, 'Analisis y Desarrollo de Software', 'ADSO', 'Tecnólogo', 'activo');
 
--- --------------------------------------------------------
+/*Table structure for table `seguimientos` */
 
---
--- Estructura de tabla para la tabla `seguimientos`
---
+DROP TABLE IF EXISTS `seguimientos`;
 
 CREATE TABLE `seguimientos` (
-  `id_seguimiento` int NOT NULL,
+  `id_seguimiento` int NOT NULL AUTO_INCREMENT,
   `fecha` date DEFAULT NULL,
   `seguimiento` enum('1','2','3') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `estado` enum('solicitud','aprobado','no aprobado') DEFAULT NULL,
