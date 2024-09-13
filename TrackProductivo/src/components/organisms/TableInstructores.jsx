@@ -163,7 +163,7 @@ function TableInstructores() {
                             <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
                             <ButtonDesactivar onClick={() => handleDesactivar(item.id_persona)} />
                             <ButtonRegistrarActividad
-                                onClick={() => handleOpenModal("formActividades")}
+                                onClick={() => handleOpenModal("formActividades",item)}
                             />
                         </div>
                     );
