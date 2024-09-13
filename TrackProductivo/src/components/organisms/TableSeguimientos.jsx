@@ -4,6 +4,7 @@ import ModalAcciones from './ModalAcciones.jsx';
 import axiosClient from '../../configs/axiosClient.jsx';
 import FormNovedades from './FormNovedades.jsx';
 import { format } from 'date-fns';
+
 import {
     Table,
     TableHeader,
@@ -26,6 +27,7 @@ import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import ButtonRegistrarNovedad from '../atoms/ButtonRegistrarNovedades.jsx';
 import ButtonEliminar from '../atoms/ButtonEliminar.jsx';
 import { Tooltip } from '@nextui-org/react';
+import Novedad from './Novedad.jsx';
 
 function TableSeguimientos() {
     const [seguimientos, setSeguimientos] = useState([]);
@@ -47,19 +49,25 @@ function TableSeguimientos() {
         if (type === 'formNovedades') {
             setBodyContent(<FormNovedades />);
         } else if (type === 'componentSeguimiento') {
-            setBodyContent(<ComponentSeguimiento
-                id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado
-                mode="create"
-                handleSubmit={() => console.log("Submit")}
-                onClose={() => console.log("Close")}
-                actionLabel="Enviar"
-                onIdSend={(id) => console.log("ID de seguimiento enviado:", id)} />);
+            setBodyContent(
+                <>
+                    <ComponentSeguimiento
+                        id_seguimiento={id_seguimiento}
+                        mode="create"
+                        handleSubmit={() => console.log("Submit")}
+                        onClose={() => console.log("Close")}
+                        actionLabel="Enviar"
+                        onIdSend={(id) => console.log("ID de seguimiento enviado:", id)}
+                    />
+                    {/* Inserta el componente Novedad aquí */}
+                    <Novedad id_seguimiento={id_seguimiento} />
+                </>
+            );
         }
-        console.log("datos enviados", id_seguimiento)
         setSelectedSeguimientoId(id_seguimiento);
         setIsModalOpen(true);
     };
-
+    
 
     // Function to close the modal
     const handleCloseModal = () => {
