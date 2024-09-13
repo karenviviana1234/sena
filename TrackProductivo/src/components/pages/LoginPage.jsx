@@ -39,7 +39,12 @@ export const LoginPage = () => {
         const { token, user } = response.data;
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user[0]));
+        
+        console.log("usuario", user);
+        
+        localStorage.clear();
 
+        
         Swal.fire({
           position: 'top-center',
           icon: 'success',

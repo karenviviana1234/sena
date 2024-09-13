@@ -120,7 +120,7 @@ function FormActividades({ selectedInstructor, onClose }) {
               label="Fecha de Fin"
               value={fechaFin}
               onChange={(e) => setFechaFin(e.target.value)}
-              min={fechaInicio || today} 
+              min={fechaInicio || today} // Ajustar mínimo a la fecha de inicio o a hoy si no se ha seleccionado
               helperText={errors.fechaFin}
               helperColor={errors.fechaFin ? "danger" : "default"}
             />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
+import { Button, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useProviderContext } from "@nextui-org/react";
 import v from "../../styles/Variables.jsx";
 import PDFUploader from "../molecules/Pdf.jsx";
 import axiosClient from "../../configs/axiosClient.jsx";
@@ -34,26 +34,28 @@ function ComponentSeguimiento({
   useEffect(() => {
     const currentDate = new Date().toISOString().slice(0, 10);
     setFecha(currentDate);
-  
     const userJson = localStorage.getItem("user");
-    if (userJson && userJson !== "undefined" && userJson !== "null") {
+    if (userJson && userJson !== "undefined" && userJson !== "null" && userJson !== "") {
       try {
         const user = JSON.parse(userJson);
         if (user && user.id_persona) {
           setIdPersona(user.id_persona);
+          console.log("ID de persona asignado:", user.id_persona);
+        } else {
+          console.warn("No se encontró un 'id_persona' válido en el usuario.");
         }
       } catch (error) {
-        console.error("Error al parsear JSON:", error);
+        console.error("Error al parsear el JSON del usuario:", error);
       }
     } else {
-      console.warn("El valor en localStorage para 'user' es inválido o no existe.");
-    }
+      console.warn("No se encontró un valor válido para 'user' en localStorage.");
+      setIdPersona(null);
+    }    
   
     if (onIdSend && id_seguimiento) {
       onIdSend(id_seguimiento);
     }
   }, [id_seguimiento, onIdSend]);
-  
   
   useEffect(() => {
     if (id_seguimiento) {
@@ -297,4 +299,4 @@ function ComponentSeguimiento({
   );
 }
 
-export default ComponentSeguimiento;
+export default ComponentSeguimiento;  

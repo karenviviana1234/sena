@@ -1,5 +1,5 @@
 import Router from 'express'
-import { registrarAprendiz, actualizarPersona, eliminarPersona, listarPersonas, buscarPersonas, listarAprendices, listarInstructores, registrarInstructor, listarMunicipios, desactivarPersona } from '../controllers/personas.controller.js'
+import { registrarAprendiz, actualizarPersona, eliminarPersona, listarPersonas, buscarPersonas, listarAprendices, listarInstructores, registrarInstructor, listarMunicipios, desactivarPersona, perfil, actualizarPerfil } from '../controllers/personas.controller.js'
 import { validarToken } from '../controllers/seguridad.controller.js'
 
 const rutaPersona = Router()
@@ -14,4 +14,6 @@ rutaPersona.post('/registrarI', registrarInstructor)
 rutaPersona.put('/actualizar/:id_persona', validarToken, actualizarPersona)
 rutaPersona.delete('/eliminar/:id_persona', validarToken, eliminarPersona)
 rutaPersona.post('/desactivar/:id_persona', validarToken, desactivarPersona)
-export default rutaPersona
+rutaPersona.get('/perfil/:id_persona',/*  validarToken,  */perfil)
+rutaPersona.put('/perfilActualizar/:id_persona',/*  validarToken,  */actualizarPerfil)
+export default rutaPersona  
