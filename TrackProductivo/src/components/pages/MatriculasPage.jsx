@@ -1,14 +1,10 @@
-import React from 'react'
+import React from "react";
+import TableMatriculas from "../organisms/TableMatriculas";
 
-
-function MatriculasPage() {
+export default function NominaPage() {
   return (
-    <>
-      <main className='w-full p-3'>
-        MatriculasPage para matricular imagino yo aprendices jsjs o nose
-      </main>
-    </>
-  )
+    <div className="flex min-h-screen flex-col m-10">
+      <TableMatriculas />
+    </div>
+  );
 }
-
-export default MatriculasPage
