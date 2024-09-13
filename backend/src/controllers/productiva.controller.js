@@ -23,6 +23,47 @@ export const listarProductiva = async (req, res) => {
     }
 }
 
+export const contarProductivasPorEstado = async (req, res) => {
+    try {
+        // Consulta SQL para contar la cantidad de registros por estado
+        const sql = `
+            SELECT 
+                estado, 
+                COUNT(*) AS total
+            FROM 
+                productivas
+            GROUP BY 
+                estado
+        `;
+
+        const [results] = await pool.query(sql);
+
+        // Mapear los resultados a un formato más legible
+        const conteoPorEstado = {
+            Inicio: 0,
+            Renuncia: 0,
+            Terminado: 0
+        };
+
+        results.forEach(row => {
+            if (row.estado === 'Inicio') {
+                conteoPorEstado.Inicio = row.total;
+            } else if (row.estado === 'Renuncia') {
+                conteoPorEstado.Renuncia = row.total;
+            } else if (row.estado === 'Terminado') {
+                conteoPorEstado.Terminado = row.total;
+            }
+        });
+
+        res.status(200).json(conteoPorEstado);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error.message
+        });
+    }
+};
+
+
 const storage = multer.diskStorage(
     {
         destination: function(req,file,cb){
@@ -72,7 +113,7 @@ export const registrarProductiva = async (req, res) => {
 
         // Registrar etapa productiva
         const sqlProductiva = `
-            INSERT INTO productivas 
+            INSERT INTO productivas
             (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
             VALUES (?,?,?,?,?, 1,?,?,?,?)
         `;

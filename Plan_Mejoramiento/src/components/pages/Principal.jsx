@@ -1,83 +1,116 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import Layout from '../Template/Layout';
-import ModalBitacoras from '../moleculas/Modal_Bitacoras';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Asegúrate de que esta biblioteca esté correctamente vinculada
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import React from "react";
+import Layout from "../Template/Layout";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { usePersonas } from "../../Context/ContextPersonas";
 
 const Principal = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const { rol } = usePersonas();
 
-  const handleOpenModal = () => {
-    setModalVisible(true);
+  const downloadOptions = [
+    { title: "Contrato de Aprendizaje" },
+    { title: "Pasantías" },
+    { title: "Proyecto Productivo" },
+    { title: "Monitorías" },
+  ];
+
+  const handleDownload = (title) => {
+    Alert.alert(
+      "Descarga exitosa",
+      `El archivo de ${title} se ha descargado correctamente.`,
+      [{ text: "OK" }]
+    );
   };
-
-  const handleCloseModal = () => {
-    setModalVisible(false);
+  const handleupload = (title) => {
+    Alert.alert(
+      "Archivo cargado con éxito",
+      `El archivo de ${title} se ha cargado correctamente.`,
+      [{ text: "OK" }]
+    );
   };
 
   return (
-    <Layout style={styles.text} title="Seguimientos">
-      <View style={styles.container}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleOpenModal}>
-            <Icon name="upload" size={20} color="#fff" style={styles.icon} />
-            <Text style={styles.buttonText}>Subir Bitácora</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.content}>
-          <Text style={styles.text}>No se que meter aqui</Text>
-        </View>
-        <ModalBitacoras
-          visible={modalVisible}
-          onClose={handleCloseModal}
-        />
-      </View>
+    <Layout title={"Inicio"}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.subtitle}>
+          A continuación se muestran los formatos correspondientes para cada
+          modalidad de etapa productiva
+        </Text>
+
+        {downloadOptions.map((option, index) => (
+          <View
+            key={index}
+            style={[
+              styles.optionContainer,
+              index === downloadOptions.length - 1 ? styles.lastOption : {},
+            ]}
+          >
+            <Text style={styles.optionTitle}>{option.title}:</Text>
+            <View style={styles.downloadContainer}>
+              <Text style={styles.downloadText}>archivo.zip</Text>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={() => handleDownload(option.title)}
+              >
+                <Icon name="download" size={24} color="green" />
+              </TouchableOpacity>
+              {rol === "Seguimiento" && (
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={() => handleupload(option.title)}
+                >
+                  <Icon name="upload" size={24} color="green" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        ))}
+      </ScrollView>
     </Layout>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative', 
+    flexGrow: 1,
+    padding: 16,
   },
-  buttonContainer: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
+  subtitle: {
+    fontSize: 20,
+    color: "black",
+    fontWeight: "400",
+    marginBottom: 16,
+    textAlign: "center",
   },
-  button: {
-    backgroundColor: '#28a745', // Color verde
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    elevation: 2, // Para sombra en Android
-    shadowColor: '#000', // Para sombra en iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+  optionContainer: {
+    backgroundColor: "white",
+    borderRadius: 8,
+    padding: 18,
+    marginBottom: 18,
   },
-  buttonText: {
-    color: '#fff',
+  optionTitle: {
+    fontSize: 20,
+    color: "black",
+    marginBottom: 8,
+  },
+  downloadContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  downloadText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10,
+    color: "#333",
+    marginRight: 180, // Espacio entre el texto y los botones
   },
-  icon: {
-    marginRight: 5,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 18,
-    marginBottom: 20, // Espacio debajo del texto
+  iconButton: {
+    marginHorizontal: 10, // Espacio horizontal entre los botones
   },
 });
 

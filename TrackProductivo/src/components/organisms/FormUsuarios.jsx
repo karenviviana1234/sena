@@ -1,55 +1,56 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Button, Input } from "@nextui-org/react";
-import axiosClient from "../../configs/axiosClient";
-import v from '../../styles/Variables';
 import PersonasContext from "../../context/PersonasContext"; // Importar el contexto
 import Swal from 'sweetalert2'; // Importar SweetAlert2
+import axiosClient from "../../configs/axiosClient";
 
-function FormUsuarios({ initialData, onClose }) {
+function FormUsuarios({ initialData }) {
+  const { registrarInstructor } = useContext(PersonasContext); // Usar el contexto
+  const [area, setArea] = useState([]);
+  const [selectedArea, setSelectArea] = useState('');
   const [identificacion, setIdentificacion] = useState("");
   const [nombres, setNombres] = useState("");
   const [correo, setCorreo] = useState("");
   const [rol, setRol] = useState("Selecciona");
+  const [tipo, setTipo] = useState("Selecciona");
+  const [sede, setSede] = useState("Selecciona");
   const [telefono, setTelefono] = useState("");
-  const [password, setPassword] = useState("");
-  const [municipio, setMunicipio] = useState("");
-  const [municipiosList, setMunicipiosList] = useState([]);
-  const [showPassword, setShowPassword] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [idPersona, setIdPersona] = useState(null);
-
-  const [errors, setErrors] = useState({}); // Estado para manejar errores
-
-  const { setPersonas } = useContext(PersonasContext); // Obtener el contexto y la función de actualización
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const fetchMunicipios = async () => {
+    
+    const fetchArea = async () => {
       try {
-        const response = await axiosClient.get("/personas/listarM");
-        setMunicipiosList(response.data);
+        const response = await axiosClient.get('/areas/listar');
+        setArea(response.data);
       } catch (error) {
-        console.error("Error al obtener municipios", error);
+        console.error("Error al cargar areas:", error);
+        setErrorMessage("Error al cargar areas. Intenta de nuevo más tarde.");
       }
     };
-    fetchMunicipios();
+
+    fetchArea();
   }, []);
 
   useEffect(() => {
     if (initialData) {
+      console.log('Initial Data:', initialData);
       setIdentificacion(initialData.identificacion || "");
       setNombres(initialData.nombres || "");
       setCorreo(initialData.correo || "");
-      setRol(initialData.rol || "Instructor");
       setTelefono(initialData.telefono || "");
-      setMunicipio(initialData.municipio || "");
+      setRol(initialData.rol || "Selecciona");
+      setSede(initialData.sede || "Selecciona"); // Establecer sede
+      setTipo(initialData.tipo || "Selecciona"); // Establecer tipo
+      setSelectArea(initialData.area || "Selecciona"); // Establecer area
       setIdPersona(initialData.id_persona); // Establecer el ID de la persona
       setIsEditing(true);
     } else {
       setIsEditing(false);
     }
   }, [initialData]);
-
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,18 +64,18 @@ function FormUsuarios({ initialData, onClose }) {
       correo,
       rol,
       telefono,
-      municipio,
+      sede,
+      tipo,
+      area: selectedArea
     };
 
-    if (password) {
-      formData.password = password; // Incluir la contraseña solo si se proporciona
-    }
+/*     console.log("Campos enviados:", formData);
+ */
 
     try {
-      let response;
       if (isEditing) {
         // Actualizar el usuario
-        response = await axiosClient.put(`/personas/actualizar/${idPersona}`, formData);
+        await axiosClient.put(`/personas/actualizar/${idPersona}`, formData);
         Swal.fire({
           icon: 'success',
           title: 'Éxito',
@@ -82,22 +83,19 @@ function FormUsuarios({ initialData, onClose }) {
         });
       } else {
         // Registrar un nuevo usuario
-        response = await axiosClient.post('/personas/registrarI', formData);
+        await registrarInstructor(formData);
         Swal.fire({
           icon: 'success',
           title: 'Éxito',
           text: 'Usuario registrado correctamente',
         });
       }
-  
-      // Actualizar el contexto de personas
-      const updatedPersonas = await axiosClient.get('/personas/listarA'); // Obtén la lista actualizada de personas
-      setPersonas(updatedPersonas.data); // Actualiza el contexto
-  
+
+      // Puedes omitir la llamada a getPersonas ya que registrarInstructor ya actualiza la lista
     } catch (error) {
       console.error("Error del servidor:", error);
       const { response } = error;
-  
+
       // Manejar errores específicos del backend
       if (response && response.data) {
         Swal.fire({
@@ -105,7 +103,7 @@ function FormUsuarios({ initialData, onClose }) {
           title: 'Error',
           text: response.data.message || 'Error desconocido',
         });
-  
+
         // Aquí puedes también actualizar el estado de errores si es necesario
         setErrors(response.data.errors || {});
       } else {
@@ -116,7 +114,6 @@ function FormUsuarios({ initialData, onClose }) {
         });
       }
     }
-    onClose(); // Cierra el modal después de enviar el formulario
   };
 
   return (
@@ -158,7 +155,7 @@ function FormUsuarios({ initialData, onClose }) {
             type="email"
             label='Correo Electrónico'
             id='correo'
-            name="correo" 
+            name="correo"
             className="w-96"
             value={correo}
             onChange={(e) => setCorreo(e.target.value)}
@@ -181,41 +178,61 @@ function FormUsuarios({ initialData, onClose }) {
             status={errors.telefono ? 'error' : 'default'}
           />
         </div>
-        <div className='relative py-2'>
-          <Input
-            type={showPassword ? "text" : "password"}
-            id="password"
-            className="w-96"
-            label="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            helperText={errors.password} // Mostrar error si existe
-            status={errors.password ? 'error' : 'default'}
-          />
-          <Button
-            onClick={togglePasswordVisibility}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 bg-transparent"
-          >
-            {showPassword ? <v.OjoON size={20} /> : <v.OjoOFF size={20} />}
-          </Button>
-        </div>
-
         <select
           name="rol"
-          label="Rol"
           value={rol}
           onChange={(e) => setRol(e.target.value)}
-          className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.rol ? 'border-red-500' : ''}`}
+          className={`mt-3 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.rol ? 'border-red-500' : ''}`}
           style={{ width: '385px' }}
         >
-          <option value="Selecciona">Selecciona una Opcion</option>
+          <option value="Selecciona">Selecciona un Rol</option>
           <option value="Instructor">Instructor</option>
-          <option value="Lider">Lider</option>
+          <option value="Lider">Líder</option>
         </select>
         {errors.rol && <p className="text-red-500">{errors.rol}</p>}
 
+        <select
+          name="tipo"
+          value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+          className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.tipo ? 'border-red-500' : ''}`}
+          style={{ width: '385px' }}
+        >
+          <option value="Selecciona">Selecciona una Tipo</option>
+          <option value="Contratista">Contratista</option>
+          <option value="Planta">Planta</option>
+        </select>
+        {errors.tipo && <p className="text-red-500">{errors.tipo}</p>}
+
+        <select
+          name="sede"
+          value={sede}
+          onChange={(e) => setSede(e.target.value)}
+          className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.sede ? 'border-red-500' : ''}`}
+          style={{ width: '385px' }}
+        >
+          <option value="Selecciona">Selecciona una Sede</option>
+          <option value="Yamboro">Yamboro</option>
+          <option value="Centro">Centro</option>
+        </select>
+        {errors.sede && <p className="text-red-500">{errors.sede}</p>}
+
+        <select
+          className="mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.sede ? 'border-red-500' : ''}"
+          id="areas"
+          name="Area"
+          value={selectedArea}
+          onChange={(e) => setSelectArea(e.target.value)}
+          required
+        >
+          <option value="">Selecciona una Area</option>
+          {area.map((areas) => (
+            <option key={areas.id_area} value={areas.id_area}>
+              {areas.nombre_area}
+            </option>
+          ))}
+        </select>
         <div className="flex justify-end gap-5 mt-5">
-          <Button type="button" color="danger" onClick={onClose}>Cerrar</Button>
           <Button className="bg-[#92d22e] text-white" type="submit" color="success">
             {isEditing ? "Actualizar" : "Registrar"}
           </Button>

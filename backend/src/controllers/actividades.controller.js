@@ -1,128 +1,139 @@
 import { pool } from './../database/conexion.js'
-import multer from 'multer'
-
-const storage = multer.diskStorage(
-    {
-        destination: function(req,file,cb){
-            cb(null, "public/actividades")
-        },
-        filename: function(req,file,cb){
-            cb(null, file.originalname)
-        }
-    }
-)
-
-const upload = multer({storage: storage})
-export const cargarImage = upload.single('foto')
 
 export const registrarActividad = async (req, res) => {
     try {
-        
-        let foto = req.file.originalname
-        const {descripcion, fecha, seguimiento, instructor} = req.body
+        const { fecha_inicio, fecha_fin, instructor, horario,  tipo, solicitud } = req.body;
 
-        let sql = `INSERT INTO actividades (descripcion, fecha, foto, seguimiento, instructor) VALUES (?, ?, ?, ?, ?)`
+        let sql = `INSERT INTO actividades (estado, fecha_inicio, fecha_fin, instructor, horario,  tipo, solicitud) VALUES (1, ?, ?, ?, ?, ?, ?)`;
 
-        const [rows] = await pool.query(sql, [descripcion, fecha, foto, seguimiento, instructor])
+        const [rows] = await pool.query(sql, [ fecha_inicio, fecha_fin, instructor, horario,  tipo, solicitud]);
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Actividad registrada exitosamente'
-            })
-        }else{
+            });
+        } else {
             res.status(403).json({
                 message: 'Error al registrar la actividad'
-            })
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
+};
+
 
 export const listarActividades = async (req, res) => {
     try {
-        let sql = `SELECT * FROM actividades`
+        let sql = `SELECT * FROM actividades`;
 
-        const [results] = await pool.query(sql)
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        const [results] = await pool.query(sql);
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
                 message: 'No hay actividades registradas'
-            })
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
+};
 
 export const actualizarActividad = async (req, res) => {
     try {
-        
-        const {id} = req.params
-        let foto = req.file ? req.file.originalname : null;
-        const {descripcion, fecha, seguimiento, instructor} = req.body
+        const { id } = req.params;
+        const { estado, fecha_inicio, fecha_fin, instructor, horario,  tipo, solicitud } = req.body;
 
-        const [anterior] = await pool.query(`SELECT * FROM actividades WHERE id_actividad = ?`, [id])
+        const [anterior] = await pool.query(`SELECT * FROM actividades WHERE id_actividad = ?`, [id]);
 
         let sql = `UPDATE actividades SET
-                    descripcion = ?,
-                    fecha =?,
-                    seguimiento =?,
-                    instructor =?`
+                    estado = ?,
+                    fecha_inicio = ?,
+                    fecha_fin = ?,
+                    instructor = ?,
+                    horario = ?,
+                    tipo = ?,
+                    solicitud = ?
+                    WHERE id_actividad = ?`;
 
-        const params = [descripcion || anterior[0].descripcion, fecha || anterior[0].fecha, seguimiento || anterior[0].seguimiento, instructor || anterior[0].instructor]
+        const params = [
+            estado || anterior[0].estado,
+            fecha_inicio || anterior[0].fecha_inicio,
+            fecha_fin || anterior[0].fecha_fin,
+            instructor || anterior[0].instructor,
+            horario || anterior[0].horario,
+            tipo || anterior[0].tipo,
+            solicitud || anterior[0].solicitud,
+            id
+        ];
 
-        if (foto) {
-            sql += `, foto = ?`;
-            params.push(foto);
-        }
+        const [rows] = await pool.query(sql, params);
 
-        sql += ` WHERE id_actividad = ?`;
-        params.push(id);
-        
-        const [rows] = await pool.query(sql, params)
-
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Actividad actualizada exitosamente'
-            })
-        }else{
+            });
+        } else {
             res.status(403).json({
                 message: 'Error al actualizar la actividad'
-            })
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
+};
 
-export const eliminarActividad = async (req, res) => {
+export const desactivarActividad = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params;
 
-        let sql = `DELETE FROM actividades WHERE id_actividad = ?`
+        let sql = `UPDATE actividades SET estado = 2 WHERE id_actividad = ?`;
 
-        const [rows] = await pool.query(sql, [id])
+        const [rows] = await pool.query(sql, [id]);
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
-                message: 'Actividad eliminada exitosamente'
-            })
-        }else{
+                message: 'Actividad desactivada exitosamente'
+            });
+        } else {
             res.status(403).json({
-                message: 'Error al eliminar la actividad'
-            })
+                message: 'Error al desactivar la actividad'
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
+};
+
+export const activarActividad = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        let sql = `UPDATE actividades SET estado = 1 WHERE id_actividad = ?`;
+
+        const [rows] = await pool.query(sql, [id]);
+
+        if (rows.affectedRows > 0) {
+            res.status(200).json({
+                message: 'Actividad activada exitosamente'
+            });
+        } else {
+            res.status(403).json({
+                message: 'Error al activar la actividad'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error
+        });
+    }
+};

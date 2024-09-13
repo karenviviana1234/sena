@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -10,6 +10,10 @@ import Landing_page from './src/components/pages/Landing_page';
 import Login from './src/components/pages/login';
 import Usuarios from './src/components/pages/Usuarios';
 import Reportes from './src/components/pages/Reportes';
+import Seguimientos from './src/components/pages/Seguimientos';
+import Matriculas from './src/components/pages/Matriculas';
+import Empresas from './src/components/pages/Empresas';
+import Aprendices from './src/components/pages/Aprendices';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +27,26 @@ const App = () => {
           <Stack.Screen 
             name="principal" 
             component={Principal} 
+            options={{ headerShown: false }} // Ocultar el encabezado para esta pantalla
+          />
+          <Stack.Screen 
+            name="matriculas" 
+            component={Matriculas} 
+            options={{ headerShown: false }} // Ocultar el encabezado para esta pantalla
+          />
+          <Stack.Screen 
+            name="empresas" 
+            component={Empresas} 
+            options={{ headerShown: false }} // Ocultar el encabezado para esta pantalla
+          />
+          <Stack.Screen 
+            name="aprendices" 
+            component={Aprendices} 
+            options={{ headerShown: false }} // Ocultar el encabezado para esta pantalla
+          />
+          <Stack.Screen 
+            name="seguimiento" 
+            component={Seguimientos} 
             options={{ headerShown: false }} // Ocultar el encabezado para esta pantalla
           />
           <Stack.Screen 

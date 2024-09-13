@@ -27,6 +27,8 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
         fetchAprendices();
     }, []);
 
+
+
     useEffect(() => {
         if (initialData) {
             setMatriculaId(initialData.id_matricula);
@@ -162,6 +164,7 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                         {errors.pendiente_ingles && <p className="text-red-500">{errors.pendiente_ingles}</p>}
                     </>
                 )}
+
 
                 <div className="flex justify-end gap-5 mt-5">
                     <Button className="bg-[#92d22e] text-white" type="submit" color="success">

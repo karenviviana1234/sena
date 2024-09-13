@@ -59,6 +59,42 @@ export const registrarBitacora = async (req, res) => {
         })
     }
 }
+/* Cargar Archivo pdf a una bitacora existente. */
+export const uploadPdfToBitacoras = async (req, res) => {
+    try {
+        const { id_bitacora } = req.params;  // Obtener el ID del seguimiento desde los parámetros de la URL
+        const pdf = req.file?.originalname || null;  // Obtener el nombre del archivo PDF cargado
+
+        if (!pdf) {
+            return res.status(400).json({
+                message: 'No se ha cargado ningún archivo'
+            });
+        }
+
+        // Actualizar el campo 'pdf' en la tabla 'bitacoras' con la ruta o el nombre del archivo
+        const sqlUpdateBitacora = `
+            UPDATE bitacoras
+            SET pdf = ? 
+            WHERE id_bitacora = ?
+        `;
+        const [result] = await pool.query(sqlUpdateBitacora, [pdf, id_bitacora]);
+
+        if (result.affectedRows > 0) {
+            res.status(200).json({
+                message: 'PDF cargado exitosamente en la bitacora'
+            });
+        } else {
+            res.status(404).json({
+                message: 'Bitacora no encontrada'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error.message
+        });
+    }
+};
+
 
 export const actualizarBitacora = async (req, res) => {
     try {
@@ -147,6 +183,48 @@ export const rechazarBitacora = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             message: 'Error del servidor' + error
+        })
+    }
+}
+
+export const bitacoraSeguimiento = async (req, res) => {
+    try {
+        const {id} = req.params
+
+        let sql = `SELECT * FROM bitacoras WHERE seguimiento = ?`
+        const [result] = await pool.query(sql, [id])
+
+        if(result.length>0){
+            res.status(200).json(result)
+        }else{
+            res.status(404).json({
+                message: 'No hay bitacoras asociadas al seguimiento'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor' + error
+        })
+    }
+}
+
+export const buscarBitacora = async (req, res) => {
+    try {
+        const {id} = req.params
+        let sql = `SELECT * FROM bitacoras WHERE id_bitacora =?`
+
+        const [result] = await pool.query(sql, [id])
+
+        if(result.length>0){
+            res.status(200).json(result)
+        }else{
+            res.status(404).json({
+                message: 'Bitacora no encontrada'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error en el servidor' + error
         })
     }
 }

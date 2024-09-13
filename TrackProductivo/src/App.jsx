@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSearch2, UserCheck ,BookText } from 'lucide-react';
+import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSearch2, UserCheck, BookText, BarChart3Icon } from 'lucide-react';
 import Sidebar, { SidebarItem, SidebarAccordion } from './components/Sidebar';
 import { LoginPage } from '../src/components/pages/LoginPage';
 import { Navbar2 } from './components/Navbar';
@@ -17,68 +17,74 @@ import EstadisticasPage from './components/pages/EstadisticasPage.jsx';
 import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
+import AsignacionPage from './components/pages/AsignacionPage.jsx';
 
 export const App = () => {
   return (
     <BrowserRouter>
       <GlobalProvider>
-        
-        <Routes>
-        <Route path='/' element={
-          <LoginPage/>
-        }/>
-          <Route path="/home" element={
-              <WithSidebar>
-                <HomePage />
-              </WithSidebar>
-          } />
 
+        <Routes>
+          <Route path='/' element={
+            <LoginPage />
+          } />
+          <Route path="/home" element={
+            <WithSidebar>
+              <HomePage />
+            </WithSidebar>
+          } />
+         
           <Route path="/nomina" element={
-              <WithSidebar>
-                <NominaPage />
-              </WithSidebar>
+            <WithSidebar>
+              <NominaPage />
+            </WithSidebar>
           } />
 
           <Route path="/fichas" element={
-              <WithSidebar>
-                <FichasPage />
-              </WithSidebar>
+            <WithSidebar>
+              <FichasPage />
+            </WithSidebar>
           } />
 
           <Route path="/matriculas" element={
-              <WithSidebar>
-                <MatriculasPage />
-              </WithSidebar>
+            <WithSidebar>
+              <MatriculasPage />
+            </WithSidebar>
           } />
 
           <Route path="/empresa" element={
-              <WithSidebar>
-                <EmpresaPage />
-              </WithSidebar>
+            <WithSidebar>
+              <EmpresaPage />
+            </WithSidebar>
+          } />
+          <Route path="/asignaciones" element={
+            <WithSidebar>
+              <AsignacionPage />
+            </WithSidebar>
           } />
 
           <Route path="/etapapractica" element={
-              <WithSidebar>
-                <EtapaPracticaPage />
-              </WithSidebar>
+            <WithSidebar>
+              <EtapaPracticaPage />
+            </WithSidebar>
           } />
 
           <Route path="/seguimiento" element={
-              <WithSidebar>
-                <SeguimientoPage />
-              </WithSidebar>
+            <WithSidebar>
+              <SeguimientoPage />
+            </WithSidebar>
           } />
 
           <Route path="/estadisticas" element={
-              <WithSidebar>
-                <EstadisticasPage />
-              </WithSidebar>
+            <WithSidebar>
+              <EstadisticasPage />
+            </WithSidebar>
           } />
 
-<Route path="/reportes" element={
-              <WithSidebar>
-                <ReportesPage />
-              </WithSidebar>
+          <Route path="/reportes" element={
+            <WithSidebar>
+              <ReportesPage />
+            </WithSidebar>
           } />
 
         </Routes>
@@ -92,7 +98,7 @@ const WithSidebar = ({ children }) => (
     <Sidebar>
       {/* estas son las secciones de el rol de Coordinador */}
       <SidebarItem nav="/" icon={<Home size={20} />} text="Home" />
-      <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Nomina" />
+      <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
       <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
       <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
       <SidebarItem nav="/asignaciones" icon={<UserCheck size={20} />} text="Asignaciones" />
@@ -101,7 +107,7 @@ const WithSidebar = ({ children }) => (
 
       <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimineto" />
       <SidebarItem nav="/reportes" icon={<BookText size={20} />} text="Reportes" />
-      <SidebarItem nav="/estadisticas" text="Estadisticas" />
+      <SidebarItem nav="/estadisticas"icon={<BarChart3Icon size={20}/>} text="Estadisticas" />
 
 
       {/* <SidebarAccordion icon={<FolderSearch2 size={20} />} text="Seguimientos">

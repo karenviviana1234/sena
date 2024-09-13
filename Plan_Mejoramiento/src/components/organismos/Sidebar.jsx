@@ -69,16 +69,79 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
         </TouchableOpacity>
         <View style={styles.logoContainer}>
           <Image
-            source={require("../../../public/logo-sena-verde.png")}
+            source={require("../../../public/logoTic.png")}
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
         {/* Vistas por roles */}
 
-        {(rol === "Instructor" || rol === "Seguimiento") && (
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("principal")}
+          >
+            <View style={styles.menuItemContent}>
+              <Icon
+                name="book"
+                size={20}
+                color="black"
+                style={styles.menuIcon}
+              />
+              <Text style={styles.menuText}>Inicio</Text>
+            </View>
+          </TouchableOpacity>
+{/* 
+        {rol === "Instructor" && (
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("matriculas")}
+          >
+            <View style={styles.menuItemContent}>
+              <Icon
+                name="file-text"
+                size={20}
+                color="black"
+                style={styles.menuIcon}
+              />
+              <Text style={styles.menuText}>Matriculas</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        {rol === "Instructor" && (
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("empresas")}
+          >
+            <View style={styles.menuItemContent}>
+              <Icon
+                name="building"
+                size={20}
+                color="black"
+                style={styles.menuIcon}
+              />
+              <Text style={styles.menuText}>Empresas</Text>
+            </View>
+          </TouchableOpacity>
+        )} */}
+        {rol === "Instructor" && (
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("aprendices")}
+          >
+            <View style={styles.menuItemContent}>
+              <Icon
+                name="users"
+                size={20}
+                color="black"
+                style={styles.menuIcon}
+              />
+              <Text style={styles.menuText}>Aprendices</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        {(rol === "Instructor" || rol === "Seguimiento" || rol === "Aprendiz") && (
           <>
-            <TouchableOpacity style={styles.menuItem} onPress={toggleSubMenu}>
+            <TouchableOpacity style={styles.menuItem}         onPress={() => navigation.navigate("seguimiento")} /* onPress={toggleSubMenu} */>
               <View style={styles.menuItemContent}>
                 <Icon
                   name="dashboard"
@@ -87,16 +150,16 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
                   style={styles.menuIcon}
                 />
                 <Text style={styles.menuText}>Seguimientos</Text>
-                <Icon
+{/*                 <Icon
                   name={subMenuVisible ? "angle-up" : "angle-down"}
                   size={20}
                   color="black"
                   style={styles.menuIcon}
-                />
+                /> */}
               </View>
             </TouchableOpacity>
 
-            {subMenuVisible && (
+{/*             {subMenuVisible && (
               <View style={styles.subMenu}>
                 <TouchableOpacity
                   style={styles.subMenuItem}
@@ -111,7 +174,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
                   <Text style={styles.subMenuText}>Estadísticas</Text>
                 </TouchableOpacity>
               </View>
-            )}
+            )} */}
           </>
         )}
 
@@ -131,7 +194,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
             </View>
           </TouchableOpacity>
         )}
-        {rol === "Aprendiz" && (
+{/*         {rol === "Aprendiz" && (
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate("bitacoras")}
@@ -146,7 +209,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
               <Text style={styles.menuText}>Bitácoras</Text>
             </View>
           </TouchableOpacity>
-        )}
+        )} */}
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate("perfil")}
@@ -199,8 +262,8 @@ const styles = StyleSheet.create({
   logo: {
     marginBottom: 5,
     marginTop: 30,
-    width: 120, // Ajusta el ancho de la imagen
-    height: 120, // Ajusta la altura de la imagen
+    width: 150, // Ajusta el ancho de la imagen
+    height: 150, // Ajusta la altura de la imagen
     borderRadius: 40, // Ajusta el radio del borde para que sea redondeado
   },
   closeIcon: {

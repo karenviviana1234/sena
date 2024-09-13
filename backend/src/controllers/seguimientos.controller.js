@@ -47,10 +47,10 @@ export const listarSeguimientoAprendices = async (req, res) => {
                 (COUNT(b.pdf) / 12) * 100 AS porcentaje
             FROM
                 seguimientos s
-                LEFT JOIN productiva pr ON s.productiva = pr.id_productiva
+                LEFT JOIN productivas pr ON s.productiva = pr.id_productiva
                 LEFT JOIN matriculas m ON pr.matricula = m.id_matricula
                 LEFT JOIN personas p ON m.aprendiz = p.id_persona
-                LEFT JOIN empresa e ON pr.empresa = e.id_empresa
+                LEFT JOIN empresas e ON pr.empresa = e.id_empresa
                 LEFT JOIN fichas f ON m.ficha = f.codigo
                 LEFT JOIN programas prg ON f.programa = prg.id_programa
                 LEFT JOIN bitacoras b ON b.seguimiento = s.id_seguimiento

@@ -24,7 +24,7 @@ const Layout = ({ children, title }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start', // Alinea el contenido al inicio del contenedor
+    justifyContent: 'flex-start', 
   },
   header: {
     position: 'absolute',
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginBottom: 60, // Asegúrate de dejar espacio para el Header
+    marginBottom: 60, 
   },
 });
 
