@@ -4,31 +4,31 @@ import { pool } from './../database/conexion.js'
 
 export const listarAprendices = async (req, res) => {
     try {
-        // Consulta SQL con LEFT JOIN para obtener los aprendices sin matrícula
-        const sql = `
+      // Consulta SQL con LEFT JOIN para obtener los aprendices sin matrícula
+      const sql = `
         SELECT p.*, m.nombre_mpio
         FROM personas p
         LEFT JOIN municipios m ON p.municipio = m.id_municipio
         LEFT JOIN matriculas ma ON p.id_persona = ma.aprendiz
         WHERE p.rol = 'Aprendiz' AND ma.id_matricula IS NULL
       `;
-        const [results] = await pool.query(sql);
-
-        if (results.length > 0) {
-            res.status(200).json(results);
-        } else {
-            res.status(404).json({
-                message: 'No hay aprendices sin matrícula'
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: 'Error del servidor: ' + error.message
+      const [results] = await pool.query(sql);
+  
+      if (results.length > 0) {
+        res.status(200).json(results);
+      } else {
+        res.status(404).json({
+          message: 'No hay aprendices sin matrícula'
         });
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error del servidor: ' + error.message
+      });
     }
-};
+  };
 
-export const listarMatriculas = async (req, res) => {
+  export const listarMatriculas = async (req, res) => {
     const { codigo } = req.params; // Obtener el parámetro id_ficha de la URL
 
     try {
@@ -59,17 +59,7 @@ export const listarMatriculas = async (req, res) => {
     }
 };
 
-export const GetMatriculas = async (pool, sql, params) => {
-    try {
-        const [results] = await pool.query(sql, params);
-        return results;
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        throw error;
-    }
-};
-
-
+  
 
 export const registrarMatriculas = async (req, res) => {
     try {
@@ -89,13 +79,13 @@ export const registrarMatriculas = async (req, res) => {
         const ingles = pendiente_ingles ?? 0;
 
         // Asegúrate de que el valor de estado sea una cadena y esté en el formato esperado
-        /*  const estadoValido = ['Inducción', 'Formación', 'Condicionado', 'Cancelado', 'Retiro Voluntario', 'Por Certificar', 'Certificado'];
-         if (!estadoValido.includes(estado)) {
-             return res.status(400).json({
-                 message: 'Estado no válido'
-             });
-         }
-  */
+       /*  const estadoValido = ['Inducción', 'Formación', 'Condicionado', 'Cancelado', 'Retiro Voluntario', 'Por Certificar', 'Certificado'];
+        if (!estadoValido.includes(estado)) {
+            return res.status(400).json({
+                message: 'Estado no válido'
+            });
+        }
+ */
         // Inserción en la base de datos
         const sql = `INSERT INTO matriculas (ficha, aprendiz, estado, pendiente_tecnicos, pendiente_transversales, pendiente_ingles) VALUES (?, ?, ?, ?, ?, ?)`;
         const [rows] = await pool.query(sql, [ficha, aprendiz, estado, tecnicos, transversales, ingles]);
@@ -124,12 +114,12 @@ export const actualizarMatriculas = async (req, res) => {
         const { ficha, estado, pendientes_tecnicos, pendientes_transversales, pendiente_ingles } = req.body;
 
         // Asegúrate de que el valor de estado sea una cadena y esté en el formato esperado
-        /*  const estadoValido = ['Inducción', 'Formación', 'Condicionado', 'Cancelado', 'Retiro Voluntario', 'Por Certificar', 'Certificado'];
-         if (estado && !estadoValido.includes(estado)) {
-             return res.status(400).json({
-                 message: 'Estado no válido'
-             });
-         } */
+       /*  const estadoValido = ['Inducción', 'Formación', 'Condicionado', 'Cancelado', 'Retiro Voluntario', 'Por Certificar', 'Certificado'];
+        if (estado && !estadoValido.includes(estado)) {
+            return res.status(400).json({
+                message: 'Estado no válido'
+            });
+        } */
 
         let sql = `UPDATE matriculas SET
                     ficha = ?,
@@ -161,144 +151,144 @@ export const actualizarMatriculas = async (req, res) => {
 
 export const formacionMatricula = async (req, res) => {
     try {
-        const { id } = req.params
+        const {id} = req.params
 
         let sql = `UPDATE matriculas SET estado = 2 WHERE id_matricula = ?`
 
         const [rows] = await pool.query(sql, [id])
 
-        if (rows.affectedRows > 0) {
+        if(rows.affectedRows>0){
             res.status(200).json({
                 message: 'La formación se ha solicitado correctamente'
             })
-        } else {
+        }else{
             res.status(403).json({
                 message: 'Error al solicitar la formación'
             })
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
+            message: 'Error del servidor'+ error
         })
     }
 }
 
 export const condicionadaMatricula = async (req, res) => {
     try {
-        const { id } = req.params
+        const {id} = req.params
 
         let sql = `UPDATE matriculas SET estado = 3 WHERE id_matricula = ?`
 
         const [rows] = await pool.query(sql, [id])
 
-        if (rows.affectedRows > 0) {
+        if(rows.affectedRows>0){
             res.status(200).json({
                 message: 'Matricula condicionada exitosamente'
             })
-        } else {
+        }else{
             res.status(403).json({
                 message: 'Error al condicionar la matricula'
             })
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
+            message: 'Error del servidor'+ error
         })
     }
 }
 
 export const canceladaMatricula = async (req, res) => {
     try {
-        const { id } = req.params
+        const {id} = req.params
 
         let sql = `UPDATE matriculas SET estado = 4 WHERE id_matricula = ?`
 
         const [rows] = await pool.query(sql, [id])
 
-        if (rows.affectedRows > 0) {
+        if(rows.affectedRows>0){
             res.status(200).json({
                 message: 'Matricula cancelada exitosamente'
             })
-        } else {
+        }else{
             res.status(403).json({
                 message: 'Error al cancelar la matricula'
             })
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
+            message: 'Error del servidor'+ error
         })
     }
 }
 
 export const retiroMatricula = async (req, res) => {
     try {
-        const { id } = req.params
+        const {id} = req.params
 
         let sql = `UPDATE matriculas SET estado = 5 WHERE id_matricula = ?`
 
         const [rows] = await pool.query(sql, [id])
 
-        if (rows.affectedRows > 0) {
+        if(rows.affectedRows>0){
             res.status(200).json({
                 message: 'Matricula retirada exitosamente'
             })
-        } else {
+        }else{
             res.status(403).json({
                 message: 'Error al retirar la matricula'
             })
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
+            message: 'Error del servidor'+ error
         })
     }
 }
 
 export const porCertificarMatricula = async (req, res) => {
     try {
-        const { id } = req.params
+        const {id} = req.params
 
         let sql = `UPDATE matriculas SET estado = 6 WHERE id_matricula = ?`
 
         const [rows] = await pool.query(sql, [id])
 
-        if (rows.affectedRows > 0) {
+        if(rows.affectedRows>0){
             res.status(200).json({
                 message: 'Matricula por certificar exitosamente'
             })
-        } else {
+        }else{
             res.status(403).json({
                 message: 'Error al cambiar estado de la matricula'
             })
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
+            message: 'Error del servidor'+ error
         })
     }
 }
 
 export const certificadaMatricula = async (req, res) => {
     try {
-        const { id } = req.params
+        const {id} = req.params
 
         let sql = `UPDATE matriculas SET estado = 7 WHERE id_matricula = ?`
 
         const [rows] = await pool.query(sql, [id])
 
-        if (rows.affectedRows > 0) {
+        if(rows.affectedRows>0){
             res.status(200).json({
                 message: 'Matricula certificada exitosamente'
             })
-        } else {
+        }else{
             res.status(403).json({
                 message: 'Error al certificar la matricula'
             })
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
+            message: 'Error del servidor'+ error
         })
     }
 }

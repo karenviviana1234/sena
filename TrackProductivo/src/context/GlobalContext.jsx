@@ -3,6 +3,7 @@ import { SeguimientosProvider } from './SeguimientosContext'
 import { PersonasProvider } from './PersonasContext'
 import { NovedadesProvider } from './NovedadContext'
 import { AsignacionProvider } from './AsignacionesContext'
+import { MatriculasProvider } from './MatriculasContext'
 
 
 export const GlobalContext = createContext()
@@ -15,12 +16,14 @@ const GlobalProvider = ({ children }) => {
         <GlobalContext.Provider value={globalContextValue}>
             <NovedadesProvider>
                 <AsignacionProvider>
-                    <SeguimientosProvider>
-                        <PersonasProvider>
+                    <MatriculasProvider>
+                        <SeguimientosProvider>
+                            <PersonasProvider>
 
-                            {children}
-                        </PersonasProvider>
-                    </SeguimientosProvider>
+                                {children}
+                            </PersonasProvider>
+                        </SeguimientosProvider>
+                    </MatriculasProvider>
                 </AsignacionProvider>
             </NovedadesProvider>
         </GlobalContext.Provider>
