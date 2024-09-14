@@ -47,7 +47,7 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
     }
   };
   
-
+//dd
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -139,7 +139,7 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
             required
           />
         </div>
-
+                                  
         <div>
           <select
             className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
