@@ -5,6 +5,7 @@ export const listarasignaciones = async (req, res) => {
         const [result] = await pool.query(`
             SELECT 
                 p.id_asignacion, 
+<<<<<<< HEAD
                 a.id_productiva  AS productiva, 
                 act.id_actividad AS actividad,
                 act.fecha_inicio,
@@ -15,12 +16,27 @@ export const listarasignaciones = async (req, res) => {
                 a.alternativa,
                 a.estado,
                 a.aprendiz
+=======
+                a.id_productiva AS productiva, 
+                act.id_actividad AS actividad,
+                persA.nombres AS nombre_aprendiz,
+                persI.nombres AS nombre_instructor,
+                emp.razon_social AS nombre_empresa
+>>>>>>> devsdva
             FROM 
                 asignaciones AS p
             LEFT JOIN 
                 productivas AS a ON p.productiva = a.id_productiva 
             LEFT JOIN 
-                actividades AS act ON p.actividad = act.id_actividad;
+                actividades AS act ON p.actividad = act.id_actividad
+            LEFT JOIN 
+                matriculas AS mat ON a.aprendiz = mat.aprendiz
+            LEFT JOIN 
+                personas AS persA ON mat.aprendiz = persA.id_persona
+            LEFT JOIN 
+                personas AS persI ON act.instructor = persI.id_persona
+            LEFT JOIN 
+                empresas AS emp ON a.empresa = emp.id_empresa;
         `);
 
         if (result.length > 0) {
@@ -40,6 +56,11 @@ export const listarasignaciones = async (req, res) => {
 };
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> devsdva
 export const registrarasignacion = async (req, res) => {
     try {
         const { productiva, actividad } = req.body;
