@@ -3,7 +3,7 @@ import FormUsuarios from './FormUsuarios.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
-import FormVinculaciones from './FormVinculaciones.jsx';
+
 import { format } from 'date-fns';
 import {
     Table,
@@ -22,6 +22,8 @@ import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import FormActividades from './FormActividades.jsx';
 import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad.jsx';
 import ButtonDesactivar from '../atoms/ButtonDesactivar.jsx';
+import ButtonListarActividad from '../atoms/ButtonListarActividad.jsx';
+
 
 function TableInstructores() {
     const [personas, setPersonas] = useState([]);
@@ -68,8 +70,6 @@ function TableInstructores() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
-
-
 
     const fetchAreas = async () => {
         try {
@@ -162,9 +162,8 @@ function TableInstructores() {
                         <div className="flex justify-around items-center">
                             <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
                             <ButtonDesactivar onClick={() => handleDesactivar(item.id_persona)} />
-                            <ButtonRegistrarActividad
-                                onClick={() => handleOpenModal("formActividades",item)}
-                            />
+                            <ButtonRegistrarActividad onClick={() => handleOpenModal("formActividades",item)}/>
+                            <ButtonListarActividad onClick={() => handleOpenModal("formActividades",item)}/>
                         </div>
                     );
 
