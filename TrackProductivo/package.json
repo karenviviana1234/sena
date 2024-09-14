@@ -1,5 +1,5 @@
 {
-  "name": " trackproductivo",
+  "name": "trackproductivo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -37,11 +37,7 @@
     "react-router-dom": "^6.23.0",
     "recharts": "^2.12.7",
     "sweetalert2": "^11.14.0",
-<<<<<<< HEAD
-=======
     "rollup": "^4.21.3",
-    "sweetalert2": "^11.6.13",
->>>>>>> devao
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
