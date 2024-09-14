@@ -37,7 +37,6 @@
     "react-router-dom": "^6.23.0",
     "react-toastify": "^10.0.5",
     "recharts": "^2.12.7",
-    "rollup": "^4.21.3",
     "sweetalert2": "^11.6.13",
     "xlsx": "^0.18.5"
   },
@@ -51,6 +50,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "postcss": "^8.4.38",
+    "rollup": "^4.21.3",
     "tailwindcss": "^3.2.0",
     "vite": "^5.2.0"
   }
