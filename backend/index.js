@@ -18,6 +18,7 @@ import { rutaHorarios } from './src/routes/Horarios.js'
 import { RutaMunicipios } from './src/routes/municipios.route.js'
 import rutaNovedades from './src/routes/novedades.route.js'
 import rutaAsignacion from './src/routes/asignacion.route.js'
+import router from './src/routes/exportToExcel.js'
 
 const servidor = express()
 
@@ -43,6 +44,7 @@ servidor.use('/horarios', rutaHorarios )
 servidor.use('/municipios', RutaMunicipios )
 servidor.use('/novedad', rutaNovedades )
 servidor.use(rutaAsignacion )
+servidor.use('/export', router)
 
 servidor.use(express.static('./public'))
 servidor.set('view engine', 'ejs')
