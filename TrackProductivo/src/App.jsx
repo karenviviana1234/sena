@@ -105,7 +105,7 @@ const WithSidebar = ({ children }) => (
       <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
       <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
 
-      <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimiento" />
+      <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimineto" />
       <SidebarItem nav="/reportes" icon={<BookText size={20} />} text="Reportes" />
       <SidebarItem nav="/estadisticas"icon={<BarChart3Icon size={20}/>} text="Estadisticas" />
 

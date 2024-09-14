@@ -57,7 +57,7 @@ function TableInstructores() {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios initialData={data} onSuccess={handleUpdateData}/>);
         } else if (formType === 'formActividades') {
-            setBodyContent(<FormActividades selectedInstructor={data} onClose={handleCloseModal}/>);
+            setBodyContent(<FormActividades />);
         }
         setIsModalOpen(true);
     };
@@ -261,7 +261,7 @@ function TableInstructores() {
         <div className="overflow-hidden flex-1 bg-dark p-2">
             <div className="flex flex-col">
                 {topContent}
-                <Table aria-labelledby="Tabla de Personas" css={{ height: "auto", minWidth: "100%" }}>
+                <Table aria-label="Tabla de Personas" css={{ height: "auto", minWidth: "100%" }}>
                     <TableHeader>
                         {columns.map((column) => (
                             <TableColumn key={column.key}>{column.label}</TableColumn>

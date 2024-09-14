@@ -37,8 +37,8 @@ export const LoginPage = () => {
       if (response.status === 200) {
         const { token, user } = response.data;
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user[0]));  // Guarda el usuario en localStorage correctamente.
-  
+        localStorage.setItem('user', JSON.stringify(user[0]));
+
         Swal.fire({
           position: 'top-center',
           icon: 'success',

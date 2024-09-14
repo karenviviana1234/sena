@@ -60,15 +60,10 @@ export const registrarBitacora = async (req, res) => {
     }
 }
 /* Cargar Archivo pdf a una bitacora existente. */
-/* Cargar Archivo PDF a una bitácora existente y actualizar instructor y fecha */
 export const uploadPdfToBitacoras = async (req, res) => {
     try {
-        const { id_bitacora } = req.params;  // Obtener ID de la bitácora desde los parámetros de la URL
-        const { instructor } = req.body;  // Obtener instructor desde el cuerpo de la solicitud
+        const { id_bitacora } = req.params;  // Obtener el ID del seguimiento desde los parámetros de la URL
         const pdf = req.file?.originalname || null;  // Obtener el nombre del archivo PDF cargado
-
-        console.log('req.body:', req.body);  // Ver qué datos llegan en el cuerpo de la solicitud
-        console.log('instructor:', instructor);  // Verificar si el instructor está presente
 
         if (!pdf) {
             return res.status(400).json({
@@ -76,32 +71,21 @@ export const uploadPdfToBitacoras = async (req, res) => {
             });
         }
 
-        if (!instructor) {
-            return res.status(400).json({
-                message: 'El campo instructor es obligatorio'
-            });
-        }
-
-        // Obtener la fecha actual en el formato adecuado
-        const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-        // Actualizar el campo 'pdf', 'fecha' e 'instructor' en la tabla 'bitacoras'
+        // Actualizar el campo 'pdf' en la tabla 'bitacoras' con la ruta o el nombre del archivo
         const sqlUpdateBitacora = `
             UPDATE bitacoras
-            SET pdf = ?, fecha = ?, instructor = ? 
+            SET pdf = ? 
             WHERE id_bitacora = ?
         `;
-        
-        // Ejecutar la consulta para actualizar la bitácora
-        const [result] = await pool.query(sqlUpdateBitacora, [pdf, fechaActual, instructor, id_bitacora]);
+        const [result] = await pool.query(sqlUpdateBitacora, [pdf, id_bitacora]);
 
         if (result.affectedRows > 0) {
             res.status(200).json({
-                message: 'PDF cargado exitosamente en la bitácora y datos actualizados'
+                message: 'PDF cargado exitosamente en la bitacora'
             });
         } else {
             res.status(404).json({
-                message: 'Bitácora no encontrada'
+                message: 'Bitacora no encontrada'
             });
         }
     } catch (error) {
@@ -202,6 +186,7 @@ export const rechazarBitacora = async (req, res) => {
         })
     }
 }
+
 export const bitacoraSeguimiento = async (req, res) => {
     try {
         const {id} = req.params
@@ -222,7 +207,6 @@ export const bitacoraSeguimiento = async (req, res) => {
         })
     }
 }
-
 
 export const buscarBitacora = async (req, res) => {
     try {

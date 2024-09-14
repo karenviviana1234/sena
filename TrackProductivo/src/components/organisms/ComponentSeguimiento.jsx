@@ -1,23 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useProviderContext,
-} from "@nextui-org/react";
+import { Button, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
 import v from "../../styles/Variables.jsx";
 import PDFUploader from "../molecules/Pdf.jsx";
 import axiosClient from "../../configs/axiosClient.jsx";
 import ButtonEnviar from "../atoms/ButtonEnviar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
-import axios from "axios";
-import ModalAcciones from "./ModalAcciones.jsx";
-import Novedad from "./Novedad.jsx";
 
 function ComponentSeguimiento({
   initialData,
@@ -47,31 +34,21 @@ function ComponentSeguimiento({
   useEffect(() => {
     const currentDate = new Date().toISOString().slice(0, 10);
     setFecha(currentDate);
+  
+    // Verificar si el valor existe y es un JSON válido
     const userJson = localStorage.getItem("user");
-    if (
-      userJson &&
-      userJson !== "undefined" &&
-      userJson !== "null" &&
-      userJson !== ""
-    ) {
+    if (userJson) {
       try {
         const user = JSON.parse(userJson);
         if (user && user.id_persona) {
           setIdPersona(user.id_persona);
-          console.log("ID de persona asignado:", user.id_persona);
-        } else {
-          console.log("No se encontró un 'id_persona' válido en el usuario.");
         }
       } catch (error) {
-        console.error("Error al parsear el JSON del usuario:", error);
+        console.error("Error al parsear JSON:", error);
       }
-    } else {
-      console.log(
-        "No se encontró un valor válido para 'user' en localStorage."
-      );
-      setIdPersona(null);
     }
 
+    // Llama al callback para enviar el ID cuando el componente se monta
     if (onIdSend && id_seguimiento) {
       onIdSend(id_seguimiento);
     }
@@ -139,7 +116,7 @@ function ComponentSeguimiento({
   };
 
   // Función para enviar la bitácora
-  const handleSubmitBitacoras = async (bitacora) => {
+  const handleSubmitBitacoras = async () => {
     const formData = new FormData();
     formData.append("fecha", fecha);
     formData.append("bitacora", bitacora); // Número de bitácora fijo
@@ -225,43 +202,10 @@ function ComponentSeguimiento({
           <h1 className="font-semibold text-xl">Bitácoras:</h1>
           <div className="flex flex-col gap-4">
             {bitacorasPdfs.length > 0 ? (
-              bitacorasPdfs.map((bitacora) => (
-                <div
-                  key={bitacora.id_bitacora}
-                  className="border shadow-medium rounded-2xl p-4 flex flex-col gap-4 relative"
-                >
-                  <h2 className="font-semibold text-lg">
-                    Bitácora {bitacora.id_bitacora}
-                  </h2>
-                  <h2 className=" text-lg">Estado: {bitacora.estado}</h2>
-                  <div className="flex justify-center items-center gap-4">
-                    <PDFUploader
-                      onFileSelect={(file) =>
-                        handleBitacoraPdfSubmit(file, bitacora.id_bitacora)
-                      }
-                    />
-                    <ButtonEnviar
-                      onClick={() =>
-                        handleSubmitBitacoras(
-                          bitacora.id_bitacora,
-                          bitacora.bitacoraPdf
-                        )
-                      }
-                    />
-                  </div>
-
-                  {bitacora.bitacoraPdf && (
-                    <div className="absolute top-4 left-28 flex items-center gap-2">
-                      <Chip
-                        endContent={<v.solicitud size={20} />}
-                        variant="flat"
-                        color="warning"
-                      >
-                        Archivo listo
-                      </Chip>
-                    </div>
-                  )}
-                </div>
+              bitacorasPdfs.map((bita) => (
+                <option key={bita.id_bitacora} value={bita.id_bitacora}>
+                  Bitácora {bita.id_bitacora}
+                </option>
               ))
             ) : (
               <p>No hay bitácoras disponibles.</p>
@@ -272,7 +216,19 @@ function ComponentSeguimiento({
         {/* Sección para actividades */}
         <div className="flex-1 min-w-[300px]  p-4">
           <h1 className="font-semibold mb-4 text-xl">Novedades:</h1>
-         <Novedad/>
+          <div className="border shadow-medium rounded-2xl p-4">
+            <div className="flex justify-between">
+              <div>
+                <h2 className="font-semibold text-lg">Magda Lorena:</h2>
+                <span className="text-gray-500 text-sm">Administrativo</span>
+              </div>
+              <ButtonActualizar />
+            </div>
+            <p className=" text-sm mt-2">Corregir Bitacora 4</p>
+            <div className="flex justify-end items-center gap-4 mt-2">
+              <p className="text-gray-500 text-sm">20-12-2023</p>
+            </div>
+          </div>
         </div>
       </div>
       {/*       <div className="flex flex-col w-[600px]">
