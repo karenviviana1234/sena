@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs';
 import FileSaver from 'file-saver';
 
+
 export const exportToExcel = async (matriculas) => {
     // Crear un nuevo libro de trabajo
     const workbook = new ExcelJS.Workbook();
@@ -25,7 +26,7 @@ export const exportToExcel = async (matriculas) => {
     // Agregar datos de matrículas
     sheetMatriculas.addRows(matriculas);
     
-    // Formatea la tabla
+    // Formatear la tabla
     sheetMatriculas.views = [
         {
             x: 0,
@@ -43,10 +44,10 @@ export const exportToExcel = async (matriculas) => {
         to: 'I1'
     };
 
-    // Genera el archivo Excel
+    // Generar el archivo Excel
     const buffer = await workbook.xlsx.writeBuffer();
     
-    // Descarga el archivo
+    // Descargar el archivo
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' });
     FileSaver.saveAs(blob, `matriculas_ficha_${matriculas[0]?.ficha || ''}.xlsx`);
 };
