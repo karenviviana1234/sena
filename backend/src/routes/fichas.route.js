@@ -1,3 +1,4 @@
+//modificaciones
 import Router from 'express'
 import { listarFichas, registrarFichas, actualizarFicha, electivaFicha, finalizarFicha, listarCodigo } from '../controllers/fichas.controller.js'
 import { validarToken } from './../controllers/seguridad.controller.js' 
