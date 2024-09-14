@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
+import { Button, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useProviderContext } from "@nextui-org/react";
 import v from "../../styles/Variables.jsx";
 import PDFUploader from "../molecules/Pdf.jsx";
 import axiosClient from "../../configs/axiosClient.jsx";
@@ -16,54 +16,54 @@ function ComponentSeguimiento({
   onIdSend, // Callback para enviar el ID
 }) {
   const [fecha, setFecha] = useState("");
-  const [bitacora, setBitacora] = useState("");
+  const [bitacora, setBitacora] = useState('')
   const [seguimientoPdf, setSeguimientoPdf] = useState(null);
   const [bitacoraPdf, setBitacoraPdf] = useState(null); // Estado para PDF de bitácora
   const [idPersona, setIdPersona] = useState("");
   const [estadoActaVisible, setEstadoActaVisible] = useState(false);
   const [estadoBitacoraVisible, setEstadoBitacoraVisible] = useState(false);
-  const [bitacorasPdfs, setBitacorasPdfs] = useState([]);
-  const [modalBitacora, setModalBitacora] = useState(false);
+  const [bitacorasPdfs, setBitacorasPdfs] = useState([])
+  const [modalBitacora, setModalBitacora] = useState(false)
 
   const seguimientoNumeros = {
     1: 1,
     2: 2,
     3: 3,
   };
-
+  
   useEffect(() => {
     const currentDate = new Date().toISOString().slice(0, 10);
     setFecha(currentDate);
-  
-    // Verificar si el valor existe y es un JSON válido
     const userJson = localStorage.getItem("user");
-    if (userJson) {
+    if (userJson && userJson !== "undefined" && userJson !== "null" && userJson !== "") {
       try {
         const user = JSON.parse(userJson);
         if (user && user.id_persona) {
           setIdPersona(user.id_persona);
+          console.log("ID de persona asignado:", user.id_persona);
+        } else {
+          console.warn("No se encontró un 'id_persona' válido en el usuario.");
         }
       } catch (error) {
-        console.error("Error al parsear JSON:", error);
+        console.error("Error al parsear el JSON del usuario:", error);
       }
-    }
-
-    // Llama al callback para enviar el ID cuando el componente se monta
+    } else {
+      console.warn("No se encontró un valor válido para 'user' en localStorage.");
+      setIdPersona(null);
+    }    
+  
     if (onIdSend && id_seguimiento) {
       onIdSend(id_seguimiento);
     }
   }, [id_seguimiento, onIdSend]);
-
+  
   useEffect(() => {
     if (id_seguimiento) {
-      axiosClient
-        .get(`/bitacoras/bitacorasSeguimiento/${id_seguimiento}`)
-        .then((response) => {
-          setBitacorasPdfs(response.data); // Guardamos las bitácoras obtenidas en el estado
-        })
-        .catch((error) => {
-          console.error("Error al obtener las bitácoras:", error);
-        });
+      axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id_seguimiento}`).then((response) => {
+        setBitacorasPdfs(response.data);  // Guardamos las bitácoras obtenidas en el estado
+      }).catch(error => {
+        console.error("Error al obtener las bitácoras:", error);
+      });
     }
   }, [id_seguimiento]);
 
@@ -116,7 +116,7 @@ function ComponentSeguimiento({
   };
 
   // Función para enviar la bitácora
-  const handleSubmitBitacoras = async () => {
+  const handleSubmitBitacoras = async (bitacora) => {
     const formData = new FormData();
     formData.append("fecha", fecha);
     formData.append("bitacora", bitacora); // Número de bitácora fijo
@@ -152,14 +152,14 @@ function ComponentSeguimiento({
     }
   };
 
-  const [findBitacora, setFindBitacora] = useState([]);
+  const [findBitacora, setFindBitacora] = useState([])
 
   const handleBuscar = (id) => {
     axiosClient.get(`/bitacoras/buscar/${id}`).then((response) => {
-      console.log("Bitacora a editar", response.data);
-      setFindBitacora(response.data);
-    });
-  };
+      console.log('Bitacora a editar', response.data);
+      setFindBitacora(response.data)
+    })
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -171,7 +171,7 @@ function ComponentSeguimiento({
       <h1 className="font-semibold text-xl">Acta:</h1>
       <div className="border shadow-medium rounded-2xl p-4 flex flex-col gap-4 relative h-32">
         <h2 className="font-semibold text-lg absolute top-4 left-4">
-          Acta N° {seguimientoNumeros[id_seguimiento] || 1} :
+          Acta N° {seguimientoNumeros[id_seguimiento] || 1}{" "}:
         </h2>
         <div className="flex justify-center items-center h-full">
           <PDFUploader onFileSelect={handleActaPdfSubmit} />
@@ -197,15 +197,48 @@ function ComponentSeguimiento({
 
       {/* Sección para registrar bitácoras y actividades */}
       <div className="flex gap-8">
-        {/* Sección para registrar bitácoras y lista las bitacoras correspondientes */}
+        {/* Sección para registrar bitácoras */}
         <div className="flex-1 min-w-[300px] p-4">
           <h1 className="font-semibold text-xl">Bitácoras:</h1>
           <div className="flex flex-col gap-4">
             {bitacorasPdfs.length > 0 ? (
-              bitacorasPdfs.map((bita) => (
-                <option key={bita.id_bitacora} value={bita.id_bitacora}>
-                  Bitácora {bita.id_bitacora}
-                </option>
+              bitacorasPdfs.map((bitacora) => (
+                <div
+                  key={bitacora.id_bitacora}
+                  className="border shadow-medium rounded-2xl p-4 flex flex-col gap-4 relative"
+                >
+                  <h2 className="font-semibold text-lg">
+                    Bitácora {bitacora.id_bitacora}
+                  </h2>
+                  <h2 className=" text-lg">Estado: {bitacora.estado}</h2>
+                  <div className="flex justify-center items-center gap-4">
+                    <PDFUploader
+                      onFileSelect={(file) =>
+                        handleBitacoraPdfSubmit(file, bitacora.id_bitacora)
+                      }
+                    />
+                    <ButtonEnviar
+                      onClick={() =>
+                        handleSubmitBitacoras(
+                          bitacora.id_bitacora,
+                          bitacora.bitacoraPdf
+                        )
+                      }
+                    />
+                  </div>
+
+                  {bitacora.bitacoraPdf && (
+                    <div className="absolute top-4 left-28 flex items-center gap-2">
+                      <Chip
+                        endContent={<v.solicitud size={20} />}
+                        variant="flat"
+                        color="warning"
+                      >
+                        Archivo listo
+                      </Chip>
+                    </div>
+                  )}
+                </div>
               ))
             ) : (
               <p>No hay bitácoras disponibles.</p>
@@ -231,7 +264,7 @@ function ComponentSeguimiento({
           </div>
         </div>
       </div>
-      {/*       <div className="flex flex-col w-[600px]">
+{/*       <div className="flex flex-col w-[600px]">
         <h2 className="font-semibold mb-4 text-xl"> Bitacoras asociadas al seguimiento: </h2>
             {bitacorasPdfs.map((bita) => (
               <div key={bita.id_bitacora} className="flex flex-row">
@@ -242,13 +275,13 @@ function ComponentSeguimiento({
             ))}
       </div> */}
       <Modal isOpen={modalBitacora} onClose={() => setModalBitacora(false)}>
-        <ModalContent>
-          <ModalHeader>
-            <h2> Actualizar Bitacora </h2>
-          </ModalHeader>
-
-          <ModalBody className="overflow-y-auto max-h-[70vh]">
-            {findBitacora.map((bita) => (
+      <ModalContent>
+        <ModalHeader>
+          <h2> Actualizar Bitacora </h2>
+        </ModalHeader>
+        
+          <ModalBody className='overflow-y-auto max-h-[70vh]'>
+            {findBitacora.map(bita => (
               <div>
                 <Input type="text" value={bita.fecha} />
                 <Input type="text" value={bita.pdf} />
@@ -257,18 +290,8 @@ function ComponentSeguimiento({
             ))}
           </ModalBody>
           <ModalFooter>
-            <Button
-              color="danger"
-              variant="flat"
-              onClick={() => setModalBitacora(false)}
-            >
-              {" "}
-              Cerrar{" "}
-            </Button>
-            <Button className="bg-[#6fb12d] text-white font-semibold">
-              {" "}
-              Actualizar{" "}
-            </Button>
+            <Button color="danger" variant="flat" onClick={() => setModalBitacora(false)}> Cerrar </Button>
+            <Button className="bg-[#6fb12d] text-white font-semibold"> Actualizar </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -276,4 +299,4 @@ function ComponentSeguimiento({
   );
 }
 
-export default ComponentSeguimiento;
+export default ComponentSeguimiento;  
