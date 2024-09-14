@@ -341,3 +341,130 @@ export const desactivarPersona = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor: ' + error.message });
   }
 };
+/* Perfi de la persona */
+
+export const perfil = async (req, res) => {
+  const { id_persona } = req.params;
+  try {
+    const query = `
+     SELECT 
+    p.identificacion,
+    p.nombres, 
+    p.correo, 
+    p.telefono, 
+    p.rol,
+    p.sede,
+    p.area,
+    p.municipio,
+    m.nombre_mpio AS id_municipio
+FROM personas p
+LEFT JOIN municipios m ON p.municipio = m.id_municipio
+WHERE p.id_persona = ?;
+    `;
+
+    const [rows] = await pool.query(query, [id_persona]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Persona no encontrada' });
+    }
+
+    const persona = rows[0];
+
+    if (persona.rol !== 'aprendiz') {
+      delete persona.municipio;
+    }
+
+    if (persona.rol !== 'instructor') {
+      delete persona.tipo_sede;
+      delete persona.area;
+    }
+
+    res.json(persona);
+
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: 'Error en el sistema: ' + error.message
+    });
+  }
+};
+export const actualizarPerfil = async (req, res) => {
+  const { id_persona } = req.params;
+  const { identificacion, nombres, correo, telefono, rol, sede, area, municipio } = req.body;
+
+  try {
+    // Validar si la persona existe
+    const queryPersona = 'SELECT * FROM personas WHERE id_persona = ?';
+    const [personaExistente] = await pool.query(queryPersona, [id_persona]);
+
+    if (personaExistente.length === 0) {
+      return res.status(404).json({ message: 'Persona no encontrada' });
+    }
+
+    // Obtener los valores actuales si no se proporcionan en el cuerpo de la solicitud
+    const personaActual = personaExistente[0];
+
+    const updatedIdentificacion = identificacion || personaActual.identificacion;
+    const updatedNombres = nombres || personaActual.nombres;
+    const updatedCorreo = correo || personaActual.correo;
+    const updatedTelefono = telefono || personaActual.telefono;
+    const updatedRol = rol || personaActual.rol;
+    const updatedSede = sede || personaActual.sede;
+    const updatedArea = area || personaActual.area;
+    const updatedMunicipio = municipio || personaActual.municipio;
+
+    // Actualizar la persona
+    const queryUpdate = `
+      UPDATE personas 
+      SET identificacion = ?, nombres = ?, correo = ?, telefono = ?, rol = ?, sede = ?, area = ?, municipio = ?
+      WHERE id_persona = ?;
+    `;
+
+    const [result] = await pool.query(queryUpdate, [
+      updatedIdentificacion,
+      updatedNombres,
+      updatedCorreo,
+      updatedTelefono,
+      updatedRol,
+      updatedSede,
+      updatedArea,
+      updatedMunicipio,
+      id_persona
+    ]);
+
+    // Verificar si se actualizó algo
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: 'No se pudo actualizar el perfil' });
+    }
+
+    // Obtener los datos actualizados
+    const querySelectUpdated = `
+      SELECT 
+        p.identificacion,
+        p.nombres, 
+        p.correo, 
+        p.telefono, 
+        p.rol,
+        p.sede,
+        p.area,
+        p.municipio,
+        m.nombre_mpio AS id_municipio
+      FROM personas p
+      LEFT JOIN municipios m ON p.municipio = m.id_municipio
+      WHERE p.id_persona = ?;
+    `;
+    
+    const [updatedPersona] = await pool.query(querySelectUpdated, [id_persona]);
+
+    res.json({
+      message: 'Perfil actualizado correctamente',
+      persona: updatedPersona[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: 'Error en el sistema: ' + error.message
+    });
+  }
+};

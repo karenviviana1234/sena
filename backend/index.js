@@ -15,6 +15,7 @@ import rutaSeguridad from './src/routes/seguridad.route.js'
 import rutaPrograma from './src/routes/programa.route.js'
 import { rutaAreas } from './src/routes/areas.route.js'
 import rutaExport from './src/routes/exportToExcel.js' 
+import { rutaHorarios } from './src/routes/Horarios.js'
 
 const servidor = express()
 
@@ -36,6 +37,7 @@ servidor.use('/empresas', rutaEmpresas)
 servidor.use('/ambientes', rutaAmbientes)
 servidor.use('/programa', rutaPrograma)
 servidor.use('/areas', rutaAreas)
+servidor.use('/horarios', rutaHorarios)
 servidor.use('/export', rutaExport)
 
 
