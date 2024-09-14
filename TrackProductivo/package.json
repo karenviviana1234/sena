@@ -35,6 +35,7 @@
     "react-hook-form": "^7.53.0",
     "react-onclickoutside": "^6.13.1",
     "react-router-dom": "^6.23.0",
+    "react-toastify": "^10.0.5",
     "recharts": "^2.12.7",
     "rollup": "^4.21.3",
     "sweetalert2": "^11.6.13",

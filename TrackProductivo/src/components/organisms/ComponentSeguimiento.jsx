@@ -15,6 +15,9 @@ import PDFUploader from "../molecules/Pdf.jsx";
 import axiosClient from "../../configs/axiosClient.jsx";
 import ButtonEnviar from "../atoms/ButtonEnviar.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
+import axios from "axios";
+import ModalAcciones from "./ModalAcciones.jsx";
+import Novedad from "./Novedad.jsx";
 
 function ComponentSeguimiento({
   initialData,
@@ -216,11 +219,23 @@ function ComponentSeguimiento({
       </div>
 
       {/* Sección para registrar bitácoras y actividades */}
+<<<<<<< HEAD
       <div className="flex gap-8">
         {/* Sección para registrar bitácoras y lista las bitacoras correspondientes */}
         <div className="flex-1 min-w-[300px] p-4">
           <h1 className="font-semibold text-xl">Bitácoras:</h1>
           <div className="flex flex-col gap-4">
+=======
+      <div className=" gap-8">
+        {/* Sección para registrar bitácoras */}
+        <div className="flex-1 min-w-[300px]  p-4">
+          <h1 className="font-semibold mb-4 text-xl">Registrar Bitácora:</h1>
+          <div className="border shadow-medium rounded-2xl p-4 flex  gap-4 relative">
+            <h2 className="font-semibold text-lg">Bitácoras:</h2>
+          {/* Select dinámico */}
+          <select name="bitacora" value={bitacora} onChange={(e) => setBitacora(e.target.value)}>
+            <option hidden>Código de la bitácora:</option>
+>>>>>>> ddfef272175762370216dd293d39b83da1713474
             {bitacorasPdfs.length > 0 ? (
               bitacorasPdfs.map((bitacora) => (
                 <div
@@ -261,7 +276,32 @@ function ComponentSeguimiento({
                 </div>
               ))
             ) : (
+<<<<<<< HEAD
               <p>No hay bitácoras disponibles.</p>
+=======
+              <option disabled>No hay bitácoras disponibles</option>
+            )}
+          </select>
+            <div className="flex justify-center items-center gap-4">
+              <PDFUploader onFileSelect={handleBitacoraPdfSubmit} />
+              <ButtonEnviar onClick={handleSubmitBitacoras} />
+            </div>
+            {estadoBitacoraVisible && (
+              <div className="absolute top-4 left-28 flex items-center gap-2">
+                <Chip
+                  endContent={<v.solicitud size={20} />}
+                  variant="flat"
+                  color="warning"
+                >
+                  Solicitud
+                </Chip>
+              </div>
+            )}
+            {estadoBitacoraVisible && (
+              <div className="flex-1 ml-40 text-gray-500 text-sm top-2">
+                <p>{fecha}</p>
+              </div>
+>>>>>>> ddfef272175762370216dd293d39b83da1713474
             )}
           </div>
         </div>
@@ -269,19 +309,7 @@ function ComponentSeguimiento({
         {/* Sección para actividades */}
         <div className="flex-1 min-w-[300px]  p-4">
           <h1 className="font-semibold mb-4 text-xl">Novedades:</h1>
-          <div className="border shadow-medium rounded-2xl p-4">
-            <div className="flex justify-between">
-              <div>
-                <h2 className="font-semibold text-lg">Magda Lorena:</h2>
-                <span className="text-gray-500 text-sm">Administrativo</span>
-              </div>
-              <ButtonActualizar />
-            </div>
-            <p className=" text-sm mt-2">Corregir Bitacora 4</p>
-            <div className="flex justify-end items-center gap-4 mt-2">
-              <p className="text-gray-500 text-sm">20-12-2023</p>
-            </div>
-          </div>
+         <Novedad/>
         </div>
       </div>
       {/*       <div className="flex flex-col w-[600px]">
