@@ -217,7 +217,7 @@ function ComponentSeguimiento({
 
       {/* Sección para registrar bitácoras y actividades */}
       <div className="flex gap-8">
-        {/* Sección para registrar bitácoras */}
+        {/* Sección para registrar bitácoras y lista las bitacoras correspondientes */}
         <div className="flex-1 min-w-[300px] p-4">
           <h1 className="font-semibold text-xl">Bitácoras:</h1>
           <div className="flex flex-col gap-4">
