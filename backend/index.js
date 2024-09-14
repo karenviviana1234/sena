@@ -14,7 +14,10 @@ import rutaAmbientes from './src/routes/ambientes.route.js'
 import rutaSeguridad from './src/routes/seguridad.route.js'
 import rutaPrograma from './src/routes/programa.route.js'
 import { rutaAreas } from './src/routes/areas.route.js'
-import rutaExport from './src/routes/exportToExcel.js' 
+import { rutaHorarios } from './src/routes/Horarios.js'
+import { RutaMunicipios } from './src/routes/municipios.route.js'
+import rutaNovedades from './src/routes/novedades.route.js'
+import rutaAsignacion from './src/routes/asignacion.route.js'
 
 const servidor = express()
 
@@ -36,8 +39,10 @@ servidor.use('/empresas', rutaEmpresas)
 servidor.use('/ambientes', rutaAmbientes)
 servidor.use('/programa', rutaPrograma)
 servidor.use('/areas', rutaAreas)
-servidor.use('/export', rutaExport)
-
+servidor.use('/horarios', rutaHorarios )
+servidor.use('/municipios', RutaMunicipios )
+servidor.use('/novedad', rutaNovedades )
+servidor.use(rutaAsignacion )
 
 servidor.use(express.static('./public'))
 servidor.set('view engine', 'ejs')

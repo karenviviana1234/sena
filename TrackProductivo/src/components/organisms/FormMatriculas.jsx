@@ -27,8 +27,6 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
         fetchAprendices();
     }, []);
 
-
-
     useEffect(() => {
         if (initialData) {
             setMatriculaId(initialData.id_matricula);
@@ -45,50 +43,49 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+      
         setErrors({});
-
+      
         if (estado === 'Selecciona') {
-            setErrors({ estado: 'Por favor, selecciona un estado válido.' });
-            return;
+          setErrors({ estado: 'Por favor, selecciona un estado válido.' });
+          return;
         }
-
-        //listado para obtener fichas
+      
         const formData = {
-            estado,
-            ficha: fichaSeleccionada,
-            aprendiz: aprendizSeleccionado,
-            pendientes_tecnicos: pendientesTecnicos,
-            pendientes_transversales: pendientesTransversales,
-            pendiente_ingles: pendienteIngles
+          estado,
+          ficha: fichaSeleccionada,
+          aprendiz: aprendizSeleccionado,
+          pendientes_tecnicos: pendientesTecnicos,
+          pendientes_transversales: pendientesTransversales,
+          pendiente_ingles: pendienteIngles
         };
-
+      
         console.log("FormData:", formData);
-
+      
         try {
-            if (isEditing) {
-                await axiosClient.put(`/matriculas/actualizar/${idMatricula}`, formData);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: 'Matrícula actualizada correctamente',
-                });
-            } else {
-                await axiosClient.post('/matriculas/registrar', formData);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: 'Matrícula registrada correctamente',
-                });
-            }
-            if (onSuccess) onSuccess(); // Llamar a la función onSuccess después de una operación exitosa
-        } catch (error) {
-            console.error("Error del servidor:", error);
+          if (isEditing) {
+            await axiosClient.put(`/matriculas/actualizar/${idMatricula}`, formData);
             Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.response?.data?.message || 'Error desconocido',
+              icon: 'success',
+              title: 'Éxito',
+              text: 'Matrícula actualizada correctamente',
             });
+          } else {
+            await axiosClient.post('/matriculas/registrar', formData);
+            Swal.fire({
+              icon: 'success',
+              title: 'Éxito',
+              text: 'Matrícula registrada correctamente',
+            });
+          }
+          if (onSuccess) onSuccess(); // Llamar a la función onSuccess después de una operación exitosa
+        } catch (error) {
+          console.error("Error del servidor:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.response?.data?.message || 'Error desconocido',
+          });
         }
     };
 
@@ -165,7 +162,6 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                         {errors.pendiente_ingles && <p className="text-red-500">{errors.pendiente_ingles}</p>}
                     </>
                 )}
-
 
                 <div className="flex justify-end gap-5 mt-5">
                     <Button className="bg-[#92d22e] text-white" type="submit" color="success">

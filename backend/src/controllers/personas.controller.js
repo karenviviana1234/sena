@@ -24,7 +24,6 @@ export const listarPersonas = async (req, res) => {
 
 export const listarInstructores = async (req, res) => {
   try {
-    // Asegúrate de tener la columna 'estado' en la tabla 'personas'
     const sql = 'SELECT * FROM personas WHERE cargo = ? AND estado = ?';
     const values = ['Instructor', 'Activo'];
     const [results] = await pool.query(sql, values);

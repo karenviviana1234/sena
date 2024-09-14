@@ -6,13 +6,24 @@ export const listarasignaciones = async (req, res) => {
             SELECT 
                 p.id_asignacion, 
                 a.id_productiva AS productiva, 
-                act.id_actividad AS actividad
+                act.id_actividad AS actividad,
+                persA.nombres AS nombre_aprendiz,
+                persI.nombres AS nombre_instructor,
+                emp.razon_social AS nombre_empresa
             FROM 
                 asignaciones AS p
             LEFT JOIN 
                 productivas AS a ON p.productiva = a.id_productiva
             LEFT JOIN 
-                actividades AS act ON p.actividad = act.id_actividad;
+                actividades AS act ON p.actividad = act.id_actividad
+            LEFT JOIN 
+                matriculas AS mat ON a.aprendiz = mat.aprendiz
+            LEFT JOIN 
+                personas AS persA ON mat.aprendiz = persA.id_persona
+            LEFT JOIN 
+                personas AS persI ON act.instructor = persI.id_persona
+            LEFT JOIN 
+                empresas AS emp ON a.empresa = emp.id_empresa;
         `);
 
         if (result.length > 0) {
@@ -30,6 +41,7 @@ export const listarasignaciones = async (req, res) => {
         });
     }
 };
+
 
 
 
