@@ -1,6 +1,6 @@
 import { pool } from "../database/conexion.js";
 import  Jwt  from "jsonwebtoken";
-/* import bcrypt from "bcrypt";  */
+/* import bcrypt from "bcrypt";   */
 
 export const validar = async (req, res) => {
     try {
