@@ -7,12 +7,10 @@ function FormActividades({ selectedInstructor, onClose }) {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [horario, setHorario] = useState("");
-  const [ficha, setFicha] = useState(""); // Ficha seleccionada
   const [tipo, setTipo] = useState("Formacion");
   const [solicitud, setSolicitud] = useState("Solicitado");
 
-  const [fichas, setFichas] = useState([]); // Lista de fichas
-  const [horarios, setHorarios] = useState([]); // Lista de horarios filtrados por ficha
+  const [horarios, setHorarios] = useState([]);
 
   const [errors, setErrors] = useState({
     fechaInicio: "",
@@ -22,42 +20,27 @@ function FormActividades({ selectedInstructor, onClose }) {
   const tipos = ["Formacion", "Seguimiento", "Administrativo"];
   const solicitudes = ["Solicitado", "Aprobado", "No Aprobado"];
 
-  // Cargar el nombre del instructor seleccionado
+  // Al cargar el componente, establece el nombre del instructor seleccionado
   useEffect(() => {
     if (selectedInstructor) {
       setInstructor(selectedInstructor.nombres);
     }
   }, [selectedInstructor]);
 
-  // Obtener todas las fichas al cargar el componente
+  
+
   useEffect(() => {
-    const fetchFichas = async () => {
+    const fetchHorarios = async () => {
       try {
-        const response = await axiosClient.get("/fichas/listar"); // Suponiendo que esta ruta obtiene las fichas
-        setFichas(response.data);
+        const response = await axiosClient.get("/horarios/listar");
+        setHorarios(response.data);
       } catch (error) {
-        console.error("Error al obtener fichas", error);
+        console.error("Error al obtener horarios", error);
       }
     };
 
-    fetchFichas();
+    fetchHorarios();
   }, []);
-
-  // Obtener horarios basados en la ficha seleccionada
-  useEffect(() => {
-    if (ficha) {
-      const fetchHorarios = async () => {
-        try {
-          const response = await axiosClient.get(`/horarios/listar/${ficha}`); // Filtra por ficha
-          setHorarios(response.data);
-        } catch (error) {
-          console.error("Error al obtener horarios", error);
-        }
-      };
-
-      fetchHorarios();
-    }
-  }, [ficha]);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -91,7 +74,6 @@ function FormActividades({ selectedInstructor, onClose }) {
       fecha_inicio: fechaInicio,
       fecha_fin: fechaFin,
       horario: parseInt(horario, 10) || null,
-      ficha: parseInt(ficha, 10) || null, // Ficha seleccionada
       tipo: tipos.indexOf(tipo) + 1, // Convertir a número basado en el índice + 1
       solicitud: solicitudes.indexOf(solicitud) + 1, // Convertir a número basado en el índice + 1
     };
@@ -113,32 +95,13 @@ function FormActividades({ selectedInstructor, onClose }) {
     <div>
       <h2 className="text-xl font-bold mb-4">Formulario de Actividades</h2>
       <form onSubmit={handleSubmit}>
-        {/* Mostrar el nombre del instructor */}
+        {/* Mostrar el nombre del instructor en lugar de un Select */}
         <Input
           readOnly
           label="Instructor"
           value={instructor}
         />
 
-        {/* Selección de la ficha */}
-        <Select
-          name="ficha"
-          label="Selecciona una ficha"
-          placeholder="Selecciona la ficha"
-          value={ficha}
-          onChange={(e) => setFicha(e.target.value)}
-        >
-          {fichas.map((ficha) => (
-            <SelectItem
-              key={ficha.codigo}
-              value={ficha.codigo.toString()}
-            >
-              {`Ficha ${ficha.codigo} - Programa ${ficha.programa}`}
-            </SelectItem>
-          ))}
-        </Select>
-
-        {/* Fechas */}
         <div className="grid grid-cols-2 gap-4 mb-5 mt-5">
           <div className="flex flex-col">
             <Input
@@ -159,37 +122,109 @@ function FormActividades({ selectedInstructor, onClose }) {
               label="Fecha de Fin"
               value={fechaFin}
               onChange={(e) => setFechaFin(e.target.value)}
-              min={fechaInicio || today}
+              min={fechaInicio || today} // Ajustar mínimo a la fecha de inicio o a hoy si no se ha seleccionado
               helperText={errors.fechaFin}
               helperColor={errors.fechaFin ? "danger" : "default"}
             />
           </div>
         </div>
 
-        {/* Selección de horario basado en la ficha */}
-        <Select
-          name="horario"
-          label="Selecciona el horario"
-          placeholder="Selecciona el horario"
-          value={horario}
-          onChange={(e) => setHorario(e.target.value)}
-          disabled={!ficha} // Deshabilitar si no hay ficha seleccionada
-        >
-          {horarios.map((hora) => (
-            <SelectItem
-              key={hora.id_horario}
-              value={hora.id_horario.toString()}
+        <div className="grid grid-cols-2 gap-4 mb-5">
+          <div className="flex flex-col">
+            <Select
+              name="horario"
+              placeholder="Selecciona el horario"
+              value={horario}
+              onChange={(e) => setHorario(e.target.value)}
             >
-              {`Horario ${hora.hora_inicio} - ${hora.hora_fin} (${hora.dia})`}
-            </SelectItem>
-          ))}
-        </Select>
+              {horarios.map((hora) => (
+                <SelectItem
+                  key={hora.id_horario}
+                  value={hora.id_horario.toString()}
+                >
+                  {hora.id_horario}
+                </SelectItem>
+              ))}
+            </Select>
+            <Input
+              className="mt-4"
+              label="Horario Seleccionado"
+              value={
+                horario
+                  ? horarios.find((h) => h.id_horario.toString() === horario)
+                      ?.id_horario || ""
+                  : ""
+              }
+              readOnly
+              color={horario ? "success" : "default"}
+            />
+          </div>
+
+          {/*             <Select
+          <div className="flex flex-col">
+              name="productiva"
+              placeholder="Selecciona la productiva"
+              value={productiva}
+              onChange={(e) => setProductiva(e.target.value)}
+            >
+              {productivas.map((prod) => (
+                <SelectItem
+                  key={prod.id_productiva}
+                  value={prod.id_productiva.toString()}
+                >
+                  {prod.id_productiva}
+                </SelectItem>
+              ))}
+            </Select>
+            <Input
+              label="Productiva Seleccionada"
+              className="mt-4"
+              value={
+                productiva
+                  ? productivas.find(
+                      (p) => p.id_productiva.toString() === productiva
+                    )?.id_productiva || ""
+                  : ""
+              }
+              readOnly
+              color={productiva ? "success" : "default"}
+            />
+          </div> */}
+        </div>
+
+{/*         <div className="grid grid-cols-2 gap-4 mb-4">
+          <Select
+            name="tipo"
+            placeholder="Selecciona el tipo"
+            value={tipo}
+            onChange={(e) => setTipo(e.target.value)}
+          >
+            {tipos.map((tipo) => (
+              <SelectItem key={tipo} value={tipo}>
+                {tipo}
+              </SelectItem>
+            ))}
+          </Select>
+
+          <Select
+            name="solicitud"
+            placeholder="Selecciona el estado de solicitud"
+            value={solicitud}
+            onChange={(e) => setSolicitud(e.target.value)}
+          >
+            {solicitudes.map((solicitud) => (
+              <SelectItem key={solicitud} value={solicitud}>
+                {solicitud}
+              </SelectItem>
+            ))}
+          </Select>
+        </div> */}
 
         <div className="flex justify-end gap-5 mt-5">
           <Button type="button" color="danger" onClick={onClose}>
             Cerrar
           </Button>
-          <Button type="submit" color="success">
+          <Button type="submit" color="success" onClick={onClose}>
             Registrar
           </Button>
         </div>

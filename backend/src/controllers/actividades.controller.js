@@ -26,10 +26,12 @@ export const registrarActividad = async (req, res) => {
 
 
 export const listarActividades = async (req, res) => {
-    try {
-        let sql = `SELECT * FROM actividades`;
+    const {id_persona} = req.params;
 
-        const [results] = await pool.query(sql);
+    try {
+        let sql = `SELECT * FROM actividades WHERE instructor = ?`;
+
+        const [results] = await pool.query(sql, [id_persona]);
         if (results.length > 0) {
             res.status(200).json(results);
         } else {

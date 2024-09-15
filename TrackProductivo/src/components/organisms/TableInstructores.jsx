@@ -3,7 +3,7 @@ import FormUsuarios from './FormUsuarios.jsx';
 import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
-
+import FormVinculaciones from './FormVinculaciones.jsx';
 import { format } from 'date-fns';
 import {
     Table,
@@ -24,6 +24,7 @@ import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad.jsx';
 import ButtonDesactivar from '../atoms/ButtonDesactivar.jsx';
 import ButtonListarActividad from '../atoms/ButtonListarActividad.jsx';
 
+import ListActividad from './ListActividad.jsx';
 
 function TableInstructores() {
     const [personas, setPersonas] = useState([]);
@@ -57,7 +58,9 @@ function TableInstructores() {
         if (formType === 'formUsuarios') {
             setBodyContent(<FormUsuarios initialData={data} onSuccess={handleUpdateData}/>);
         } else if (formType === 'formActividades') {
-            setBodyContent(<FormActividades />);
+            setBodyContent(<FormActividades selectedInstructor={data} onClose={handleCloseModal}/>);
+        }else if (formType === 'ListActividades') {
+            setBodyContent(<ListActividad selectedInstructor={data} onClose={handleCloseModal}/>);
         }
         setIsModalOpen(true);
     };
@@ -70,6 +73,8 @@ function TableInstructores() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
+
+
 
     const fetchAreas = async () => {
         try {
@@ -162,8 +167,12 @@ function TableInstructores() {
                         <div className="flex justify-around items-center">
                             <ButtonActualizar onClick={() => handleOpenModal('formUsuarios', item)} />
                             <ButtonDesactivar onClick={() => handleDesactivar(item.id_persona)} />
-                            <ButtonRegistrarActividad onClick={() => handleOpenModal("formActividades",item)}/>
-                            <ButtonListarActividad onClick={() => handleOpenModal("formActividades",item)}/>
+                            <ButtonRegistrarActividad
+                                onClick={() => handleOpenModal("formActividades",item)}
+                            />
+                            <ButtonListarActividad
+                                onClick={() => handleOpenModal("ListActividades",item)}
+                            />
                         </div>
                     );
 
@@ -261,7 +270,7 @@ function TableInstructores() {
         <div className="overflow-hidden flex-1 bg-dark p-2">
             <div className="flex flex-col">
                 {topContent}
-                <Table aria-label="Tabla de Personas" css={{ height: "auto", minWidth: "100%" }}>
+                <Table aria-labelledby="Tabla de Personas" css={{ height: "auto", minWidth: "100%" }}>
                     <TableHeader>
                         {columns.map((column) => (
                             <TableColumn key={column.key}>{column.label}</TableColumn>
