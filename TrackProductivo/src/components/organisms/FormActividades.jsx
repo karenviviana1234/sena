@@ -2,13 +2,24 @@ import React, { useState, useEffect } from "react";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
 
-function FormActividades({ selectedInstructor, onClose }) {
+function FormActividades({ selectedInstructor, actividadSeleccionada, onClose }) {
   const [instructor, setInstructor] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [horario, setHorario] = useState("");
   const [tipo, setTipo] = useState("Formacion");
   const [solicitud, setSolicitud] = useState("Solicitado");
+
+  useEffect(() => {
+    if (actividadSeleccionada) {
+      // Si hay una actividad seleccionada, rellena el formulario con los datos
+      setFechaInicio(actividadSeleccionada.fecha_inicio || "");
+      setFechaFin(actividadSeleccionada.fecha_fin || "");
+      setHorario(actividadSeleccionada.horario || "");
+      setTipo(actividadSeleccionada.tipo || "Formacion");
+      setSolicitud(actividadSeleccionada.solicitud || "Solicitado");
+    }
+  }, [actividadSeleccionada]);
 
   const [horarios, setHorarios] = useState([]);
 
@@ -26,8 +37,6 @@ function FormActividades({ selectedInstructor, onClose }) {
       setInstructor(selectedInstructor.nombres);
     }
   }, [selectedInstructor]);
-
-  
 
   useEffect(() => {
     const fetchHorarios = async () => {
