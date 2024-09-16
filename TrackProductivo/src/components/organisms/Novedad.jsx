@@ -7,7 +7,7 @@ function Novedad({ id_seguimiento }) {
     const [novedades, setNovedades] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedNovedad, setSelectedNovedad] = useState(null);
-//h
+
     useEffect(() => {
         const fetchNovedades = async () => {
             if (!id_seguimiento) return;
