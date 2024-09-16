@@ -137,7 +137,6 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-5">
           <div className="flex flex-col">
             <Select
               name="horario"
@@ -150,19 +149,23 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
                   key={hora.id_horario}
                   value={hora.id_horario.toString()}
                 >
-                  {` ${hora.id_horario} - ${hora.dia} - ${hora.ficha}`} {/* Mostrar día y hora */}
+                  {`${hora.id_horario} - ${hora.dia} - ${hora.ficha} - (${hora.hora_inicio} a ${hora.hora_fin})`}
                 </SelectItem>
               ))}
             </Select>
             <Input
               className="mt-4"
               label="Horario Seleccionado"
-              value={selectedHorario ? `${selectedHorario.dia} - ${selectedHorario.ficha}` : ""}
+              value={
+                selectedHorario
+                  ? `${selectedHorario.id_horario} - ${selectedHorario.dia} - ${selectedHorario.ficha} - (${selectedHorario.hora_inicio} a ${selectedHorario.hora_fin})`
+                  : ""
+              }
               readOnly
               color={horario ? "success" : "default"}
             />
           </div>
-        </div>
+
 
         <div className="flex justify-end gap-5 mt-5">
           <Button type="button" color="danger" onClick={onClose}>
