@@ -19,7 +19,7 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
-import FormActividades from "./FormActividades.jsx";
+/* import FormActividades from "./FormActividades.jsx"; */
 import ButtonRegistrarActividad from "../atoms/ButtonRegistrarActividad.jsx";
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonListarActividad from "../atoms/ButtonListarActividad.jsx";
@@ -57,11 +57,11 @@ function TableInstructores() {
       setBodyContent(
         <FormUsuarios initialData={data} onSuccess={handleUpdateData} />
       );
-    } else if (formType === "formActividades") {
+    } /* else if (formType === "formActividades") {
       setBodyContent(
         <FormActividades selectedInstructor={data} onClose={handleCloseModal} />
-      );
-    } else if (formType === "ListActividades") {
+      ); 
+    }*/ else if (formType === "ListActividades") {
       setBodyContent(
         <ListActividad selectedInstructor={data} onClose={handleCloseModal} />
       );
@@ -176,9 +176,9 @@ function TableInstructores() {
               <ButtonDesactivar
                 onClick={() => handleDesactivar(item.id_persona)}
               />
-              <ButtonRegistrarActividad
+{/*               <ButtonRegistrarActividad
                 onClick={() => handleOpenModal("formActividades", item)}
-              />
+              /> */}
               <ButtonListarActividad
                 onClick={() => handleOpenModal("ListActividades", item)}
               />

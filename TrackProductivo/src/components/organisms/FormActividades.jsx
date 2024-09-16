@@ -7,12 +7,11 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [horario, setHorario] = useState("");
-  const [tipo, setTipo] = useState("Formacion");
-  const [solicitud, setSolicitud] = useState("Solicitado");
+  const [tipo, setTipo] = useState("Seguimiento");
+  const [solicitud, setSolicitud] = useState("Aprobado");
 
   useEffect(() => {
     if (actividadSeleccionada) {
-      // Si hay una actividad seleccionada, rellena el formulario con los datos
       setFechaInicio(actividadSeleccionada.fecha_inicio || "");
       setFechaFin(actividadSeleccionada.fecha_fin || "");
       setHorario(actividadSeleccionada.horario || "");
@@ -22,7 +21,6 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
   }, [actividadSeleccionada]);
 
   const [horarios, setHorarios] = useState([]);
-
   const [errors, setErrors] = useState({
     fechaInicio: "",
     fechaFin: "",
@@ -31,7 +29,6 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
   const tipos = ["Formacion", "Seguimiento", "Administrativo"];
   const solicitudes = ["Solicitado", "Aprobado", "No Aprobado"];
 
-  // Al cargar el componente, establece el nombre del instructor seleccionado
   useEffect(() => {
     if (selectedInstructor) {
       setInstructor(selectedInstructor.nombres);
@@ -79,12 +76,12 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
     }
 
     const dataToSend = {
-      instructor: selectedInstructor.id_persona, // El ID del instructor seleccionado
+      instructor: selectedInstructor.id_persona,
       fecha_inicio: fechaInicio,
       fecha_fin: fechaFin,
       horario: parseInt(horario, 10) || null,
-      tipo: tipos.indexOf(tipo) + 1, // Convertir a número basado en el índice + 1
-      solicitud: solicitudes.indexOf(solicitud) + 1, // Convertir a número basado en el índice + 1
+      tipo: tipos.indexOf(tipo) + 1,
+      solicitud: solicitudes.indexOf(solicitud) + 1,
     };
 
     try {
@@ -100,11 +97,13 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
     }
   };
 
+  // Encuentra el horario seleccionado por ID
+  const selectedHorario = horarios.find(h => h.id_horario.toString() === horario);
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Formulario de Actividades</h2>
       <form onSubmit={handleSubmit}>
-        {/* Mostrar el nombre del instructor en lugar de un Select */}
         <Input
           readOnly
           label="Instructor"
@@ -131,7 +130,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
               label="Fecha de Fin"
               value={fechaFin}
               onChange={(e) => setFechaFin(e.target.value)}
-              min={fechaInicio || today} // Ajustar mínimo a la fecha de inicio o a hoy si no se ha seleccionado
+              min={fechaInicio || today}
               helperText={errors.fechaFin}
               helperColor={errors.fechaFin ? "danger" : "default"}
             />
@@ -151,83 +150,19 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
                   key={hora.id_horario}
                   value={hora.id_horario.toString()}
                 >
-                  {hora.id_horario}
+                  {` ${hora.id_horario} - ${hora.dia} - ${hora.ficha}`} {/* Mostrar día y hora */}
                 </SelectItem>
               ))}
             </Select>
             <Input
               className="mt-4"
               label="Horario Seleccionado"
-              value={
-                horario
-                  ? horarios.find((h) => h.id_horario.toString() === horario)
-                      ?.id_horario || ""
-                  : ""
-              }
+              value={selectedHorario ? `${selectedHorario.dia} - ${selectedHorario.ficha}` : ""}
               readOnly
               color={horario ? "success" : "default"}
             />
           </div>
-
-          {/*             <Select
-          <div className="flex flex-col">
-              name="productiva"
-              placeholder="Selecciona la productiva"
-              value={productiva}
-              onChange={(e) => setProductiva(e.target.value)}
-            >
-              {productivas.map((prod) => (
-                <SelectItem
-                  key={prod.id_productiva}
-                  value={prod.id_productiva.toString()}
-                >
-                  {prod.id_productiva}
-                </SelectItem>
-              ))}
-            </Select>
-            <Input
-              label="Productiva Seleccionada"
-              className="mt-4"
-              value={
-                productiva
-                  ? productivas.find(
-                      (p) => p.id_productiva.toString() === productiva
-                    )?.id_productiva || ""
-                  : ""
-              }
-              readOnly
-              color={productiva ? "success" : "default"}
-            />
-          </div> */}
         </div>
-
-{/*         <div className="grid grid-cols-2 gap-4 mb-4">
-          <Select
-            name="tipo"
-            placeholder="Selecciona el tipo"
-            value={tipo}
-            onChange={(e) => setTipo(e.target.value)}
-          >
-            {tipos.map((tipo) => (
-              <SelectItem key={tipo} value={tipo}>
-                {tipo}
-              </SelectItem>
-            ))}
-          </Select>
-
-          <Select
-            name="solicitud"
-            placeholder="Selecciona el estado de solicitud"
-            value={solicitud}
-            onChange={(e) => setSolicitud(e.target.value)}
-          >
-            {solicitudes.map((solicitud) => (
-              <SelectItem key={solicitud} value={solicitud}>
-                {solicitud}
-              </SelectItem>
-            ))}
-          </Select>
-        </div> */}
 
         <div className="flex justify-end gap-5 mt-5">
           <Button type="button" color="danger" onClick={onClose}>
