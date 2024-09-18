@@ -5,10 +5,10 @@ import {validarToken} from './../controllers/seguridad.controller.js'
 
 const rutaActividades = Router()
 
-rutaActividades.get('/listar',/*  validarToken, */ listarActividades)
-rutaActividades.post('/registrar',/*  validarToken,  */registrarActividad)
-rutaActividades.put('/actualizar/:id', /* validarToken, */ actualizarActividad)
-rutaActividades.put('/desactivar/:id', validarToken, desactivarActividad)
+rutaActividades.get('/listar/:id_persona', /* validarToken,  */listarActividades)
+rutaActividades.post('/registrar', validarToken, registrarActividad)
+rutaActividades.put('/actualizar/:id', validarToken, actualizarActividad)
+rutaActividades.put('/desactivar/:id',/*  validarToken, */ desactivarActividad)
 rutaActividades.put('/activar/:id', validarToken, activarActividad)
 
 export default rutaActividades;

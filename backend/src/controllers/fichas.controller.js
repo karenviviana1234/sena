@@ -21,7 +21,6 @@ export const listarFichas = async (req, res) => {
 
 export const listarCodigo = async (req, res) => {
     try {
-        // Modifica la consulta SQL para seleccionar solo la columna `codigo`
         let sql = `SELECT codigo FROM fichas`;
 
         const [results] = await pool.query(sql);

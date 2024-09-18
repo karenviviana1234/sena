@@ -24,7 +24,6 @@ export const listarPersonas = async (req, res) => {
 
 export const listarInstructores = async (req, res) => {
   try {
-    // Asegúrate de tener la columna 'estado' en la tabla 'personas'
     const sql = 'SELECT * FROM personas WHERE cargo = ? AND estado = ?';
     const values = ['Instructor', 'Activo'];
     const [results] = await pool.query(sql, values);
@@ -341,3 +340,185 @@ export const desactivarPersona = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor: ' + error.message });
   }
 };
+/* Perfi de la persona */
+
+export const perfil = async (req, res) => {
+  const { id_persona } = req.params;
+  try {
+    const query = `
+     SELECT 
+    p.identificacion,
+    p.nombres, 
+    p.correo, 
+    p.telefono, 
+    p.rol,
+    p.sede,
+    p.area,
+    p.municipio,
+    m.nombre_mpio AS id_municipio
+FROM personas p
+LEFT JOIN municipios m ON p.municipio = m.id_municipio
+WHERE p.id_persona = ?;
+    `;
+
+    const [rows] = await pool.query(query, [id_persona]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Persona no encontrada' });
+    }
+
+    const persona = rows[0];
+
+    if (persona.rol !== 'aprendiz') {
+      delete persona.municipio;
+    }
+
+    if (persona.rol !== 'instructor') {
+      delete persona.tipo_sede;
+      delete persona.area;
+    }
+
+    res.json(persona);
+
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: 'Error en el sistema: ' + error.message
+    });
+  }
+};
+export const actualizarPerfil = async (req, res) => {
+  const { id_persona } = req.params;
+  const { identificacion, nombres, correo, telefono, rol, sede, area, municipio } = req.body;
+
+  try {
+    // Validar si la persona existe
+    const queryPersona = 'SELECT * FROM personas WHERE id_persona = ?';
+    const [personaExistente] = await pool.query(queryPersona, [id_persona]);
+
+    if (personaExistente.length === 0) {
+      return res.status(404).json({ message: 'Persona no encontrada' });
+    }
+
+    // Obtener los valores actuales si no se proporcionan en el cuerpo de la solicitud
+    const personaActual = personaExistente[0];
+
+    const updatedIdentificacion = identificacion || personaActual.identificacion;
+    const updatedNombres = nombres || personaActual.nombres;
+    const updatedCorreo = correo || personaActual.correo;
+    const updatedTelefono = telefono || personaActual.telefono;
+    const updatedRol = rol || personaActual.rol;
+    const updatedSede = sede || personaActual.sede;
+    const updatedArea = area || personaActual.area;
+    const updatedMunicipio = municipio || personaActual.municipio;
+
+    // Actualizar la persona
+    const queryUpdate = `
+      UPDATE personas 
+      SET identificacion = ?, nombres = ?, correo = ?, telefono = ?, rol = ?, sede = ?, area = ?, municipio = ?
+      WHERE id_persona = ?;
+    `;
+
+    const [result] = await pool.query(queryUpdate, [
+      updatedIdentificacion,
+      updatedNombres,
+      updatedCorreo,
+      updatedTelefono,
+      updatedRol,
+      updatedSede,
+      updatedArea,
+      updatedMunicipio,
+      id_persona
+    ]);
+
+    // Verificar si se actualizó algo
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: 'No se pudo actualizar el perfil' });
+    }
+
+    // Obtener los datos actualizados
+    const querySelectUpdated = `
+      SELECT 
+        p.identificacion,
+        p.nombres, 
+        p.correo, 
+        p.telefono, 
+        p.rol,
+        p.sede,
+        p.area,
+        p.municipio,
+        m.nombre_mpio AS id_municipio
+      FROM personas p
+      LEFT JOIN municipios m ON p.municipio = m.id_municipio
+      WHERE p.id_persona = ?;
+    `;
+    
+    const [updatedPersona] = await pool.query(querySelectUpdated, [id_persona]);
+
+    res.json({
+      message: 'Perfil actualizado correctamente',
+      persona: updatedPersona[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: 'Error en el sistema: ' + error.message
+    });
+  }
+};
+
+export const registrarUsuarios = async (req, res) => {
+  try {
+    const { identificacion, nombres, correo, telefono, password, cargo, sede } = req.body;
+
+    const cargosPermitidos = ["Coordinador", "Administrativo"];
+    if (!cargo || cargo === "$.0" || !cargosPermitidos.includes(cargo.toLowerCase())) {
+      return res.status(400).json({ message: "El cargo no es válido. Solo se permiten 'Coordinador' y 'Administrativo'." });
+    }
+
+    const [result] = await pool.query('SELECT COUNT(*) as count FROM personas WHERE cargo = ?', [cargo.toLowerCase()]);
+
+    if (cargo.toLowerCase() === "Administrativo" && result[0].count >= 2) {
+      return res.status(400).json({ message: "Ya existen 2 usuarios registrados como Administrativos." });
+    }
+
+    if (cargo.toLowerCase() === "Coordinador" && result[0].count >= 1) {
+      return res.status(400).json({ message: "Ya existe 1 usuario registrado como Coordinador." });
+    }
+
+    let rol;
+    if (cargo.toLowerCase() === "Administrativo") {
+      rol = "seguimiento";
+    } else if (cargo.toLowerCase() === "Coordinador") {
+      rol = "Coordinador"; 
+    }
+
+    const estado = 'activo';
+
+    const [rows] = await pool.query(
+      `INSERT INTO personas (identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede]
+    );
+
+    if (rows.affectedRows > 0) {
+      res.status(200).json({
+        status: 200,
+        message: 'Se registró con éxito el usuario ' + nombres
+      });
+    } else {
+      res.status(403).json({
+        status: 403,
+        message: 'No se registró el usuario'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: 'Error del servidor: ' + error.message
+    });
+  }
+};
+
+

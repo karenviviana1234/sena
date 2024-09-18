@@ -15,25 +15,24 @@ export const LoginPage = () => {
   const correo = useRef(null);
   const password = useRef(null);
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const emailValue = correo.current.value;
       const passwordValue = password.current.value;
-
+  
       if (!emailValue || !passwordValue) {
         setMensaje('Los campos son obligatorios');
         setModalAcciones(true);
         return;
       }
-
+  
       const data = {
         correo: emailValue,
         password: passwordValue,
       };
-
+  
       const response = await axiosClient.post('/validacion', data);
       if (response.status === 200) {
         const { token, user } = response.data;
@@ -48,7 +47,7 @@ export const LoginPage = () => {
           timer: 1500,
         }).then(() => {
           const userRol = user[0]?.rol;
-
+  
           if (userRol === 'seguimiento') {
             navigate('/nomina');
           } else if (userRol === 'aprendiz') {
@@ -60,7 +59,7 @@ export const LoginPage = () => {
       } else {
         setMensaje('Credenciales incorrectas');
         setModalAcciones(false);
-
+  
         Swal.fire({
           position: 'top-center',
           icon: 'error',
@@ -73,6 +72,7 @@ export const LoginPage = () => {
       alert('Error del servidor' + error);
     }
   };
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

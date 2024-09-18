@@ -18,6 +18,7 @@ import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
 import AsignacionPage from './components/pages/AsignacionPage.jsx';
+import Registro from './components/pages/RegistroPage.jsx';
 
 export const App = () => {
   return (
@@ -27,6 +28,9 @@ export const App = () => {
         <Routes>
           <Route path='/' element={
             <LoginPage />
+          } />
+           <Route path='/registro' element={
+            <Registro />
           } />
           <Route path="/home" element={
             <WithSidebar>

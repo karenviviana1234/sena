@@ -1,202 +1,199 @@
-import React, { useState } from 'react'
-import Icons from '../../styles/Variables.jsx'
-import axiosClient from '../../configs/axiosClient.jsx'
-import { Link, useNavigate } from 'react-router-dom'
-import AccionesModal from '../molecules/Modal.jsx'
-import { Input } from "@nextui-org/react";
+import React, { useState, useEffect, useContext } from "react";
+import { Button, Input } from "@nextui-org/react";
+import Swal from 'sweetalert2'; // Importar SweetAlert2
+import axiosClient from "../../configs/axiosClient";
 import { EyeFilledIcon } from "../NextIU/EyeFilledIcon.jsx";
 import { EyeSlashFilledIcon } from "../NextIU/EyeSlashFilledIcon.jsx";
-import { Select, SelectItem } from "@nextui-org/select";
-import Swal from 'sweetalert2';
+
+function Registro({ initialData }) {
+  const [identificacion, setIdentificacion] = useState("");
+  const [nombres, setNombres] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [password, setPassword] = useState("");
+  const [cargo, setCargo] = useState("Selecciona");
+  const [sede, setSede] = useState("Selecciona");
+  const [telefono, setTelefono] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [idPersona, setIdPersona] = useState(null);
+  const [errors, setErrors] = useState({});
 
 
-export const Registro = () => {
 
-  const navigate = useNavigate()
-  const [mensaje, setMensaje] = useState('')
-  const [modalAcciones, setModalAcciones] = useState(false)
+  useEffect(() => {
+    if (initialData) {
+      console.log('Initial Data:', initialData);
+      setIdentificacion(initialData.identificacion || "");
+      setNombres(initialData.nombres || "");
+      setCorreo(initialData.correo || "");
+      setPassword(initialData.password || "");
+      setTelefono(initialData.telefono || "");
+      setCargo(initialData.cargo || "Selecciona");
+      setSede(initialData.sede || "Selecciona"); // Establecer sede
+      setIdPersona(initialData.id_persona); // Establecer el ID de la persona
+      setIsEditing(true);
+    } else {
+      setIsEditing(false);
+    }
+  }, [initialData]);
 
-  const [formData, setFormData] = useState({
-    identificacion: '',
-    nombres: '',
-    correo: '',
-    password: '',
-    telefono: '',
-    rol: '', // Añadir manejo del campo de 'rol'
-    cargo: '', // Si es necesario
-    municipio: '', // Si es necesario
-  });
-
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await axiosClient.post("/personas/registrar", formData);
-      Swal.fire({
-        position: "top-center",
-        icon: "success",
-        title: "Usuario Registrado Con Exito",
-        showConfirmButton: false,
-        timer: 1500
-      });
-      navigate('/');
-    } catch (error) {
-      console.error("Error al registrar usuario:", error.response || error.message);
-      alert('Error en el servidor: ' + (error.response ? error.response.data.message : error.message));
-    }
 
+    // Limpiar errores previos
+    setErrors({});
+
+
+  // console.log("Campos enviados:", formData);
+  const formData = {
+    identificacion,
+    nombres,
+    correo,
+    password,
+    cargo,
+    telefono,
+    sede,
   };
-  const [isVisible, setIsVisible] = React.useState(false);
-  const toggleVisibility = () => setIsVisible(!isVisible);
-
-  return (
-    <div>
-      <div className='flex items-center justify-center bg-[#EDEBDE] min-h-screen  p-4 w-full' >
-        <div className='relative flex flex-col m-2 space-y-5 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0 '>
-
-          <div className='flex flex-col p-5 m-4  md:p-5'>
-            <span className='mb-2 text-4xl font-bold text-center'>Registro</span>
-            <form onSubmit={handleSubmit}>
-
-              <div className='py-2'>
-                <Input
-                  type="number"
-                  label="Identificación"
-                  variant="bordered"
-                  className="w-80"
-                  name='identificacion'
-                  id='identificacion'
-                  value={formData.identificacion}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className='py-2'>
-                <Input
-                  type="text"
-                  label="Nombre(s)"
-                  className="w-80"
-                  name='nombres'
-                  id='nombres'
-                  value={formData.nombres}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className='py-2'>
-                <Input
-                  type="email"
-                  label="Correo"
-                  variant="bordered"
-                  className="w-80"
-                  name='correo'
-                  id='correo'
-                  value={formData.correo}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className='py-2'>
-                <Input
-                  label="Password"
-                  variant="bordered"
-                  name='password'
-                  id='password'
-                  value={formData.password}
-                  onChange={handleChange}
-                  endContent={
-                    <button type="button" onClick={toggleVisibility}>
-                      {isVisible ? (
-                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                      ) : (
-                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
-                      )}
-                    </button>
-                  }
-                  type={isVisible ? "text" : "password"}
-                  className="max-w-xs"
-                />
-              </div>
-              <div className='py-2'>
-                <Input
-                  type="number"
-                  label="Telefono"
-                  variant="bordered"
-                  className="w-80"
-                  name='telefono'
-                  id='telefono'
-                  value={formData.telefono}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <Select
-                variant="bordered"
-                label="Rol"
-                name="rol"
-                value={formData.rol} // Esto asegura que el valor seleccionado se asigne correctamente al estado
-                onChange={(e) => handleChange({ target: { name: 'rol', value: e.target.value } })}
-                className="max-w-xs"
-              >
-                <SelectItem value="Aprendiz">Aprendiz</SelectItem>
-                <SelectItem value="Instructor">Instructor</SelectItem>
-              </Select>
 
 
-              <div className='py-2'>
-                <Select
-                  variant="bordered"
-                  label="Cargo"
-                  className="max-w-xs"
-                  name="cargo"
-                  value={formData.cargo} // Esto asegura que el valor seleccionado se asigne correctamente al estado
-                  onChange={(e) => handleChange({ target: { name: 'cargo', value: e.target.value } })}
-                >
-                  <SelectItem>Aprendiz</SelectItem>
-                  <SelectItem>Instructor</SelectItem>
-                </Select>
+  try {
+    const response = await axiosClient.post('/personas/registrares', formData);
+      if (response.status === 200) {
+      alert("Usuario registrada correctamente");
+    } else {
+      alert("Error al registrar la Usuario");
+    }
+  } catch (error) {
+    console.error("Error del servidor:", error);
+    alert("Error del servidor: " + error.message);
+  }
+};
 
-              </div>
+const [isVisible, setIsVisible] = React.useState(false);
+const toggleVisibility = () => setIsVisible(!isVisible);
 
-              <div className='py-2'>
-                <Input
-                  type="text"
-                  label="Municipio"
-                  className="w-80"
-                  name='municipio'
-                  id='municipio'
-                  value={formData.municipio}
-                  onChange={handleChange}
-                />
-              </div>
-
-
-              <button className='mt-4 w-full bg-green    hover:bg-green-500 text-white p-2 rounded-lg mb-6' type='submit' >
-                Registro
-              </button>
-            </form>
-          </div>
-
-
-          <AccionesModal
-            isOpen={modalAcciones}
-            onClose={() => setModalAcciones(false)}
-            label={mensaje}
-          />
-        </div>
+return (
+  <div className="flex items-center justify-center min-h-screen w-full">
+  <div className="relative flex flex-col bg-white shadow-2xl rounded-2xl p-3 md:w-auto md:flex-row transition-transform duration-500 hover:scale-105">
+    <div className="flex flex-col p-5 space-y-4">    
+      <h1 className="text-2xl font-bold text-center mb-6">Registro de Usuario</h1>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className='relative'>
+        <Input
+          type="number"
+          label='Identificación'
+          id='identificacion'
+          name="identificacion"
+          className="w-96"
+          value={identificacion}
+          onChange={(e) => setIdentificacion(e.target.value)}
+          required
+          helperText={errors.identificacion} 
+          status={errors.identificacion ? 'error' : 'default'}
+        />
+      </div>
+      <div className='relative'>
+        <Input
+          type="text"
+          label='Nombres Completos'
+          id='nombres'
+          name="nombres"
+          className="w-96"
+          value={nombres}
+          onChange={(e) => setNombres(e.target.value)}
+          required
+          helperText={errors.nombres} 
+          status={errors.nombres ? 'error' : 'default'}
+        />
+      </div>
+      <div className='relative'>
+        <Input
+          type="email"
+          label='Correo Electrónico'
+          id='correo'
+          name="correo"
+          className="w-96"
+          value={correo}
+          onChange={(e) => setCorreo(e.target.value)}
+          required
+          helperText={errors.correo} 
+          status={errors.correo ? 'error' : 'default'}
+        />
+      </div>
+      <div className='relative'>
+        <Input
+          label="Password"
+          className="w-96"
+          name='password'
+          id='password'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          endContent={
+            <button type="button" onClick={toggleVisibility}>
+              {isVisible ? (
+                <EyeSlashFilledIcon className="text-2xl text-gray-400 pointer-events-none" />
+              ) : (
+                <EyeFilledIcon className="text-2xl text-gray-400 pointer-events-none" />
+              )}
+            </button>
+          }
+          type={isVisible ? "text" : "password"}
+        />
+      </div>
+      <div className='relative'>
+        <Input
+          type="number"
+          label='Teléfono'
+          id='telefono'
+          name="telefono"
+          className="w-96"
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value)}
+          required
+          helperText={errors.telefono} 
+          status={errors.telefono ? 'error' : 'default'}
+        />
       </div>
 
-    </div>
+      <div className="relative">
+        <select
+          name="cargo"
+          value={cargo}
+          onChange={(e) => setCargo(e.target.value)}
+          className={`w-96 h-14 rounded-lg bg-gray-100 p-3 ${errors.cargo ? 'border-red-500' : 'border-gray-300'}`}
+        >
+          <option value="Selecciona">Selecciona un Cargo</option>
+          <option value="Administrativo">Administrativo</option>
+          <option value="Coordinador">Coordinador</option>
+        </select>
+        {errors.cargo && <p className="text-red-500 text-sm">{errors.cargo}</p>}
+      </div>
 
-  )
+      <div className="relative">
+        <select
+          name="sede"
+          value={sede}
+          onChange={(e) => setSede(e.target.value)}
+          className={`w-96 h-14 rounded-lg bg-gray-100 p-3 ${errors.sede ? 'border-red-500' : 'border-gray-300'}`}
+        >
+          <option value="Selecciona">Selecciona una Sede</option>
+          <option value="Yamboro">Yamboro</option>
+          <option value="Centro">Centro</option>
+        </select>
+        {errors.sede && <p className="text-red-500 text-sm">{errors.sede}</p>}
+      </div>
+
+      <div className="flex justify-end mt-6">
+        <Button className="bg-[#84cc16] hover:bg-[#70b22d] text-white w-96 rounded-lg" type="submit">
+          Registrar
+        </Button>
+      </div>
+    </form>
+  </div>
+  </div>
+  </div>
+);
+
 }
 
-export default Registro
+export default Registro;

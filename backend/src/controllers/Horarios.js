@@ -18,3 +18,5 @@ export const listarHorarios = async (req, res) => {
         });
     }
 };
+
+/* Registrar horarios  */

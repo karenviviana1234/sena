@@ -97,7 +97,8 @@ export const registrarMatriculas = async (req, res) => {
          }
   */
         // Inserción en la base de datos
-        const sql = `INSERT INTO matriculas (ficha, aprendiz, estado, pendiente_tecnicos, pendiente_transversales, pendiente_ingles) VALUES (?, ?, ?, ?, ?, ?)`;
+        const sql = ` INSERT INTO matriculas (ficha, aprendiz, estado, pendiente_tecnicos, pendiente_transversales, pendiente_ingles) VALUES (?, ?, ?, ?, ?, ?)`;
+
         const [rows] = await pool.query(sql, [ficha, aprendiz, estado, tecnicos, transversales, ingles]);
 
         if (rows.affectedRows > 0) {
@@ -163,7 +164,7 @@ export const formacionMatricula = async (req, res) => {
     try {
         const { id } = req.params
 
-        let sql = `UPDATE matriculas SET estado = 2 WHERE id_matricula = ?`
+        let sql = ` UPDATE matriculas SET estado = 2 WHERE id_matricula = ?`;
 
         const [rows] = await pool.query(sql, [id])
 
@@ -187,7 +188,7 @@ export const condicionadaMatricula = async (req, res) => {
     try {
         const { id } = req.params
 
-        let sql = `UPDATE matriculas SET estado = 3 WHERE id_matricula = ?`
+        let sql = `UPDATE matriculas SET estado = 3 WHERE id_matricula = ?`;
 
         const [rows] = await pool.query(sql, [id])
 
@@ -211,7 +212,7 @@ export const canceladaMatricula = async (req, res) => {
     try {
         const { id } = req.params
 
-        let sql = `UPDATE matriculas SET estado = 4 WHERE id_matricula = ?`
+        let sql = `UPDATE matriculas SET estado = 4 WHERE id_matricula = ?`;
 
         const [rows] = await pool.query(sql, [id])
 
@@ -235,7 +236,7 @@ export const retiroMatricula = async (req, res) => {
     try {
         const { id } = req.params
 
-        let sql = `UPDATE matriculas SET estado = 5 WHERE id_matricula = ?`
+        let sql = `UPDATE matriculas SET estado = 5 WHERE id_matricula = ?`;
 
         const [rows] = await pool.query(sql, [id])
 
@@ -259,7 +260,7 @@ export const porCertificarMatricula = async (req, res) => {
     try {
         const { id } = req.params
 
-        let sql = `UPDATE matriculas SET estado = 6 WHERE id_matricula = ?`
+        let sql = `UPDATE matriculas SET estado = 6 WHERE id_matricula = ?`;
 
         const [rows] = await pool.query(sql, [id])
 
@@ -283,7 +284,7 @@ export const certificadaMatricula = async (req, res) => {
     try {
         const { id } = req.params
 
-        let sql = `UPDATE matriculas SET estado = 7 WHERE id_matricula = ?`
+        let sql = `UPDATE matriculas SET estado = 7 WHERE id_matricula = ?`;
 
         const [rows] = await pool.query(sql, [id])
 

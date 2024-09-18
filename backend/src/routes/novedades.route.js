@@ -5,18 +5,17 @@ import {
   eliminarNovedad, 
   listarnovedades, 
   cargarImage,
-  obtenerNovedadPorId// Debes crear esta función en tu controlador
+  listar
 } from '../controllers/novedades.controller.js';
 import { validarToken } from '../controllers/seguridad.controller.js';
 
 const rutaNovedades = Router();
 
-// Nueva ruta para obtener una novedad por su ID
-rutaNovedades.get('/listarN/:id_novedad', validarToken, obtenerNovedadPorId);
+rutaNovedades.get('/listarN', validarToken, listar);
 
 rutaNovedades.get('/listar/:id_seguimiento', validarToken, listarnovedades);
 rutaNovedades.post('/registrar', validarToken, cargarImage, registrarNovedad);
 rutaNovedades.put('/actualizar/:id', validarToken, cargarImage, actualizarNovedades);
-rutaNovedades.delete('/eliminar/:id', validarToken, eliminarNovedad);
+rutaNovedades.delete('/eliminar/:id_novedad', validarToken, eliminarNovedad);
 
 export default rutaNovedades;
