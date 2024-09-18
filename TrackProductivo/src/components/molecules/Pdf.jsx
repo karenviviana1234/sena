@@ -18,16 +18,7 @@ const PDFUploader = ({ onFileSelect }) => {
     onFileSelect(uploadedFile);
   };
 
-  const downloadFile = () => {
-    if (!file) return;
 
-    const url = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="flex items-center gap-4">
@@ -47,9 +38,6 @@ const PDFUploader = ({ onFileSelect }) => {
         </label>
       )}
 
-      {file && (
-        <ButtonDescargar onClick={downloadFile} />
-      )}
     </div>
   );
 };

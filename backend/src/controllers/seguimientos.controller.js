@@ -251,3 +251,24 @@ export const rechazarSeguimiento = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor: ' + error });
     }
 };
+
+
+export const descargarPdf = async (req, res) => {
+    const { id_seguimiento } = req.params;
+  
+    try {
+      const [result] = await pool.query('SELECT pdf_acta FROM seguimientos WHERE id_seguimiento = ?', [id_seguimiento]);
+  
+      if (result.length === 0 || !result[0].pdf_acta) {
+        return res.status(404).send('Archivo no encontrado');
+      }
+  
+      const pdfPath = result[0].pdf_acta; // Ruta del PDF almacenada en la base de datos
+      res.download(pdfPath); // Envía el archivo al cliente para su descarga
+    } catch (error) {
+      res.status(500).send('Error al descargar el archivo: ' + error.message);
+    }
+  };
+
+
+
