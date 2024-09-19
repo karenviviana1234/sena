@@ -521,4 +521,3 @@ export const registrarUsuarios = async (req, res) => {
   }
 };
 
-

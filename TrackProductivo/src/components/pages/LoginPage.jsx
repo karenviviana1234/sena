@@ -33,12 +33,16 @@ export const LoginPage = () => {
         password: passwordValue,
       };
   
+      // Hacer la solicitud a la API para validar el usuario
       const response = await axiosClient.post('/validacion', data);
       if (response.status === 200) {
         const { token, user } = response.data;
+  
+        // Almacenar el token y el usuario en localStorage
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user[0]));
-
+        localStorage.setItem('user', JSON.stringify(user));  // Almacenar todo el usuario
+        localStorage.setItem('cargo', user.cargo); // Almacenar el cargo por separado
+  
         Swal.fire({
           position: 'top-center',
           icon: 'success',
@@ -46,12 +50,13 @@ export const LoginPage = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-          const userRol = user[0]?.rol;
+          const usercargo = user.cargo;
   
-          if (userRol === 'seguimiento') {
-            navigate('/nomina');
-          } else if (userRol === 'aprendiz') {
-            navigate('/Inicio');
+          // Redirigir según el cargo del usuario
+          if (usercargo === 'Instructor') {
+            navigate('/home');
+          } else if (usercargo === 'Aprendiz') {
+            navigate('/home');
           } else {
             navigate('/home');
           }
@@ -69,9 +74,10 @@ export const LoginPage = () => {
         });
       }
     } catch (error) {
-      alert('Error del servidor' + error);
+      alert('Error del servidor: ' + error);
     }
   };
+  
   
 
   const togglePasswordVisibility = () => {
