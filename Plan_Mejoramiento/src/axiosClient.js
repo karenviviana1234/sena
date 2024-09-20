@@ -1,13 +1,13 @@
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Ip = '192.168.100.155'
+const Ip = '192.168.0.108'
 /* Ip de mi casa 192.168.100.155  */
 const axiosClient = axios.create({
   baseURL: `http://${Ip}:3000`,
 });
 
-axiosClient.interceptors.request.use(
+axiosClient.interceptors.request.use( 
   async (config) => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -15,7 +15,7 @@ axiosClient.interceptors.request.use(
         config.headers['token'] = token;
         console.log("Token desde axiosClient",token);
         
-      }
+      } 
     } catch (error) {
       console.error("Error getting token from AsyncStorage:", error);
     }
