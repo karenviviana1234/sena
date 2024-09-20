@@ -1,6 +1,6 @@
 import React from "react";
 import { Tooltip } from "@nextui-org/react";
-import v from '../../styles/Variables'
+import Icons from "../../styles/Variables";
 
 const ButtonDesactivar = ({ estado, onClick }) => {
   const handleClick = () => {
@@ -15,10 +15,10 @@ const ButtonDesactivar = ({ estado, onClick }) => {
   if (estado === "activo") {
     tooltipContent = "Activar";
     tooltipColor = "danger";
-    iconComponent = <v.aprobado className="text-success" />; // Ícono para desactivar
+    iconComponent = <Icons.aprobado className="text-success" />; // Ícono para desactivar
   } else {
     tooltipContent = "Desactivar";
-    iconComponent = <v.noAprobado className="text-danger" />; // Ícono para activar
+    iconComponent = <Icons.noAprobado className="text-danger" />; // Ícono para activar
   }
 
   return (

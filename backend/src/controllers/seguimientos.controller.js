@@ -1,5 +1,12 @@
 import { pool } from './../database/conexion.js';
 import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+// Obtener el directorio actual del archivo
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Función para listar seguimientos
 export const listarSeguimiento = async (req, res) => {
@@ -27,8 +34,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 export const cargarSeguimiento = upload.single('seguimientoPdf');
-
-
 export const listarSeguimientoAprendices = async (req, res) => {
     const { sigla } = req.params; 
     try {
@@ -43,8 +48,8 @@ export const listarSeguimientoAprendices = async (req, res) => {
                 s.seguimiento AS seguimiento,
                 s.fecha AS fecha,
                 COUNT(b.id_bitacora) AS total_bitacoras,
-                COUNT(b.pdf) AS bitacoras_con_pdf,
-                (COUNT(b.pdf) / 12) * 100 AS porcentaje
+                SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) AS bitacoras_con_pdf,
+                (SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) / 12) * 100 AS porcentaje -- Calculamos el porcentaje sobre 12 bitácoras
             FROM
                 seguimientos s
                 LEFT JOIN productivas pr ON s.productiva = pr.id_productiva
@@ -57,7 +62,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
             WHERE
                 p.rol = 'Aprendiz'
             GROUP BY
-                s.id_seguimiento, p.identificacion
+                s.id_seguimiento, p.identificacion, s.seguimiento, s.fecha, f.codigo, prg.sigla, e.razon_social
             ORDER BY
                 p.identificacion, s.seguimiento;
         `;
@@ -80,7 +85,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
                         seguimiento1: null,
                         seguimiento2: null,
                         seguimiento3: null,
-                        porcentaje: 0 // Inicializamos el porcentaje
+                        porcentaje: 0, // Inicializamos el porcentaje
                     };
                 }
 
@@ -95,8 +100,15 @@ export const listarSeguimientoAprendices = async (req, res) => {
                     aprendizMap[row.identificacion].seguimiento3 = row.fecha;
                 }
 
-                // Asignamos el porcentaje calculado
-                aprendizMap[row.identificacion].porcentaje = row.porcentaje; 
+                // Calculamos el porcentaje total
+                aprendizMap[row.identificacion].porcentaje += (row.bitacoras_con_pdf / 12) * 100;
+            });
+
+            // Aseguramos que el porcentaje no exceda el 100% y agregamos el signo de porcentaje
+            Object.values(aprendizMap).forEach(aprendiz => {
+                aprendiz.porcentaje = Math.min(aprendiz.porcentaje, 100);
+                // Redondeamos al entero más cercano y agregamos el signo de porcentaje
+                aprendiz.porcentaje = Math.round(aprendiz.porcentaje) + '%';
             });
 
             const resultArray = Object.values(aprendizMap);
@@ -109,7 +121,6 @@ export const listarSeguimientoAprendices = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor: ' + error.message });
     }
 };
-
 
 
 
@@ -219,56 +230,105 @@ export const actualizarSeguimiento = async (req, res) => {
 // Función para aprobar seguimientos
 export const aprobarSeguimiento = async (req, res) => {
     try {
-        const { id } = req.params;
-        const sql = `UPDATE seguimientos SET estado = 2 WHERE id_seguimiento = ?`;
-
-        const [rows] = await pool.query(sql, [id]);
-
-        if (rows.affectedRows > 0) {
-            res.status(200).json({ message: 'Seguimiento aprobado correctamente' });
-        } else {
-            res.status(403).json({ error: 'Error al aprobar el seguimiento' });
-        }
+      const { id_seguimiento } = req.params;
+      const sql = 'UPDATE seguimientos SET estado = ? WHERE id_seguimiento = ?';
+      const values = ['aprobado', id_seguimiento];
+      const [result] = await pool.query(sql, values);
+  
+      if (result.affectedRows > 0) {
+        res.status(200).json({ message: 'Estado actualizado a Aprobado' });
+      } else {
+        res.status(404).json({ message: 'Acta no encontrada' });
+      }
     } catch (error) {
-        res.status(500).json({ message: 'Error del servidor: ' + error });
+      res.status(500).json({ message: 'Error del servidor: ' + error.message });
     }
-};
+  };
 
 // Función para rechazar seguimientos
 export const rechazarSeguimiento = async (req, res) => {
     try {
-        const { id } = req.params;
-        const sql = `UPDATE seguimientos SET estado = 3 WHERE id_seguimiento = ?`;
-
-        const [rows] = await pool.query(sql, [id]);
-
-        if (rows.affectedRows > 0) {
-            res.status(200).json({ message: 'Seguimiento rechazado correctamente' });
-        } else {
-            res.status(403).json({ error: 'Error al rechazar el seguimiento' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Error del servidor: ' + error });
-    }
-};
-
-
-export const descargarPdf = async (req, res) => {
-    const { id_seguimiento } = req.params;
+      const { id_seguimiento } = req.params;
+      const sql = 'UPDATE seguimientos SET estado = ? WHERE id_seguimiento = ?';
+      const values = ['no aprobado', id_seguimiento];
+      const [result] = await pool.query(sql, values);
   
-    try {
-      const [result] = await pool.query('SELECT pdf_acta FROM seguimientos WHERE id_seguimiento = ?', [id_seguimiento]);
-  
-      if (result.length === 0 || !result[0].pdf_acta) {
-        return res.status(404).send('Archivo no encontrado');
+      if (result.affectedRows > 0) {
+        res.status(200).json({ message: 'Estado actualizado a No Aprobado' });
+      } else {
+        res.status(404).json({ message: 'Acta no encontrada' });
       }
-  
-      const pdfPath = result[0].pdf_acta; // Ruta del PDF almacenada en la base de datos
-      res.download(pdfPath); // Envía el archivo al cliente para su descarga
     } catch (error) {
-      res.status(500).send('Error al descargar el archivo: ' + error.message);
+      res.status(500).json({ message: 'Error del servidor: ' + error.message });
     }
   };
 
 
 
+
+export const descargarPdf = async (req, res) => {
+    try {
+        const id_seguimiento = decodeURIComponent(req.params.id_seguimiento);
+
+        // Consultar la bitácora para obtener el nombre del archivo PDF
+        const [result] = await pool.query('SELECT pdf FROM seguimientos WHERE id_seguimiento = ?', [id_seguimiento]);
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: 'Bitácora no encontrada'
+            });
+        }
+
+        const pdfFileName = result[0].pdf;
+
+        // Construir la ruta correcta hacia la carpeta public
+        const filePath = path.resolve(__dirname, '../../public/seguimientos', pdfFileName);
+
+        console.log(`Intentando acceder al archivo en: ${filePath}`); // Mensaje de depuración
+
+        // Verificar si el archivo existe
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({
+                message: `Archivo no encontrado en la ruta: ${filePath}`
+            });
+        }
+
+        // Enviar el archivo como respuesta
+        res.download(filePath, pdfFileName);
+    } catch (error) {
+        console.error('Error en el servidor:', error); // Mensaje de depuración
+        res.status(500).json({
+            message: 'Error en el servidor: ' + error.message
+        });
+    }
+};
+
+
+
+  export const listarEstadoSeguimiento = async (req, res) => {
+    const { id_seguimiento } = req.params;
+    try {
+      const sql = `
+        SELECT
+          s.id_seguimiento AS id_seguimiento,
+          s.seguimiento AS seguimiento,
+          s.estado AS estado,
+          s.pdf AS pdf
+        FROM
+          seguimientos s
+        WHERE
+          s.id_seguimiento = ?
+      `;
+      const [result] = await pool.query(sql, [id_seguimiento]);
+  
+      if (result.length > 0) {
+        const estado = result[0];
+        res.status(200).json(estado);
+      } else {
+        res.status(404).json({ error: 'Seguimiento no encontrado' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Error del servidor: ' + error.message });
+    }
+  };
+  

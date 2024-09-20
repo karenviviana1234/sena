@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ButtonDescargar from "../atoms/ButtonDescargar.jsx";
 
-const PDFUploader = ({ onFileSelect }) => {
+const PDFUploader = ({ onFileSelect, className }) => {
   const [file, setFile] = useState(null);
 
   const handleFileUpload = (event) => {
@@ -23,15 +23,15 @@ const PDFUploader = ({ onFileSelect }) => {
   return (
     <div className="flex items-center gap-4">
       {file ? (
-        <span className="text-base text-gray-400">Archivo Cargado</span>
+        <span className="text-base text-gray-400 mr-4">Archivo Cargado</span>
       ) : (
-        <label className="relative inline-block cursor-pointer">
+        <label className="relative inline-block cursor-pointer mr-4">
           <input
             type="file"
             accept="application/pdf"
             onChange={handleFileUpload}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          />
+            className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer ${className}`}
+            />
           <span className="inline-block px-4 py-2 border shadow-lg rounded-xl">
             Seleccionar archivo PDF
           </span>
