@@ -101,26 +101,28 @@ function TableInstructores() {
       cancelButtonText: "No, cancelar",
       reverseButtons: true,
       customClass: {
-        confirmButton:
-          "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
+        confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
         cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
       },
     });
-
+  
     // Si el usuario confirma, proceder con la desactivación
     if (result.isConfirmed) {
       try {
-        const response = await axiosClient.post(
-          `/personas/desactivar/${id_persona}`
-        );
+        const response = await axiosClient.post(`/personas/desactivar/${id_persona}`);
         Swal.fire("Desactivado", response.data.message, "success");
-        fetchData(); // Refrescar la lista de personas
+  
+        // Actualizar el estado para eliminar el instructor desactivado
+        setPersonas((prevPersonas) =>
+          prevPersonas.filter((persona) => persona.id_persona !== id_persona)
+        );
       } catch (error) {
         console.error("Error desactivando usuario:", error);
         Swal.fire("Error", "No se pudo desactivar el usuario", "error");
       }
     }
   };
+  
 
   const hasSearchFilter = Boolean(filterValue);
 

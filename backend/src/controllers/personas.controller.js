@@ -468,38 +468,38 @@ export const actualizarPerfil = async (req, res) => {
   }
 };
 
+
 export const registrarUsuarios = async (req, res) => {
   try {
     const { identificacion, nombres, correo, telefono, password, cargo, sede } = req.body;
 
-    const cargosPermitidos = ["Coordinador", "Administrativo"];
-    if (!cargo || cargo === "$.0" || !cargosPermitidos.includes(cargo.toLowerCase())) {
-      return res.status(400).json({ message: "El cargo no es válido. Solo se permiten 'Coordinador' y 'Administrativo'." });
-    }
-
     const [result] = await pool.query('SELECT COUNT(*) as count FROM personas WHERE cargo = ?', [cargo.toLowerCase()]);
 
-    if (cargo.toLowerCase() === "Administrativo" && result[0].count >= 2) {
+    if (cargo.toLowerCase() === "administrativo" && result[0].count >= 2) {
       return res.status(400).json({ message: "Ya existen 2 usuarios registrados como Administrativos." });
     }
 
-    if (cargo.toLowerCase() === "Coordinador" && result[0].count >= 1) {
+    if (cargo.toLowerCase() === "coordinador" && result[0].count >= 1) {
       return res.status(400).json({ message: "Ya existe 1 usuario registrado como Coordinador." });
     }
 
     let rol;
-    if (cargo.toLowerCase() === "Administrativo") {
+    if (cargo.toLowerCase() === "administrativo") {
       rol = "seguimiento";
-    } else if (cargo.toLowerCase() === "Coordinador") {
+    } else if (cargo.toLowerCase() === "coordinador") {
       rol = "Coordinador"; 
     }
 
     const estado = 'activo';
 
+    // Encripta la contraseña
+    const saltRounds = 12; // Puedes ajustar este valor según tus necesidades
+    const bcryptPassword = bcrypt.hashSync(password, saltRounds);
+
     const [rows] = await pool.query(
       `INSERT INTO personas (identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede]
+      [identificacion, nombres, correo, bcryptPassword, telefono, rol, cargo, estado, sede]
     );
 
     if (rows.affectedRows > 0) {
@@ -520,4 +520,3 @@ export const registrarUsuarios = async (req, res) => {
     });
   }
 };
-
