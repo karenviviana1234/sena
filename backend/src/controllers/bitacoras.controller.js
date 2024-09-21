@@ -59,11 +59,11 @@ export const registrarBitacora = async (req, res) => {
         })
     }
 }
-/* Cargar Archivo pdf a una bitacora existente. */
-export const uploadPdfToBitacoras = async (req, res) => {
+/* Cargar Archivo pdf a una bitacora existente. */export const uploadPdfToBitacoras = async (req, res) => {
     try {
-        const { id_bitacora } = req.params;  // Obtener el ID del seguimiento desde los parámetros de la URL
+        const { id_bitacora } = req.params;  // Obtener el ID de la bitácora desde los parámetros de la URL
         const pdf = req.file?.originalname || null;  // Obtener el nombre del archivo PDF cargado
+        const { instructor } = req.body;  // Obtener el nombre del instructor desde el cuerpo de la solicitud
 
         if (!pdf) {
             return res.status(400).json({
@@ -71,21 +71,27 @@ export const uploadPdfToBitacoras = async (req, res) => {
             });
         }
 
-        // Actualizar el campo 'pdf' en la tabla 'bitacoras' con la ruta o el nombre del archivo
+        if (!instructor) {
+            return res.status(400).json({
+                message: 'El campo instructor es requerido'
+            });
+        }
+
+        // Actualizar el campo 'pdf', 'fecha' e 'instructor' en la tabla 'bitacoras'
         const sqlUpdateBitacora = `
             UPDATE bitacoras
-            SET pdf = ? 
+            SET pdf = ?, fecha = NOW(), instructor = ?
             WHERE id_bitacora = ?
         `;
-        const [result] = await pool.query(sqlUpdateBitacora, [pdf, id_bitacora]);
+        const [result] = await pool.query(sqlUpdateBitacora, [pdf, instructor, id_bitacora]);
 
         if (result.affectedRows > 0) {
             res.status(200).json({
-                message: 'PDF cargado exitosamente en la bitacora'
+                message: 'PDF cargado exitosamente en la bitácora'
             });
         } else {
             res.status(404).json({
-                message: 'Bitacora no encontrada'
+                message: 'Bitácora no encontrada'
             });
         }
     } catch (error) {
