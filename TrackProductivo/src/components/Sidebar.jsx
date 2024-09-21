@@ -1,6 +1,6 @@
 import { ChevronFirst, ChevronLast, Power, ChevronDown, ChevronUp } from "lucide-react";
 import logo from "../assets/img/logo-sena-verde.png";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ModalLogout } from "../configs/ModalLogout";
 
@@ -8,6 +8,7 @@ const SidebarContext = createContext();
 
 export default function Sidebar({ children }) {
   const [expanded, setExpanded] = useState(true);
+
   return (
     <aside className="h-screen bg-white text-black shadow-md border-r-1">
       <nav className="h-full flex flex-col justify-between">

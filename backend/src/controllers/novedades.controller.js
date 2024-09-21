@@ -48,26 +48,26 @@ export const registrarNovedad = async (req, res) => {
 };
 
 
-export const obtenerNovedadPorId = async (req, res) => {
-    const { id_novedad } = req.params;
-  
+export const listar = async (req, res) => {
     try {
-      const [rows] = await pool.query('SELECT * FROM Novedades WHERE id_novedad = ?', [id_novedad]);
-  
-      if (rows.length > 0) {
-        res.json(rows[0]);
-      } else {
-        res.status(404).json({ message: 'Novedad no encontrada' });
-      }
+        let sql = `SELECT * FROM novedades`
+
+        const [results] = await pool.query(sql)
+        
+        if(results.length>0){
+            res.status(200).json(results)
+        }else{
+            res.status(404).json({
+                message: 'No hay novedades registrados'
+            })
+        }
     } catch (error) {
-      console.error('Error al obtener la novedad:', error);
-      res.status(500).json({ message: 'Error al obtener la novedad', error });
+        res.status(500).json({
+            message: 'Error del servidor' + error
+        })
     }
-  };
+}
   
-
-
-
 export const listarnovedades = async (req, res) => {
     try {
         const { id_seguimiento } = req.params; // Obtén el ID del seguimiento desde los parámetros de la solicitud
@@ -87,8 +87,6 @@ export const listarnovedades = async (req, res) => {
         });
     }
 }
-
-
 
 export const actualizarNovedades = async (req, res) => {
     try {
@@ -155,11 +153,11 @@ export const eliminarNovedad = async (req, res) => {
 
         if(rows.affectedRows>0){
             res.status(200).json({
-                message: 'Actividad eliminada exitosamente'
+                message: 'novedad eliminada exitosamente'
             })
         }else{
             res.status(403).json({
-                message: 'Error al eliminar la actividad'
+                message: 'Error al eliminar la novedad'
             })
         }
     } catch (error) {

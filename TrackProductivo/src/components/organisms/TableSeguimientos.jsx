@@ -26,6 +26,7 @@ import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import ButtonRegistrarNovedad from '../atoms/ButtonRegistrarNovedades.jsx';
 import ButtonEliminar from '../atoms/ButtonEliminar.jsx';
 import { Tooltip } from '@nextui-org/react';
+import Novedades from './Novedad.jsx';
 
 function TableSeguimientos() {
     const [seguimientos, setSeguimientos] = useState([]);
@@ -45,7 +46,7 @@ function TableSeguimientos() {
     const handleOpenModal = (id_seguimiento, type) => {
         setFormType(type);
         if (type === 'formNovedades') {
-            setBodyContent(<FormNovedades />);
+            setBodyContent(<Novedades />);
         } else if (type === 'componentSeguimiento') {
             setBodyContent(<ComponentSeguimiento
                 id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado

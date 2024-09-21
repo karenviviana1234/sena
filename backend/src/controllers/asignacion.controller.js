@@ -5,25 +5,22 @@ export const listarasignaciones = async (req, res) => {
         const [result] = await pool.query(`
             SELECT 
                 p.id_asignacion, 
-                a.id_productiva AS productiva, 
+                a.id_productiva  AS productiva, 
                 act.id_actividad AS actividad,
-                persA.nombres AS nombre_aprendiz,
-                persI.nombres AS nombre_instructor,
-                emp.razon_social AS nombre_empresa
+                act.fecha_inicio,
+                act.fecha_fin,
+                act.tipo,
+                act.solicitud,
+                a.empresa,
+                a.alternativa,
+                a.estado,
+                a.aprendiz
             FROM 
                 asignaciones AS p
             LEFT JOIN 
-                productivas AS a ON p.productiva = a.id_productiva
+                productivas AS a ON p.productiva = a.id_productiva 
             LEFT JOIN 
-                actividades AS act ON p.actividad = act.id_actividad
-            LEFT JOIN 
-                matriculas AS mat ON a.aprendiz = mat.aprendiz
-            LEFT JOIN 
-                personas AS persA ON mat.aprendiz = persA.id_persona
-            LEFT JOIN 
-                personas AS persI ON act.instructor = persI.id_persona
-            LEFT JOIN 
-                empresas AS emp ON a.empresa = emp.id_empresa;
+                actividades AS act ON p.actividad = act.id_actividad;
         `);
 
         if (result.length > 0) {
@@ -41,8 +38,6 @@ export const listarasignaciones = async (req, res) => {
         });
     }
 };
-
-
 
 
 export const registrarasignacion = async (req, res) => {

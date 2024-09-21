@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSearch2, UserCheck, BookText, BarChart3Icon } from 'lucide-react';
 import Sidebar, { SidebarItem, SidebarAccordion } from './components/Sidebar';
@@ -18,6 +18,7 @@ import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
 import AsignacionPage from './components/pages/AsignacionPage.jsx';
+import Registro from './components/pages/RegistroPage.jsx';
 
 export const App = () => {
   return (
@@ -28,12 +29,15 @@ export const App = () => {
           <Route path='/' element={
             <LoginPage />
           } />
+           <Route path='/registro' element={
+            <Registro />
+          } />
           <Route path="/home" element={
             <WithSidebar>
               <HomePage />
             </WithSidebar>
           } />
-         
+
           <Route path="/nomina" element={
             <WithSidebar>
               <NominaPage />
@@ -93,31 +97,51 @@ export const App = () => {
   );
 };
 
-const WithSidebar = ({ children }) => (
-  <div className="flex">
-    <Sidebar>
-      {/* estas son las secciones de el rol de Coordinador */}
-      <SidebarItem nav="/" icon={<Home size={20} />} text="Home" />
-      <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
-      <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
-      <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
-      <SidebarItem nav="/asignaciones" icon={<UserCheck size={20} />} text="Asignaciones" />
-      <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
-      <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
+export function WithSidebar({ children }) {
+  const [userRole, setUserRole] = useState(null);
 
-      <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimineto" />
-      <SidebarItem nav="/reportes" icon={<BookText size={20} />} text="Reportes" />
-      <SidebarItem nav="/estadisticas"icon={<BarChart3Icon size={20}/>} text="Estadisticas" />
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        setUserRole(user.cargo);
+      } catch (error) {
+        console.error("Error al parsear el JSON del usuario:", error);
+      }
+    }
+  }, []);
 
 
-      {/* <SidebarAccordion icon={<FolderSearch2 size={20} />} text="Seguimientos">
-      
-      </SidebarAccordion> */}
-      {/* fin de secciones de el rol de Coordinador */}
-    </Sidebar>
-    <div className="w-full bg-white h-screen overflow-auto">
-      <Navbar2 />
-      {children}
+  return (
+    <div className="flex">
+      <Sidebar>
+        <SidebarItem nav="/" icon={<Home size={20} />} text="Home" />
+        {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
+          <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
+        )}
+        {(userRole !== 'Aprendiz') && (
+          <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
+        )}
+        {(userRole !== 'Aprendiz') && (
+          <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
+        )}
+        {(userRole !== 'Aprendiz') && (
+        <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
+        )}
+        {(userRole !== 'Aprendiz') && (
+        <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
+        )}
+        <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimiento" />
+        {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
+          <SidebarItem nav="/estadisticas" icon={<BarChart3Icon size={20} />} text="Estadisticas" />
+        )}
+        {/* fin de secciones de el rol de Coordinador */}
+      </Sidebar>
+      <div className="w-full bg-white h-screen overflow-auto">
+        <Navbar2 />
+        {children}
+      </div>
     </div>
-  </div>
-);
+  );
+}
