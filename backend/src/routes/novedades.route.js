@@ -9,7 +9,10 @@ import {
 } from '../controllers/novedades.controller.js';
 import { validarToken } from '../controllers/seguridad.controller.js';
 
+
 const rutaNovedades = Router();
+
+
 
 rutaNovedades.get('/listarN', validarToken, listar);
 

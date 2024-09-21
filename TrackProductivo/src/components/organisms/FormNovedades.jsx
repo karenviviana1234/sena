@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
+import Swal from 'sweetalert2'; // Importar SweetAlert2
 
 const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) => {
   const [descripcion, setDescripcion] = useState(initialData?.descripcion || "");
@@ -32,12 +33,12 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
     try {
       const response = await axiosClient.get(`/novedad/listarN/${initialData.id_novedad}`);
       const novedad = response.data;
-  
+
       setFecha(new Date(novedad.fecha));
       setDescripcion(novedad.descripcion);
       setInstructor(novedad.instructor);
       setSelectedSeguimiento(novedad.id_seguimiento);
-  
+
       if (novedad.foto) {
         setFoto(novedad.foto);
       }
@@ -46,7 +47,6 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
       setErrorMessage("Error al cargar datos iniciales. Intenta de nuevo más tarde.");
     }
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,8 +77,13 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
         });
       }
 
-      // Mostrar alerta de éxito
-      alert("Registro exitoso!");
+      // Mostrar alerta de éxito con SweetAlert2
+      await Swal.fire({
+        icon: 'success',
+        title: 'Registro exitoso!',
+        text: 'La novedad se ha guardado correctamente.',
+        confirmButtonText: 'Aceptar'
+      });
 
       if (onSubmit) {
         onSubmit(); // Asegúrate de que onSubmit sea una función
@@ -89,23 +94,35 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
     } catch (error) {
       console.error("Error del servidor:", error);
       setErrorMessage("Error del servidor: " + error.message);
+      // Mostrar alerta de error con SweetAlert2
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrió un error al guardar la novedad. Intenta de nuevo.',
+        confirmButtonText: 'Aceptar'
+      });
     }
   };
+
   const formattedFecha = typeof fecha === 'string' ? fecha : new Date(fecha).toISOString().split('T')[0];
+
   return (
     <form method="post" onSubmit={handleSubmit}>
+      <h1 className="text-xl font-bold mb-4">
+        Registro de Novedades
+      </h1>
       <div className="ml-5 align-items-center">
         {errorMessage && <div className="text-red-500">{errorMessage}</div>}
 
         <div className="py-2">
-        <Input
-  type="date"
-  label="Fecha"
-  value={formattedFecha}
-  onChange={(e) => setFecha(e.target.value)}
-  readOnly={mode === 'update'}
-/>
-
+          <Input
+            type="date"
+            label="Fecha"
+            value={formattedFecha}
+            onChange={(e) => setFecha(e.target.value)}
+            readOnly={mode === 'update'}
+            className="w-96 my-4"
+          />
         </div>
 
         <div className="py-2">
@@ -114,8 +131,7 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
           )}
           <Input
             type="file"
-            label="Foto"
-            className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            className="w-96 mb-4"
             id="foto"
             name="foto"
             onChange={(e) => {
@@ -131,9 +147,9 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
           <Input
             type="text"
             label="Descripción"
-            className="max-w-xs"
             id="descripcion"
             name="descripcion"
+            classNames="w-96"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             required
@@ -142,7 +158,7 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
 
         <div>
           <select
-            className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            className="my-4 h-14 rounded-xl bg-[#f4f4f5] p-2 w-96"
             onChange={(e) => setSelectedSeguimiento(e.target.value)}
             value={selectedSeguimiento}
             required
@@ -162,7 +178,7 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
           <Input
             type="text"
             label="Instructor"
-            className="max-w-xs"
+            className="mb-4 w-96"
             id="instructor"
             name="instructor"
             value={instructor}
@@ -172,11 +188,8 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
         </div>
 
         <div className="flex justify-end gap-5 mt-5">
-          <Button type="button" color="danger" onClick={onClose}>
-            Cerrar
-          </Button>
-          <Button type="submit" color="success">
-            {actionLabel || (mode === 'update' ? 'Actualizar' : 'Registrar')}
+          <Button type="submit" className="bg-[#92d22e] text-white">
+            {(mode === 'update' ? 'Actualizar' : 'Registrar')}
           </Button>
         </div>
       </div>

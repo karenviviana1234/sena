@@ -134,26 +134,27 @@ export const registrarInstructor = async (req, res) => {
   try {
     const { identificacion, nombres, correo, telefono, rol, tipo, sede, area } = req.body;
 
-    const sedeValida = ['Yamboro', 'Centro'];
-    if (sede && !sedeValida.includes(sede)) {
-        return res.status(400).json({
-            message: 'Sede no válido'
-        });
-    }
-
-    const tipoValida = ['Contratista', 'Planta'];
-    if (tipo && !tipoValida.includes(tipo)) {
-        return res.status(400).json({
-            message: 'Tipo no válido'
-        });
-    }
-
-
-    // Validar campos requeridos
-    if (!identificacion || !nombres || !correo || !telefono || !rol || !tipo ||!sede ||!area) {
+    // Validar que todos los campos estén presentes
+    if (!identificacion || !nombres || !correo || !telefono || !rol || !tipo || !sede || !area) {
       return res.status(400).json({
         status: 400,
         message: 'Todos los campos son obligatorios.',
+      });
+    }
+
+    // Validar sede
+    const sedeValida = ['Yamboro', 'Centro'];
+    if (!sedeValida.includes(sede)) {
+      return res.status(400).json({
+        message: 'Sede no válida',
+      });
+    }
+
+    // Validar tipo
+    const tipoValido = ['Contratista', 'Planta'];
+    if (!tipoValido.includes(tipo)) {
+      return res.status(400).json({
+        message: 'Tipo no válido',
       });
     }
 
@@ -168,13 +169,12 @@ export const registrarInstructor = async (req, res) => {
       });
     }
 
-    // Usar identificacion como contraseña por defecto y hacer el hash
-    const defaultPassword = identificacion.toString(); // Convertir a string si no es ya una cadena
-    const bcryptPassword = bcrypt.hashSync(defaultPassword, 12);
+    // Usar la identificación como contraseña por defecto y hacer el hash
+    const bcryptPassword = bcrypt.hashSync(identificacion.toString(), 12);
 
     // Consulta SQL para insertar datos
-    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol,  tipo, sede, area, cargo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)`;
-    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol,  tipo, sede, area, 'Instructor', 'Activo'];
+    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, tipo, sede, area, cargo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol, tipo, sede, area, 'Instructor', 'Activo'];
 
     const [result] = await pool.query(query, params);
 
@@ -190,7 +190,7 @@ export const registrarInstructor = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error del servidor:', error);  // Registrar el error en la consola
+    console.error('Error del servidor:', error);
     res.status(500).json({
       status: 500,
       message: 'Error del servidor: ' + error.message,
