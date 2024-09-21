@@ -1,36 +1,33 @@
 import { pool } from "../database/conexion.js";
-import Jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import  Jwt  from "jsonwebtoken";
+/* import bcrypt from "bcrypt"; */
 
 export const validar = async (req, res) => {
     try {
-        const { correo, password } = req.body;
+        let { correo, password } = req.body;
+        let sql = `SELECT * FROM personas WHERE correo='${correo}'`;
 
-        // Consulta parametrizada para evitar inyecciones SQL
-        const [rows] = await pool.query('SELECT * FROM personas WHERE correo = ?', [correo]);
+        const [rows] = await pool.query(sql);
 
         if (rows.length > 0) {
             const user = rows[0];
-            
-            // Comparar la contraseña ingresada con la contraseña encriptada en la base de datos
-            const validPassword = await bcrypt.compare(password, user.password);
+            const validPassword = await /* bcrypt.compare */(password, user.password);
 
             if (!validPassword) {
-                return res.status(401).json({ message: "Credenciales incorrectas" });
+                return res.status(404).json({ "message": "Usuario no autorizado" });
             }
 
             // Incluir la identificación del usuario en el token JWT
-            const token = Jwt.sign({ userId: user.id_persona }, process.env.AUT_SECRET, { expiresIn: process.env.AUT_EXPIRE });
-            
-            return res.status(200).json({ user: { id_persona: user.id_persona, nombres: user.nombres, correo: user.correo, cargo: user.cargo }, token, message: 'Inicio de sesión exitoso' });
+            let token = Jwt.sign({ user: user.identificacion }, process.env.AUT_SECRET, { expiresIn: process.env.AUT_EXPIRE });
+            return res.status(200).json({ 'user': user, 'token': token, message: 'Token generado con éxito' });
         } else {
-            return res.status(404).json({ message: "Usuario no encontrado" });
+            return res.status(404).json({ "message": "Usuario no autorizado" });
         }
-    } catch (error) {
-        res.status(500).json({ status: 500, message: 'Error del servidor: ' + error.message });
-    }
-};
 
+    } catch (error) {
+        res.status(500).json({ status: 500, message: 'Error del servidor: ' + error });
+    }
+}
 
 //verificar
 export const validarToken = async (req, res, next) => {

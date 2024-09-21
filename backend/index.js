@@ -43,7 +43,7 @@ servidor.use('/areas', rutaAreas)
 servidor.use('/horarios', rutaHorarios )
 servidor.use('/municipios', RutaMunicipios )
 servidor.use('/novedad', rutaNovedades )
-servidor.use(rutaAsignacion )
+servidor.use('/asig',rutaAsignacion )
 servidor.use('/export', router)
 
 servidor.use(express.static('./public'))

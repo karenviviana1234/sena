@@ -1,35 +1,34 @@
 import React, { createContext, useState, useCallback } from 'react';
-import axiosClient from '../axiosClient';
+import axiosClient from '../configs/axiosClient';
 
 const SeguimientosContext = createContext();
 
-// Proveedor del contexto
 export const SeguimientosProvider = ({ children }) => {
     const [seguimientos, setSeguimientos] = useState([]);
     const [seguimiento, setSeguimiento] = useState([]);
-    const [idSeguimiento, setSeguimientoId] = useState(null);
+    const [idSeguimiento, setSeguimientoId] = useState([]);
 
-    // Función para obtener todos los seguimientos
-    const getSeguimientos = useCallback(async () => {
+    const getSeguimientos = useCallback(() => {
         try {
-            const response = await axiosClient.get('/seguimientos/listarA');
-            console.log(response.data);
-            setSeguimientos(response.data);
+            axiosClient.get('/seguimientos/listarA').then((response) => {
+                console.log(response.data);
+                setSeguimientos(response.data);
+            });
         } catch (error) {
-            console.log('Error del servidor: ' + error);
+            console.log('Error del servidor' + error);
         }
-    }, []);
+    }, []); 
 
-    // Función para obtener un seguimiento por ID
-    const getSeguimiento = useCallback(async (id_seguimiento) => {
+    const getSeguimiento = useCallback((id_seguimiento) => {
         try {
-            const response = await axiosClient.get(`/buscar${id_seguimiento}`);
-            console.log(response.data);
-            setSeguimiento(response.data);
+            axiosClient.get(`/buscar${id_seguimiento}`).then((response) => {
+                console.log(response.data);
+                setSeguimiento(response.data);
+            });
         } catch (error) {
-            console.log('Error: ' + error);
+            console.log('Error' + error);
         }
-    }, []);
+    }, []); 
 
     return (
         <SeguimientosContext.Provider
@@ -41,7 +40,7 @@ export const SeguimientosProvider = ({ children }) => {
                 setSeguimiento,
                 setSeguimientoId,
                 getSeguimientos,
-                getSeguimiento,
+                getSeguimiento
             }}
         >
             {children}

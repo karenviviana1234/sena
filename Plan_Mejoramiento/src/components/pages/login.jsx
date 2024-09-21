@@ -30,12 +30,13 @@ const Login = () => {
         correo: email,
         password: password,
       });
-
+  
       console.log("Respuesta recibida:", response);
 
       if (response.status === 200) {
         console.log("Datos de respuesta:", response.data);
         const { user, token } = response.data;
+
 
         if (user) {
           await AsyncStorage.setItem("token", token);
@@ -61,10 +62,11 @@ const Login = () => {
       }
     } catch (error) {
       console.log("Error en login:", error);
+    console.log("Detalles del error:", error.response?.data);
 
       if (error.response && error.response.status === 404) {
-        Alert.alert("Error", error.response.data.message);
-      } else {
+        Alert.alert("Error", `${error.response.status}: ${error.response.data.message || 'Error de autenticación'}`);
+n      } else {
         Alert.alert("Error", "Hubo un problema con el servidor.");
       }
     }
