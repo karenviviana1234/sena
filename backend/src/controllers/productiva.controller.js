@@ -96,9 +96,7 @@ export const registrarProductiva = async (req, res) => {
         const [rowsMatricula] = await pool.query(sqlCheckMatricula, [matricula]);
 
         if (rowsMatricula.length === 0) {
-            return res.status(400).json({
-                message: 'La matrícula no existe'
-            });
+            return res.status(400).json({ message: 'La matrícula no existe' });
         }
 
         // Registrar etapa productiva
@@ -118,9 +116,13 @@ export const registrarProductiva = async (req, res) => {
             const fechaInicio = new Date(fecha_inicio);
             const fechaFin = new Date(fecha_fin);
 
-            const fechaSeguimiento1 = addMonths(fechaInicio, 2);
-            const fechaSeguimiento2 = addMonths(fechaInicio, 4);
-            const fechaSeguimiento3 = fechaFin;
+            const fechaSeguimiento1 = new Date(fechaInicio);
+            fechaSeguimiento1.setMonth(fechaSeguimiento1.getMonth() + 2); // 2 meses después
+
+            const fechaSeguimiento2 = new Date(fechaInicio);
+            fechaSeguimiento2.setMonth(fechaSeguimiento2.getMonth() + 4); // 4 meses después
+
+            const fechaSeguimiento3 = fechaFin; // La fecha de fin
 
             // Insertar tres seguimientos asociados a la etapa productiva
             const sqlSeguimiento = `
@@ -131,9 +133,9 @@ export const registrarProductiva = async (req, res) => {
             `;
 
             const [resultSeguimiento] = await pool.query(sqlSeguimiento, [
-                format(fechaSeguimiento1, 'yyyy-MM-dd'), null, productivaId, instructor,
-                format(fechaSeguimiento2, 'yyyy-MM-dd'), null, productivaId, instructor,
-                format(fechaSeguimiento3, 'yyyy-MM-dd'), null, productivaId, instructor
+                fechaSeguimiento1.toISOString().split('T')[0], null, productivaId, instructor,
+                fechaSeguimiento2.toISOString().split('T')[0], null, productivaId, instructor,
+                fechaSeguimiento3.toISOString().split('T')[0], null, productivaId, instructor
             ]);
 
             if (resultSeguimiento.affectedRows >= 3) { 
@@ -177,38 +179,23 @@ export const registrarProductiva = async (req, res) => {
                 ]);
 
                 if (resultBitacoras.affectedRows >= 12) {
-                    res.status(200).json({
-                        message: 'Etapa productiva, seguimientos y bitácoras registrados correctamente'
-                    });
+                    res.status(200).json({ message: 'Etapa productiva, seguimientos y bitácoras registrados correctamente' });
                 } else {
                     await pool.query('DELETE FROM seguimientos WHERE productiva = ?', [productivaId]);
-                    await pool.query('DELETE FROM productiva WHERE id_productiva = ?', [productivaId]);
-                    res.status(403).json({
-                        message: 'Error al registrar las bitácoras'
-                    });
+                    await pool.query('DELETE FROM productivas WHERE id_productiva = ?', [productivaId]);
+                    res.status(403).json({ message: 'Error al registrar las bitácoras' });
                 }
             } else {
-                await pool.query('DELETE FROM productiva WHERE id_productiva = ?', [productivaId]);
-                res.status(403).json({
-                    message: 'Error al registrar los seguimientos'
-                });
+                await pool.query('DELETE FROM productivas WHERE id_productiva = ?', [productivaId]);
+                res.status(403).json({ message: 'Error al registrar los seguimientos' });
             }
         } else {
-            res.status(403).json({
-                message: 'Error al registrar la etapa productiva'
-            });
+            res.status(403).json({ message: 'Error al registrar la etapa productiva' });
         }
     } catch (error) {
-        res.status(500).json({
-            message: 'Error del servidor: ' + error.message
-        });
+        res.status(500).json({ message: 'Error del servidor: ' + error.message });
     }
 };
-
-
-
-
-
 
 export const actualizarProductiva = async (req, res) => {
     try {

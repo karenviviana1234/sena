@@ -347,7 +347,7 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
           )}
 
           <div className="flex items-center">
-            {(userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
+          {estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
               <PDFUploader onFileSelect={handleActaPdfSubmit} />
             )}
             <ButtonDescargar onClick={() => downloadFile(id_seguimiento)} />
@@ -357,7 +357,7 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
             {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
               <ButtonNoAprobado onClick={() => handleNoAprobar(id_seguimiento)} />
             )}
-                {(userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
+            {estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
               <ButtonEnviar onClick={handleSubmitActa} />
             )}
           </div>

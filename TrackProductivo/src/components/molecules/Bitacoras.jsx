@@ -27,6 +27,8 @@ function Bitacoras({
   const [selectedPdf, setSelectedPdf] = useState({});
   const [userRole, setUserRole] = useState(null);
   const [bitacora, setBitacora] = useState([]);
+  const [estado, setEstado] = useState(null);
+
 
 
 
@@ -301,10 +303,21 @@ function Bitacoras({
   };
 
   const estadoConfig = {
-    aprobado: { color: "success", icon: Icons.aprobado },
-    noAprobado: { color: "error", icon: Icons.noAprobado },
-    solicitud: { color: "warning", icon: Icons.solicitud },
+    aprobado: {
+      color: "success",
+      icon: Icons.aprobado,
+    },
+    noAprobado: {
+      color: "error",
+      icon: Icons.noAprobado,
+    },
+    solicitud: {
+      color: "warning",
+      icon: Icons.solicitud,
+    },
   };
+
+  const { color, icon } = estadoConfig[estado] || {};
 
   return (
     <>
@@ -321,7 +334,12 @@ function Bitacoras({
                       <div className="flex items-center justify-between">
                         <h2 className="font-semibold text-lg">Bitácora {bitacora.id_bitacora}</h2>
                         {bitacora.pdf && (
-                          <Chip endContent={icon && React.createElement(icon, { size: 20 })} variant="flat" color={color} className="w-10">
+                            <Chip
+                            endContent={icon && React.createElement(icon, { size: 20 })}
+                            variant="flat"
+                            color={color}
+                            className="w-10"
+                          >
                             {bitacora.estado}
                           </Chip>
                         )}
@@ -332,7 +350,7 @@ function Bitacoras({
                     </div>
                     <div className="flex flex-col">
                       <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-                        {(userRole !== 'Administrativo' && userRole !== 'Coordinador') && (
+                      {bitacora.estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Coordinador') && (
                           <PDFUploader onFileSelect={(file) => handleBitacoraPdfSubmit(file, bitacora.id_bitacora)} />
                         )}
                         <div className="flex gap-2">
@@ -358,7 +376,7 @@ function Bitacoras({
                           {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
                             <ButtonNoAprobado onClick={() => handleNoAprobar(bitacora.id_bitacora)} />
                           )}
-                          {(userRole !== 'Administrativo' && userRole !== 'Coordinador') && (
+                          {bitacora.estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Coordinador') && (
                             <ButtonEnviar onClick={() => handleSubmitBitacoras(bitacora.id_bitacora)} />
                           )}
                         </div>

@@ -47,9 +47,10 @@ export const listarSeguimientoAprendices = async (req, res) => {
                 s.id_seguimiento AS id_seguimiento,
                 s.seguimiento AS seguimiento,
                 s.fecha AS fecha,
+                s.estado AS estado,  -- Agregamos la columna estado
                 COUNT(b.id_bitacora) AS total_bitacoras,
                 SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) AS bitacoras_con_pdf,
-                (SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) / 12) * 100 AS porcentaje -- Calculamos el porcentaje sobre 12 bitácoras
+                (SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) / 12) * 100 AS porcentaje
             FROM
                 seguimientos s
                 LEFT JOIN productivas pr ON s.productiva = pr.id_productiva
@@ -62,7 +63,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
             WHERE
                 p.rol = 'Aprendiz'
             GROUP BY
-                s.id_seguimiento, p.identificacion, s.seguimiento, s.fecha, f.codigo, prg.sigla, e.razon_social
+                s.id_seguimiento, p.identificacion, s.seguimiento, s.fecha, f.codigo, prg.sigla, e.razon_social, s.estado
             ORDER BY
                 p.identificacion, s.seguimiento;
         `;
@@ -85,34 +86,36 @@ export const listarSeguimientoAprendices = async (req, res) => {
                         seguimiento1: null,
                         seguimiento2: null,
                         seguimiento3: null,
-                        porcentaje: 0, // Inicializamos el porcentaje
+                        estado1: null,  // Añadimos estado para cada seguimiento
+                        estado2: null,
+                        estado3: null,
+                        porcentaje: 0,
                     };
                 }
 
                 if (row.seguimiento === '1') {
                     aprendizMap[row.identificacion].id_seguimiento1 = row.id_seguimiento;
                     aprendizMap[row.identificacion].seguimiento1 = row.fecha;
+                    aprendizMap[row.identificacion].estado1 = row.estado;  // Guardamos el estado
                 } else if (row.seguimiento === '2') {
                     aprendizMap[row.identificacion].id_seguimiento2 = row.id_seguimiento;
                     aprendizMap[row.identificacion].seguimiento2 = row.fecha;
+                    aprendizMap[row.identificacion].estado2 = row.estado;
                 } else if (row.seguimiento === '3') {
                     aprendizMap[row.identificacion].id_seguimiento3 = row.id_seguimiento;
                     aprendizMap[row.identificacion].seguimiento3 = row.fecha;
+                    aprendizMap[row.identificacion].estado3 = row.estado;
                 }
 
-                // Calculamos el porcentaje total
                 aprendizMap[row.identificacion].porcentaje += (row.bitacoras_con_pdf / 12) * 100;
             });
 
-            // Aseguramos que el porcentaje no exceda el 100% y agregamos el signo de porcentaje
             Object.values(aprendizMap).forEach(aprendiz => {
                 aprendiz.porcentaje = Math.min(aprendiz.porcentaje, 100);
-                // Redondeamos al entero más cercano y agregamos el signo de porcentaje
                 aprendiz.porcentaje = Math.round(aprendiz.porcentaje) + '%';
             });
 
             const resultArray = Object.values(aprendizMap);
-
             res.status(200).json(resultArray);
         } else {
             res.status(404).json({ error: 'No hay seguimientos registrados para aprendices' });
@@ -121,6 +124,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor: ' + error.message });
     }
 };
+
 
 
 

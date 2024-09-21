@@ -42,7 +42,7 @@ function TableSeguimientos() {
     const [page, setPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    
+
     // Fetch seguimientos from API
     const getSeguimientos = useCallback(async () => {
         try {
@@ -60,14 +60,14 @@ function TableSeguimientos() {
 
     const handleUpdateData = useCallback(() => {
         getSeguimientos();
-      }, [getSeguimientos]);
+    }, [getSeguimientos]);
 
 
     // Function to open the modal and set the selected ID
     const handleOpenModal = (id_seguimiento, type) => {
         setFormType(type);
         if (type === 'formNovedades') {
-            setBodyContent(<Novedades />);
+            setBodyContent(<Novedades id_seguimiento={id_seguimiento}/>);
         } else if (type === 'componentSeguimiento') {
             setBodyContent(<ComponentSeguimiento
                 id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado
@@ -135,19 +135,25 @@ function TableSeguimientos() {
         }
         return hash;
     };
-    
-    const intToColor = (int, alpha = 0.5) => {
+
+    const intToColor = (int) => {
         const r = (int >> 16) & 0xFF;
         const g = (int >> 8) & 0xFF;
         const b = int & 0xFF;
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    };
+        
+        // Convertir a un color claro
+        const lightR = Math.min(255, r + 100); // Aumenta el rojo
+        const lightG = Math.min(255, g + 100); // Aumenta el verde
+        const lightB = Math.min(255, b + 100); // Aumenta el azul
     
+        return `rgba(${lightR}, ${lightG}, ${lightB}, 0.5)`; // Opacidad del 50%
+    };
+
     const getColorForFicha = (fichaNumber) => {
         const hash = hashCode(fichaNumber.toString());
         return intToColor(hash);
     };
-    
+
 
     // Render cell based on column key
     const renderCell = useCallback((item, columnKey) => {
@@ -161,7 +167,6 @@ function TableSeguimientos() {
                     <div className="flex justify-around items-center">
                         <ButtonRegistrarNovedad
                             onClick={() => handleOpenModal(null, 'formNovedades')}
-
                         />
                     </div>
 
@@ -171,25 +176,37 @@ function TableSeguimientos() {
             case "seguimiento2":
             case "seguimiento3":
                 const formattedDate = format(new Date(cellValue), 'dd-MM-yyyy');
-                const seguimientoIdKey = `id_${columnKey}`; // Determina el ID de seguimiento basado en la clave de la columna
+                const seguimientoIdKey = `id_${columnKey}`;
+                const estadoKey = `estado${columnKey.charAt(columnKey.length - 1)}`; // Obtener el estado correspondiente
+                const estado = item[estadoKey]; // Obtener el estado
+
                 return (
-                    <Button
-                        className="bg-[#ffa808] text-white h-8 w-10 text-xs"
-                        onClick={() => handleOpenModal(item[seguimientoIdKey], 'componentSeguimiento')} // Usa el ID de seguimiento correcto
-                    >
-                        {formattedDate}
-                    </Button>
-                );
-                case "codigo":
-                    return (
-                        <Chip
-                            className="text-[#3c3c3c]"
-                            variant="flat"
-                            style={{ backgroundColor: getColorForFicha(cellValue) }} // Aplicar el color generado
+                    <div className="flex flex-col items-center">
+                        <Button
+                            className=" text-white h-8 w-10 text-xs"
+                            style={{
+                                backgroundColor:
+                                    estado === "no aprobado" ? "red" :
+                                        estado === "solicitud" ? "orange" :
+                                            estado === "aprobado" ? "green" : null
+                            }}
+
+                            onClick={() => handleOpenModal(item[seguimientoIdKey], 'componentSeguimiento')}
                         >
-                            {cellValue}
-                        </Chip>
-                    );
+                            {formattedDate}
+                        </Button>
+                    </div>
+                );
+            case "codigo":
+                return (
+                    <Chip
+                        className="text-[#3c3c3c]"
+                        variant="flat"
+                        style={{ backgroundColor: getColorForFicha(cellValue) || "rgba(240, 240, 240, 0.8)" }} // Color claro por defecto
+                    >
+                        {cellValue}
+                    </Chip>
+                );
             case "actions":
                 return (
                     <div className="relative flex justify-end items-center gap-2">
@@ -231,11 +248,6 @@ function TableSeguimientos() {
         }
     }, [page, pages]);
 
-    const onPreviousPage = useCallback(() => {
-        if (page > 1) {
-            setPage(prevPage => prevPage - 1);
-        }
-    }, [page]);
 
     const onRowsPerPageChange = useCallback((e) => {
         setRowsPerPage(Number(e.target.value));

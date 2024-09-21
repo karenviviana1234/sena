@@ -145,11 +145,11 @@ const isValidDate = (dateString) => {
 
 export const eliminarNovedad = async (req, res) => {
     try {
-        const {id} = req.params
+        const {id_novedad} = req.params
 
         let sql = `DELETE FROM novedades WHERE id_novedad = ?`
 
-        const [rows] = await pool.query(sql, [id])
+        const [rows] = await pool.query(sql, [id_novedad])
 
         if(rows.affectedRows>0){
             res.status(200).json({
