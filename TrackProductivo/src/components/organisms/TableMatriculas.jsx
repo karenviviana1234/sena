@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
@@ -17,7 +17,7 @@ import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import FormMatriculas from './FormMatriculas.jsx';
 import FormAprendices from './FormAprendices.jsx';
-import { exportToExcel } from '../../configs/exportToExcel.jsx';
+import { uploadFile } from '../../configs/UploadFile.jsx';
 
 function TableMatriculas() {
     const [selectedFicha, setSelectedFicha] = useState('');
@@ -32,46 +32,52 @@ function TableMatriculas() {
     const [page, setPage] = useState(1);
     const [fichas, setFichas] = useState([]);
     const [matriculas, setMatriculas] = useState([]);
+    const [uploadedFile, setUploadedFile] = useState(null);
+    const fileInputRef = useRef(null);
 
-    const handleExportToExcel = async () => {
-        try {
-            const response = await axiosClient.get(`/export/datos-ficha/${selectedFicha}`);
-            
-            if (response.status === 500) {
-                throw new Error('Error interno del servidor');
+    const handleUpload = (event) => {
+        event.preventDefault();
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+            const file = fileInputRef.current.files[0];
+            if (file) {
+                setUploadedFile(file);
+                uploadFile(file)
+                    .then(() => {
+                        alert('Archivo subido con éxito!');
+                    })
+                    .catch(error => {
+                        console.error('Error al subir el archivo:', error);
+                        alert('Error al subir el archivo. Por favor, inténtelo nuevamente.');
+                    });
             }
-    
-            if (Array.isArray(response.data) && response.data.length > 0) {
-                const formattedData = response.data.map(item => {
-                    return {
-                        id_matricula: item.id_matricula,
-                        ficha: item.ficha,
-                        Persona: {
-                            nombres: item.Persona?.nombres || '',
-                            identificacion: item.Persona?.identificacion || '',
-                            correo: item.Persona?.correo || '',
-                            telefono: item.Persona?.telefono || ''
-                        },
-                        estado: item.estado,
-                        pendiente_tecnicos: item.pendiente_tecnicos,
-                        pendiente_transversales: item.pendiente_transversales,
-                        pendiente_ingles: item.pendiente_ingles
-                    };
-                });
-    
-                exportToExcel(formattedData);
-            } else {
-                throw new Error('No hay matrículas disponibles para exportar');
-            }
-        } catch (error) {
-            console.error('Error al exportar a Excel:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error al exportar',
-                text: error.message || 'Ocurrió un error al intentar exportar los datos a Excel.',
-            });
         }
     };    
+
+    const handleImportExcel = async () => {
+        if (!uploadedFile) {
+            alert("Por favor seleccione un archivo para importar");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('file', uploadedFile);
+
+            const response = await axiosClient.post('/matriculas/import-excel', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            console.log(response.data); // Usa esta línea si quieres ver la respuesta en la consola
+            alert('Archivo importado con éxito');
+
+        } catch (error) {
+            console.error('Error al importar Excel:', error);
+            alert('Hubo un error al importar el archivo');
+        }
+    };
 
 
     // Fetch para obtener las fichas
@@ -230,8 +236,15 @@ function TableMatriculas() {
                             <option disabled>Cargando fichas...</option>
                         )}
                     </select>
-                    <Button className="bg-[#92d22e] text-white " onClick={handleExportToExcel}>
-                        Exportar a Excel
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".xlsx, .xls"
+                        onChange={handleUpload}
+                        style={{ display: 'none' }}
+                    />
+                    <Button className="bg-[#92d22e] text-white" onClick={handleImportExcel}>
+                        Importar Excel
                     </Button>
                     <Button
                         onClick={() => handleOpenModal("formMatriculas")}
@@ -247,6 +260,7 @@ function TableMatriculas() {
                     </Button>
                 </div>
             </div>
+
             <div className="flex items-center justify-between mt-2 mb-5">
                 <span className="text-default-400 text-small mt-2">
                     Total {matriculas.length} matriculas
