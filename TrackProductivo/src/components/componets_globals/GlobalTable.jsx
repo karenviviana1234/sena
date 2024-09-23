@@ -79,13 +79,6 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
   };
 
 
-  // const renderTableCell = (item, column) => {
-  //   if (column === 'centro_sede') {
-  //     return item.centro_sede?.nombre || '';
-  //   }
-  //   return item[column];
-  // };
-
   return (
     <div>
       <div className="flex flex-col justify-between items-end mb-4 my-2">
@@ -122,12 +115,7 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
                 >
                   Actualizar
                 </button>
-                <button
-                  className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 ease-in-out"
-                  onClick={() => handleDeleteClick(item)}
-                >
-                  Eliminar
-                </button>
+          
               </TableCell>
             </TableRow>
           ))}
