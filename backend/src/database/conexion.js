@@ -10,3 +10,11 @@ export const pool = createPool({
     port:process.env.DB_PORT,
     database:process.env.DB_DATABASE
 })
+//Validar conexión a la base de datos
+pool.getConnection().then(connect => {
+    console.log("Conexión a base de datos exitosa.");
+    connect.release();
+})
+    .catch(error => {
+        console.error("Conexion a base de datos fallida. " + error);
+}) 
