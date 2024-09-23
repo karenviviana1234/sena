@@ -21,9 +21,6 @@ function Bitacoras({
     const [modalBitacora, setModalBitacora] = useState(false)
     const [fecha, setFecha] = useState("");
     const [EstadoBitacoraVisible, setEstadoBitacoraVisible] = useState(false);
-
-
-
     useEffect(() => {
         const currentDate = new Date().toISOString().slice(0, 10);
         setFecha(currentDate);
@@ -66,10 +63,6 @@ function Bitacoras({
         setBitacoraPdf(file);
         setEstadoBitacoraVisible(true);
       };
-    
-    
-    
-        
       // Función para enviar la bitácora
       const handleSubmitBitacoras = async (bitacora) => {
         const formData = new FormData();

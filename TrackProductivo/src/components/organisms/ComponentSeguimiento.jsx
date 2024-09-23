@@ -38,44 +38,7 @@ function ComponentSeguimiento({id_seguimiento}) {
               <p className="text-gray-500 text-sm">20-12-2023</p>
             </div>
           </div>
-        </div>
-<<<<<<< HEAD
-      </div>
-
-      <Modal isOpen={modalBitacora} onClose={() => setModalBitacora(false)}>
-      <ModalContent>
-        <ModalHeader>
-          <h2> Actualizar Bitacora </h2>
-        </ModalHeader>
-        
-          <ModalBody className='overflow-y-auto max-h-[70vh]'>
-            {findBitacora.map(bita => (
-              <div>
-                <Input type="text" value={bita.fecha} />
-                <Input type="text" value={bita.pdf} />
-                <Input type="text" value={bita.instructor} />
-              </div>
-            ))}
-          </ModalBody>
-          <ModalFooter>
-            <Button color="danger" variant="flat" onClick={() => setModalBitacora(false)}> Cerrar </Button>
-            <Button className="bg-[#6fb12d] text-white font-semibold"> Actualizar </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-=======
-{/*       <div className="flex flex-col w-[600px]">
-        <h2 className="font-semibold mb-4 text-xl"> Bitacoras asociadas al seguimiento: </h2>
-            {bitacorasPdfs.map((bita) => (
-              <div key={bita.id_bitacora} className="flex flex-row">
-                <p className="text-xl font-semibold mr-5"> Bitacora {bita.bitacora} : </p>
-                <p className="text-lg font-medium mr-5"> {bita.pdf} </p>
-                <button className="bg-[#6fb12d] text-white p-2 rounded-xl mb-3 font-semibold" onClick={() => [handleBuscar(bita.id_bitacora), setModalBitacora(true)]}> Editar </button>
-              </div>
-            ))}
-      </div> */}
-     
->>>>>>> 0d6e22e8c6625cd4f784153de4ccd16bcb4c2f25
+        </div>     
     </div>
   );
 }

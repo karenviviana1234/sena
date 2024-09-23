@@ -195,24 +195,31 @@ export const rechazarBitacora = async (req, res) => {
 
 export const bitacoraSeguimiento = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params;
 
-        let sql = `SELECT * FROM bitacoras WHERE seguimiento = ?`
-        const [result] = await pool.query(sql, [id])
+        // Consulta con JOIN para obtener el nombre del instructor en lugar de su ID
+        let sql = `
+            SELECT b.id_bitacora, b.fecha, b.bitacora, b.seguimiento, b.pdf, b.estado, p.nombres as instructor 
+            FROM bitacoras b
+            JOIN personas p ON b.instructor = p.id_persona
+            WHERE b.seguimiento = ?
+        `;
+        const [result] = await pool.query(sql, [id]);
 
-        if(result.length>0){
-            res.status(200).json(result)
-        }else{
+        if (result.length > 0) {
+            res.status(200).json(result);
+        } else {
             res.status(404).json({
-                message: 'No hay bitacoras asociadas al seguimiento'
-            })
+                message: 'No hay bitácoras asociadas al seguimiento'
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
+};
+
 
 export const buscarBitacora = async (req, res) => {
     try {
