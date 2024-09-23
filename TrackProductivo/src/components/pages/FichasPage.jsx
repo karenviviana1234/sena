@@ -1,17 +1,25 @@
-import RegistroFicha from '../organisms/Ficha/RegisterFichas'
-import TableFichas from '../organisms/Ficha/TableFicha'
-//import Filter from '../organisms/Ficha/filtroFicha';
+import React from 'react';
+import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import TableHorariosPage from '../organisms/Horarios/TableHorarios';
+import TableFichasPage from '../organisms/Ficha/TableFicha';
+
+
 function FichasPage() {
-  //const [filterValue, setFilterValue] = React.useState("");
-  return (
+  return ( 
     <>
-    <main className='w-full p-3'>
-        {/* <Filter filterValue={filterValue} setFilterValue={setFilterValue} /> */}
-      <RegistroFicha/>
-      <TableFichas/>
-      </main>
-   </>
-  )
+    <div className="flex min-h-screen flex-col m-10">
+        <Tabs aria-label="Options">
+            <Tab key="fichas" title="fichas">
+              <TableFichasPage />
+            </Tab>
+            <Tab key="horarios" title="horarios">
+              <TableHorariosPage />
+            </Tab>
+        </Tabs>
+    </div>
+  </>
+  );
 }
+
 
 export default FichasPage

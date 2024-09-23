@@ -8,7 +8,7 @@ rutaFichas.get('/listar', validarToken, listarFichas)
 rutaFichas.get('/listar/:id', validarToken, obtenerFichaPorId)
 
 rutaFichas.post('/registrar', validarToken, registrarFichas)
-rutaFichas.put('/actualizar/:id', validarToken, actualizarFicha)
+rutaFichas.put('/actualizar/:codigo', validarToken, actualizarFicha)
 
 rutaFichas.put('/electiva/:id', validarToken, electivaFicha)
 rutaFichas.put('/finalizar/:id', validarToken, finalizarFicha)

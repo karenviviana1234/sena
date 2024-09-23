@@ -23,14 +23,14 @@ export const listarFichas = async (req, res) => {
 }
 export const obtenerFichaPorId = async (req, res) => {
     try {
-        const { id } = req.params
+        const { codigo } = req.params
 
         let sql = `SELECT f.*, p.nombre_programa 
                    FROM fichas f
                    INNER JOIN programas p ON f.programa = p.id_programa
                    WHERE f.codigo = ?`
 
-        const [results] = await pool.query(sql, [id])
+        const [results] = await pool.query(sql, [codigo])
 
         if (results.length > 0) {
             res.status(200).json(results[0])
@@ -62,7 +62,6 @@ export const actualizarFicha = async (req, res) => {
             programa = ?, sede = ?, estado = ?
         WHERE codigo = ?
     `;
-
     try {
         const [result] = await pool.query(sql, [inicio_ficha, fin_lectiva, fin_ficha, programa, sede, estado, codigo]);
 

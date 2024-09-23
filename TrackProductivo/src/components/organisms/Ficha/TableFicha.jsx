@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-//import RegistroFicha from './registerFichas';
+import RegistroFicha from './RegisterFichas';
 import GlobalTable from '../../componets_globals/GlobalTable';
-//import ActualizarFicha from './updateFichas';
+import UpdateFicha from './UpdateFicha';
+
 
 function TableFichasPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -25,12 +26,13 @@ function TableFichasPage() {
     <>
       <main className='w-full p-3 h-screen'>
         <div className='my-5 flex flex-col py-5'>
-          {/* <RegistroFicha onRegisterSuccess={handleRegisterSuccess} /> */}
+          <RegistroFicha onRegisterSuccess={handleRegisterSuccess} /> 
+
           <GlobalTable
             columns={columns}
             dataEndpoint="/fichas/listar"
             refreshTrigger={refreshTrigger}
-            // updateComponent={ActualizarFicha} 
+            updateComponent={UpdateFicha} 
          
           />
         </div>
