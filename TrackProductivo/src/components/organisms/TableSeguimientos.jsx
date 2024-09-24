@@ -43,6 +43,9 @@ function TableSeguimientos() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
 
+    const seguimientosIds = [1, 2, 3]; 
+
+
     // Fetch seguimientos from API
     const getSeguimientos = useCallback(async () => {
         try {

@@ -17,17 +17,16 @@ const Novedades = () => {
     const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const user = JSON.parse(storedUser);
-          setUserRole(user.cargo);
-        } catch (error) {
-          console.error("Error al parsear el JSON del usuario:", error);
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                setUserRole(user.cargo);
+            } catch (error) {
+                console.error("Error al parsear el JSON del usuario:", error);
+            }
         }
-      }
     }, []);
-  
 
     const listarN = async () => {
         setIsLoading(true);
@@ -138,17 +137,18 @@ const Novedades = () => {
                     required
                 >
                     <option value="">Selecciona un Seguimiento</option>
-                    {seguimientos.map((seguimiento) => (
+                    {seguimientos.map((seguimiento, index) => (
                         <option key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
-                            {seguimiento.id_seguimiento}
+                            {index + 1} {/* Mostrar el número 1, 2, 3, pero enviando el id_seguimiento */}
                         </option>
                     ))}
                 </select>
-                {( userRole !== 'Aprendiz') && (
-                <ButtonRegistrarActividad
-                    onClick={() => handleOpenModal('formNovedades')}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300"
-                />
+
+                {(userRole !== 'Aprendiz') && (
+                    <ButtonRegistrarActividad
+                        onClick={() => handleOpenModal('formNovedades')}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300"
+                    />
                 )}
             </div>
 
@@ -158,22 +158,31 @@ const Novedades = () => {
                         <h4 className="text-xl font-semibold mb-2">{novedad.instructor}</h4>
                         <p className="text-sm text-gray-600">Descripción: {novedad.descripcion}</p>
                         <p className="text-sm text-gray-600">Seguimiento: {novedad.seguimiento}</p>
+
                         {novedad.foto && (
                             <img
-                                src={novedad.foto}
+                                src={`${axiosClient.defaults.baseURL}/novedad/${novedad.foto}`}
                                 alt={`Foto de ${novedad.instructor}`}
-                                className="mt-2 rounded w-full max-h-40 object-cover"
+                                className="my-6 rounded-xl w-full max-h-40 object-cover"
                             />
                         )}
-                        <p className="text-sm text-gray-600 mt-2">Fecha: {new Date(novedad.fecha).toLocaleDateString()}</p>
+                        <p className="text-sm text-gray-600 absolute bottom-4 right-4 ">
+                            {new Date(novedad.fecha).toLocaleDateString('es-CO', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                            }).replace(/\//g, '-')}
+                        </p>
+
                         <div className="absolute top-2 right-2">
-                        {( userRole !== 'Aprendiz') && (
-                            <ButtonDesactivar onClick={() => desactivarNovedad(novedad.id_novedad)} />
-                        )}
+                            {(userRole !== 'Aprendiz') && (
+                                <ButtonDesactivar onClick={() => desactivarNovedad(novedad.id_novedad)} />
+                            )}
                         </div>
                     </div>
                 ))}
             </div>
+
 
             <ModalAcciones isOpen={isModalOpen} onClose={handleCloseModal} bodyContent={bodyContent} />
         </div>
