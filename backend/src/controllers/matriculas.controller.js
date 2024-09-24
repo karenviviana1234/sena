@@ -59,24 +59,6 @@ export const listarMatriculas = async (req, res) => {
     }
 };
 
-//importar excel
-export const InsertMatriculas = async (pool, data) => {
-    try {
-        const sql = `
-            INSERT INTO matriculas (ficha, aprendiz, estado, pendiente_tecnicos, pendiente_transversales, pendiente_ingles)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `;
-
-        const promises = data.map(item => pool.query(sql, Object.values(item)));
-        await Promise.all(promises);
-
-        return { success: true };
-    } catch (error) {
-        console.error('Error al insertar datos:', error);
-        throw error;
-    }
-};
-
 
 
 export const registrarMatriculas = async (req, res) => {

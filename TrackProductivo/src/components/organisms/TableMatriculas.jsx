@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import ModalAcciones from './ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
@@ -17,7 +17,6 @@ import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import FormMatriculas from './FormMatriculas.jsx';
 import FormAprendices from './FormAprendices.jsx';
-import { uploadFile } from '../../configs/UploadFile.jsx';
 
 function TableMatriculas() {
     const [selectedFicha, setSelectedFicha] = useState('');
@@ -32,53 +31,8 @@ function TableMatriculas() {
     const [page, setPage] = useState(1);
     const [fichas, setFichas] = useState([]);
     const [matriculas, setMatriculas] = useState([]);
-    const [uploadedFile, setUploadedFile] = useState(null);
-    const fileInputRef = useRef(null);
-
-    const handleUpload = (event) => {
-        event.preventDefault();
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-            const file = fileInputRef.current.files[0];
-            if (file) {
-                setUploadedFile(file);
-                uploadFile(file)
-                    .then(() => {
-                        alert('Archivo subido con éxito!');
-                    })
-                    .catch(error => {
-                        console.error('Error al subir el archivo:', error);
-                        alert('Error al subir el archivo. Por favor, inténtelo nuevamente.');
-                    });
-            }
-        }
-    };    
-
-    const handleImportExcel = async () => {
-        if (!uploadedFile) {
-            alert("Por favor seleccione un archivo para importar");
-            return;
-        }
-
-        try {
-            const formData = new FormData();
-            formData.append('file', uploadedFile);
-
-            const response = await axiosClient.post('/matriculas/import-excel', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            console.log(response.data); // Usa esta línea si quieres ver la respuesta en la consola
-            alert('Archivo importado con éxito');
-
-        } catch (error) {
-            console.error('Error al importar Excel:', error);
-            alert('Hubo un error al importar el archivo');
-        }
-    };
-
+    const [file, setFile] = useState(null);
+    const fileInputRef = useRef(null); // Use ref for file input
 
     // Fetch para obtener las fichas
     useEffect(() => {
@@ -141,7 +95,49 @@ function TableMatriculas() {
         fetchMatriculas();
     }, [selectedFicha, page, rowsPerPage, fetchMatriculas]);
 
-    // Abre el modal con el formulario para registrar matrícula
+    const fetchFile = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);  // Asegúrate de que 'file' es el nombre esperado en el backend.
+    
+        try {
+            const response = await axiosClient.post('/excel/import', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setFile(response.data);
+
+            Swal.fire({
+                title: 'Importación exitosa',
+                text: 'Los datos se han importado correctamente.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+
+        } catch (error) {
+            console.error("Error al cargar archivo:", error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al cargar el archivo. Intenta de nuevo más tarde.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+    
+    const handleFileChange = (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            fetchFile(selectedFile);  // Llama a la función fetchFile pasando el archivo seleccionado
+        }
+    };
+    
+
+    const handleClickImportarExcel = () => {
+        fileInputRef.current.click(); // Triggers file input click
+    };
+
+
     const handleOpenModal = (formType, data = null) => {
         if (formType === 'formMatriculas') {
             setBodyContent(<FormMatriculas initialData={data} fichaSeleccionada={selectedFicha} onSuccess={handleUpdateData} />);
@@ -155,12 +151,10 @@ function TableMatriculas() {
         fetchMatriculas();
     }, [fetchMatriculas]);
 
-    // Cierra el modal
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
 
-    // Filtrado de matriculas
     const filteredItems = useMemo(() => {
         if (!filterValue) return matriculas;
         return matriculas.filter(matricula =>
@@ -168,7 +162,6 @@ function TableMatriculas() {
         );
     }, [matriculas, filterValue]);
 
-    // Paginación
     const pages = useMemo(() => Math.ceil(filteredItems.length / rowsPerPage), [filteredItems.length, rowsPerPage]);
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -176,7 +169,6 @@ function TableMatriculas() {
         return filteredItems.slice(start, end);
     }, [page, filteredItems, rowsPerPage]);
 
-    // Ordenación
     const sortedItems = useMemo(() => {
         return [...items].sort((a, b) => {
             const first = a[sortDescriptor.column];
@@ -186,7 +178,6 @@ function TableMatriculas() {
         });
     }, [sortDescriptor, items]);
 
-    // Renderizado de celda
     const renderCell = useCallback(
         (item, columnKey) => {
             switch (columnKey) {
@@ -203,7 +194,6 @@ function TableMatriculas() {
         [handleOpenModal]
     );
 
-    // Contenido superior del componente
     const topContent = (
         <div className="flex flex-col mt-3">
             <div className="flex justify-between gap-3 items-end">
@@ -236,16 +226,20 @@ function TableMatriculas() {
                             <option disabled>Cargando fichas...</option>
                         )}
                     </select>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".xlsx, .xls"
-                        onChange={handleUpload}
-                        style={{ display: 'none' }}
-                    />
-                    <Button className="bg-[#92d22e] text-white" onClick={handleImportExcel}>
-                        Importar Excel
-                    </Button>
+                    <div>
+                        <Button className="bg-[#92d22e] text-white" onClick={handleClickImportarExcel}>
+                            Importar Excel
+                        </Button>
+                        <Input
+                            ref={fileInputRef}
+                            accept=".xlsx, .xls"
+                            onChange={handleFileChange}
+                            className="hidden"
+                            id="fileInput"
+                            type="file"
+                        />
+                    </div>
+
                     <Button
                         onClick={() => handleOpenModal("formMatriculas")}
                         className="bg-[#90d12c] text-white"
@@ -260,7 +254,6 @@ function TableMatriculas() {
                     </Button>
                 </div>
             </div>
-
             <div className="flex items-center justify-between mt-2 mb-5">
                 <span className="text-default-400 text-small mt-2">
                     Total {matriculas.length} matriculas
@@ -281,7 +274,6 @@ function TableMatriculas() {
         </div>
     );
 
-    // Columnas de la tabla
     const columns = [
         { key: "ficha", label: "Ficha" },
         { key: "nombre_aprendiz", label: "Aprendiz" },
@@ -327,7 +319,7 @@ function TableMatriculas() {
                     )
                 ) : (
                     <div className="text-center mt-6">
-                        <p>Seleccione una ficha para ver las matriculas.</p>
+                        <p>Seleccione una ficha para ver las matrículas.</p>
                     </div>
                 )}
                 {pages > 1 && (

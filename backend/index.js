@@ -18,7 +18,7 @@ import { rutaHorarios } from './src/routes/Horarios.js'
 import { RutaMunicipios } from './src/routes/municipios.route.js'
 import rutaNovedades from './src/routes/novedades.route.js'
 import rutaAsignacion from './src/routes/asignacion.route.js'
-import router from './src/routes/ImportExcel.js'
+import router from './src/routes/importExcel.route.js'
 
 const servidor = express()
 
