@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import PDFUploader from './Pdf';
 import ButtonEnviar from '../atoms/ButtonEnviar';
 import { Chip } from '@nextui-org/react';
 import Icons from '../../styles/Variables';
 import axiosClient from "../../configs/axiosClient.jsx";
 import ButtonDescargar from '../atoms/ButtonDescargar.jsx';
-
+import Swal from 'sweetalert2';
+import ButtonAprobado from '../atoms/ButtonAprobado.jsx';
+import ButtonNoAprobado from '../atoms/ButtonNoAprobado.jsx';
 
 function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
+  const [seguimiento, setSeguimiento] = useState([]);
   const [estadoActaVisible, setEstadoActaVisible] = useState(false);
   const [fecha, setFecha] = useState("");
   const [seguimientoPdf, setSeguimientoPdf] = useState(null);
   const [idPersona, setIdPersona] = useState("");
   const [userRole, setUserRole] = useState(null);
-  const [file, setFile] = useState(null);
-
-
-
+  const [estado, setEstado] = useState(null);
+  const [pdfName, setPdfName] = useState(null);
 
   const seguimientoNumeros = {
     1: 1,
@@ -50,7 +51,19 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
     }
   }, [id_seguimiento, onIdSend]);
 
-  /* Estado para definir elementos de los diferentes roles */
+  useEffect(() => {
+    if (id_seguimiento) {
+      axiosClient.get(`/seguimientos/listarEstado/${id_seguimiento}`)
+        .then(response => {
+          setEstado(response.data.estado);
+          setPdfName(response.data.pdf);
+        })
+        .catch(error => {
+          console.error('Error al obtener el estado del seguimiento:', error);
+        });
+    }
+  }, [id_seguimiento]);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -63,19 +76,56 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
     }
   }, []);
 
-  // Función para manejar la carga del archivo de acta
   const handleActaPdfSubmit = (file) => {
     setSeguimientoPdf(file);
     setEstadoActaVisible(true);
   };
 
-  // Función para enviar el acta
   const handleSubmitActa = async () => {
-    if (!id_seguimiento) {
-      console.error("ID de seguimiento no definido");
-      alert("ID de seguimiento no definido");
+    if (!seguimientoPdf) {
+      await Swal.fire({
+        title: "Error",
+        text: "Debes cargar un archivo PDF para poder enviarlo",
+        icon: "error",
+        confirmButtonText: "Entendido",
+        customClass: {
+          confirmButton: 'bg-[#6fb12d] text-white px-4 py-2 rounded-md text-lg hover:bg-[#5a9b25] mr-5',
+        },
+        buttonsStyling: false,
+      });
       return;
     }
+
+    if (pdfName) {
+      const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Ya existe un PDF cargado, ¿quieres reemplazarlo?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, reemplazar",
+        cancelButtonText: "Cancelar",
+        customClass: {
+          confirmButton: 'bg-[#6fb12d] text-white px-4 py-2 rounded-md text-lg hover:bg-[#5a9b25] mr-5',
+          cancelButton: 'bg-[#f53a7b] text-white px-4 py-2 rounded-md text-lg hover:bg-[#d6306e]'
+        },
+        buttonsStyling: false,
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+    }
+
+    if (!id_seguimiento) {
+      console.error("ID de seguimiento no definido");
+      Swal.fire({
+        title: "Error",
+        text: "ID de seguimiento no definido",
+        icon: "error",
+      });
+      return;
+    }
+
     const formData = new FormData();
     if (seguimientoPdf) {
       formData.append("seguimientoPdf", seguimientoPdf);
@@ -83,7 +133,7 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
 
     try {
       const response = await axiosClient.post(
-        `/seguimientos/cargarPDF/${id_seguimiento}`, // Usa id_seguimiento aquí
+        `/seguimientos/cargarPDF/${id_seguimiento}`,
         formData,
         {
           headers: {
@@ -93,63 +143,250 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
       );
 
       if (response.status === 200) {
-        alert("Acta enviada correctamente");
+        Swal.fire({
+          title: "Éxito",
+          text: "Acta enviada correctamente",
+          icon: "success",
+        });
         if (handleSubmit) handleSubmit();
       } else {
-        alert("Error al enviar el Acta.");
+        Swal.fire({
+          title: "Error",
+          text: "Error al enviar el Acta.",
+          icon: "error",
+        });
       }
     } catch (error) {
       console.error("Error del servidor:", error);
-      alert("Error del servidor: " + error.message);
+      Swal.fire({
+        title: "Error del servidor",
+        text: error.message,
+        icon: "error",
+      });
     }
   };
 
-  const downloadFile = () => {
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleAprobar = async (id_seguimiento) => {
+    try {
+      const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Quieres aprobar esta Acta?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, Aprobar",
+        cancelButtonText: "No, cancelar",
+        reverseButtons: true,
+        customClass: {
+          confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
+          cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
+        },
+      });
+  
+      if (!result.isConfirmed) {
+        return;
+      }
+  
+      if (!id_seguimiento) {
+        console.error("ID de seguimiento no proporcionado");
+        await Swal.fire({
+          title: "Error",
+          text: "El ID de seguimiento no está definido.",
+          icon: "error",
+          confirmButtonText: "Entendido",
+        });
+        return;
+      }
+  
+      const response = await axiosClient.put(`/seguimientos/aprobar/${id_seguimiento}`); // Usa PUT si es una actualización
+  
+      if (response.status === 200) {
+        Swal.fire("Aprobado", "El acta ha sido aprobada correctamente", "success");
+  
+        // Actualización del estado después de la aprobación
+        setSeguimiento((prevSeguimiento) =>
+          prevSeguimiento.filter((seguimiento) => seguimiento.id_seguimiento !== id_seguimiento)
+        );
+      } else {
+        throw new Error("Error inesperado durante la aprobación.");
+      }
+    } catch (error) {
+      console.error("Error al aprobar el acta:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo aprobar el acta. Intenta nuevamente.",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    }
   };
+
+
+  const handleNoAprobar = async (id_seguimiento) => {
+    try {
+      const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Quieres rechazar esta Acta?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, Rechazar",
+        cancelButtonText: "No, cancelar",
+        reverseButtons: true,
+        customClass: {
+          confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
+          cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
+        },
+      });
+  
+      if (!result.isConfirmed) {
+        return;
+      }
+  
+      if (!id_seguimiento) {
+        console.error("ID de seguimiento no proporcionado");
+        await Swal.fire({
+          title: "Error",
+          text: "El ID de seguimiento no está definido.",
+          icon: "error",
+          confirmButtonText: "Entendido",
+        });
+        return;
+      }
+  
+      const response = await axiosClient.put(`/seguimientos/rechazar/${id_seguimiento}`); // Usa PUT si es una actualización
+  
+      if (response.status === 200) {
+        Swal.fire("Rechazada", "El acta ha sido rechazada correctamente", "success");
+  
+        // Actualización del estado después de la aprobación
+        setSeguimiento((prevSeguimiento) =>
+          prevSeguimiento.filter((seguimiento) => seguimiento.id_seguimiento !== id_seguimiento)
+        );
+      } else {
+        throw new Error("Error inesperado durante la aprobación.");
+      }
+    } catch (error) {
+      console.error("Error al aprobar el acta:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo aprobar el acta. Intenta nuevamente.",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+    }
+  };
+  
+
+  const downloadFile = async (id_seguimiento) => {
+    console.log("ID de seguimiento:", id_seguimiento); // Verifica el valor aquí
+    try {
+      const response = await axiosClient.get(`/seguimientos/descargarPdf/${id_seguimiento}`, {
+        responseType: 'blob',
+      });
+
+      if (response.headers['content-type'] === 'application/json') {
+        const errorData = await response.data.text();
+        console.error('Error del servidor:', errorData);
+        Swal.fire({
+          title: "Error",
+          text: "No se pudo descargar el archivo.",
+          icon: "error",
+        });
+        return;
+      }
+
+      const fileURL = URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = fileURL;
+      link.setAttribute('download', `acta_seguimiento_${id_seguimiento}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Error al descargar el archivo:', error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo descargar el archivo.",
+        icon: "error",
+      });
+    }
+  };
+
+
+
+
+  const estadoConfig = {
+    aprobado: {
+      color: "success",
+      icon: Icons.aprobado,
+    },
+    noAprobado: {
+      color: "error",
+      icon: Icons.noAprobado,
+    },
+    solicitud: {
+      color: "warning",
+      icon: Icons.solicitud,
+    },
+  };
+
+  const { color, icon } = estadoConfig[estado] || {};
 
   return (
     <>
-      <h1 className="font-semibold text-xl">Acta:</h1>
-      <div className="border shadow-medium rounded-2xl p-4 flex flex-col gap-4 relative h-32">
-        <h2 className="font-semibold text-lg absolute top-4 left-4">
-          Acta N° {seguimientoNumeros[id_seguimiento] || 1}{" "}:
+      <h1 className="font-semibold text-xl mb-4">Acta:</h1>
+      <div className="border shadow-medium rounded-2xl p-4 flex flex-col relative h-40">
+        <h2 className="font-semibold text-lg mb-2">
+          Acta N° {seguimientoNumeros[id_seguimiento] || 1}:
         </h2>
-        <div className="flex justify-center items-center h-full">
-          {(userRole !== 'Aprendiz') && (
-            <PDFUploader onFileSelect={handleActaPdfSubmit} />
+
+        <div className="flex flex-col items-center gap-2 mb-4 ">
+          {pdfName && (
+            <p className="font-semibold text-gray-500 text-sm">
+              {pdfName}
+            </p>
           )}
-          <ButtonDescargar onClick={downloadFile} />
-          {(userRole !== 'Aprendiz') && (
-          <ButtonEnviar onClick={handleSubmitActa} />
-          )}
-        </div>
-        {estadoActaVisible && (
-          <div className="absolute top-4 left-4 flex items-center gap-2 ml-24">
-            <Chip
-              endContent={<Icons.solicitud size={20} />}
-              variant="flat"
-              color="warning"
-            >
-              Solicitud
-            </Chip>
+
+          <div className="flex items-center">
+          {estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
+              <PDFUploader onFileSelect={handleActaPdfSubmit} />
+            )}
+            <ButtonDescargar onClick={() => downloadFile(id_seguimiento)} />
+            {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
+              <ButtonAprobado onClick={() => handleAprobar(id_seguimiento)}/>
+            )}
+            {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
+              <ButtonNoAprobado onClick={() => handleNoAprobar(id_seguimiento)} />
+            )}
+            {estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
+              <ButtonEnviar onClick={handleSubmitActa} />
+            )}
           </div>
-        )}
-        {estadoActaVisible && (
-          <p className="absolute bottom-4 right-4 text-gray-500 text-sm">
-            {fecha}
-          </p>
+        </div>
+
+        {pdfName && (
+          <>
+            {estado && (
+              <div className="absolute top-4 left-28 flex items-center gap-2">
+                <Chip
+                  endContent={icon && React.createElement(icon, { size: 20 })}
+                  variant="flat"
+                  color={color}
+                  className="w-10"
+                >
+                  {estado}
+                </Chip>
+              </div>
+            )}
+            {fecha && (
+              <p className="absolute bottom-4 right-4 text-gray-500 text-sm">
+                {fecha}
+              </p>
+            )}
+          </>
         )}
       </div>
     </>
-  )
+  );
 }
 
-export default ActaSeguimiento
+export default ActaSeguimiento;

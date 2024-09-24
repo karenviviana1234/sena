@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
-import ActaSeguimiento from "../molecules/ActaSeguimiento.jsx";
+import ActaSeguimiento from '../molecules/ActaSeguimiento.jsx'
 import Bitacoras from "../molecules/Bitacoras.jsx";
 
 function ComponentSeguimiento({id_seguimiento}) {
@@ -20,8 +19,11 @@ function ComponentSeguimiento({id_seguimiento}) {
 
       {/* Sección para registrar bitácoras y actividades */}
      <div>
-      <Bitacoras id_seguimiento={id_seguimiento}/>
+      
+     <Bitacoras id_seguimiento={id_seguimiento} />
+
      </div>
+<<<<<<< HEAD
         {/* Sección para actividades */}
         <div className="flex-1 min-w-[300px]  p-4">
           <h1 className="font-semibold mb-4 text-xl">Novedades:</h1>
@@ -39,6 +41,10 @@ function ComponentSeguimiento({id_seguimiento}) {
             </div>
           </div>
         </div>     
+=======
+        
+
+>>>>>>> 8bcf30ec146c5c21fff989e545aab2c4e844c282
     </div>
   );
 }

@@ -39,7 +39,6 @@ export const listarasignaciones = async (req, res) => {
     }
 };
 
-
 export const registrarasignacion = async (req, res) => {
     try {
         const { productiva, actividad } = req.body;
@@ -53,6 +52,7 @@ export const registrarasignacion = async (req, res) => {
 
         console.log('Valores recibidos:', { productiva, actividad });
 
+        // Verificar si la actividad existe y está activa
         const [actividadExist] = await pool.query(
             "SELECT * FROM actividades WHERE id_actividad = ? AND estado = 'Activo'",
             [actividad]
@@ -65,6 +65,10 @@ export const registrarasignacion = async (req, res) => {
             });
         }
 
+        // Obtener el id_instructor de la actividad
+        const idInstructor = actividadExist[0].id_instructor;
+
+        // Verificar si la etapa productiva existe
         const [productivaExist] = await pool.query(
             "SELECT * FROM productivas WHERE id_productiva = ?",
             [productiva]
@@ -77,15 +81,42 @@ export const registrarasignacion = async (req, res) => {
             });
         }
 
+        // Registrar la asignación en la tabla asignaciones
         const [result] = await pool.query(
-            "INSERT INTO asignaciones (productiva, actividad) VALUES (?, ?)",
+            "INSERT INTO asignaciones (id_productiva, id_actividad) VALUES (?, ?)",
             [productiva, actividad]
         );
 
         if (result.affectedRows > 0) {
+            // Registrar seguimientos (asumiendo que hay 3 seguimientos por productiva)
+            const seguimientoQuery = `
+                INSERT INTO seguimientos (id_productiva, id_instructor, seguimiento_numero)
+                VALUES (?, ?, ?)
+            `;
+            for (let i = 1; i <= 3; i++) {
+                await pool.query(seguimientoQuery, [productiva, idInstructor, i]);
+            }
+
+            // Registrar bitacoras (asumiendo que hay 4 bitacoras por cada seguimiento)
+            const bitacoraQuery = `
+                INSERT INTO bitacoras (id_seguimiento, id_instructor, bitacora_numero)
+                VALUES (?, ?, ?)
+            `;
+
+            const [seguimientos] = await pool.query(
+                "SELECT id_seguimiento FROM seguimientos WHERE id_productiva = ?",
+                [productiva]
+            );
+
+            for (let seguimiento of seguimientos) {
+                for (let j = 1; j <= 4; j++) {
+                    await pool.query(bitacoraQuery, [seguimiento.id_seguimiento, idInstructor, j]);
+                }
+            }
+
             return res.status(200).json({
                 status: 200,
-                message: "Asignación registrada con éxito."
+                message: "Asignación registrada con éxito, incluyendo seguimientos y bitacoras."
             });
         } else {
             return res.status(403).json({

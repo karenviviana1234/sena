@@ -26,6 +26,7 @@ servidor.use(cors())
 
 servidor.use(body_parser.json())
 servidor.use(body_parser.urlencoded({ extended: false }))
+servidor.use('/public', express.static('public'));
 
 servidor.use( rutaSeguridad )
 servidor.use('/personas', rutaPersona)
@@ -45,6 +46,7 @@ servidor.use('/municipios', RutaMunicipios )
 servidor.use('/novedad', rutaNovedades )
 servidor.use(rutaAsignacion )
 servidor.use('/export', router)
+servidor.use('/novedades', rutaNovedades)
 
 servidor.use(express.static('./public'))
 servidor.set('view engine', 'ejs')

@@ -12,7 +12,6 @@ rutaPersona.get('/buscar/:id_persona', validarToken, buscarPersonas)
 rutaPersona.post('/registrarA', registrarAprendiz)
 rutaPersona.post('/registrarI', registrarInstructor)
 rutaPersona.post('/registrares', registrarUsuarios);
-
 rutaPersona.put('/actualizar/:id_persona', validarToken, actualizarPersona)
 rutaPersona.delete('/eliminar/:id_persona', validarToken, eliminarPersona)
 rutaPersona.post('/desactivar/:id_persona', validarToken, desactivarPersona)

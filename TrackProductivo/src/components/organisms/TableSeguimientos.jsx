@@ -42,30 +42,6 @@ function TableSeguimientos() {
     const [page, setPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Function to open the modal and set the selected ID
-    const handleOpenModal = (id_seguimiento, type) => {
-        setFormType(type);
-        if (type === 'formNovedades') {
-            setBodyContent(<Novedades />);
-        } else if (type === 'componentSeguimiento') {
-            setBodyContent(<ComponentSeguimiento
-                id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado
-                mode="create"
-                handleSubmit={() => console.log("Submit")}
-                onClose={() => console.log("Close")}
-                actionLabel="Enviar"
-                onIdSend={(id) => console.log("ID de seguimiento enviado:", id)} />);
-        }
-        console.log("datos enviados", id_seguimiento)
-        setSelectedSeguimientoId(id_seguimiento);
-        setIsModalOpen(true);
-    };
-
-
-    // Function to close the modal
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
 
     // Fetch seguimientos from API
     const getSeguimientos = useCallback(async () => {
@@ -80,6 +56,41 @@ function TableSeguimientos() {
     useEffect(() => {
         getSeguimientos();
     }, [getSeguimientos]);
+
+
+    const handleUpdateData = useCallback(() => {
+        getSeguimientos();
+    }, [getSeguimientos]);
+
+
+    // Function to open the modal and set the selected ID
+    const handleOpenModal = (id_seguimiento, type) => {
+        setFormType(type);
+        if (type === 'formNovedades') {
+            setBodyContent(<Novedades id_seguimiento={id_seguimiento}/>);
+        } else if (type === 'componentSeguimiento') {
+            setBodyContent(<ComponentSeguimiento
+                id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado
+                mode="create"
+                handleSubmit={() => console.log("Submit")}
+                onClose={() => console.log("Close")}
+                actionLabel="Enviar"
+                onSuccess={handleUpdateData}
+                onIdSend={(id) => console.log("ID de seguimiento enviado:", id)} />);
+        }
+        console.log("datos enviados", id_seguimiento)
+        setSelectedSeguimientoId(id_seguimiento);
+        setIsModalOpen(true);
+    };
+
+
+    // Function to close the modal
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+
+
 
     // Filter items based on the search input
     const filteredItems = useMemo(() => {
@@ -114,6 +125,36 @@ function TableSeguimientos() {
         });
     }, [sortDescriptor, items]);
 
+    /* Color de cada Ficha */
+    const hashCode = (str) => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+    };
+
+    const intToColor = (int) => {
+        const r = (int >> 16) & 0xFF;
+        const g = (int >> 8) & 0xFF;
+        const b = int & 0xFF;
+        
+        // Convertir a un color claro
+        const lightR = Math.min(255, r + 100); // Aumenta el rojo
+        const lightG = Math.min(255, g + 100); // Aumenta el verde
+        const lightB = Math.min(255, b + 100); // Aumenta el azul
+    
+        return `rgba(${lightR}, ${lightG}, ${lightB}, 0.5)`; // Opacidad del 50%
+    };
+
+    const getColorForFicha = (fichaNumber) => {
+        const hash = hashCode(fichaNumber.toString());
+        return intToColor(hash);
+    };
+
+
     // Render cell based on column key
     const renderCell = useCallback((item, columnKey) => {
         const cellValue = item[columnKey];
@@ -126,9 +167,7 @@ function TableSeguimientos() {
                     <div className="flex justify-around items-center">
                         <ButtonRegistrarNovedad
                             onClick={() => handleOpenModal(null, 'formNovedades')}
-
                         />
-                        <ButtonEliminar/>
                     </div>
 
                 );
@@ -137,20 +176,33 @@ function TableSeguimientos() {
             case "seguimiento2":
             case "seguimiento3":
                 const formattedDate = format(new Date(cellValue), 'dd-MM-yyyy');
-                const seguimientoIdKey = `id_${columnKey}`; // Determina el ID de seguimiento basado en la clave de la columna
+                const seguimientoIdKey = `id_${columnKey}`;
+                const estadoKey = `estado${columnKey.charAt(columnKey.length - 1)}`; // Obtener el estado correspondiente
+                const estado = item[estadoKey]; // Obtener el estado
+
                 return (
-                    <Button
-                        className="bg-[#ffa808] text-white h-8 w-10 text-xs"
-                        onClick={() => handleOpenModal(item[seguimientoIdKey], 'componentSeguimiento')} // Usa el ID de seguimiento correcto
-                    >
-                        {formattedDate}
-                    </Button>
+                    <div className="flex flex-col items-center">
+                        <Button
+                            className=" text-white h-8 w-10 text-xs"
+                            style={{
+                                backgroundColor:
+                                    estado === "no aprobado" ? "red" :
+                                        estado === "solicitud" ? "orange" :
+                                            estado === "aprobado" ? "green" : null
+                            }}
+
+                            onClick={() => handleOpenModal(item[seguimientoIdKey], 'componentSeguimiento')}
+                        >
+                            {formattedDate}
+                        </Button>
+                    </div>
                 );
             case "codigo":
                 return (
                     <Chip
-                        className='text-[#3c3c3c]'
+                        className="text-[#3c3c3c]"
                         variant="flat"
+                        style={{ backgroundColor: getColorForFicha(cellValue) || "rgba(240, 240, 240, 0.8)" }} // Color claro por defecto
                     >
                         {cellValue}
                     </Chip>
@@ -181,7 +233,9 @@ function TableSeguimientos() {
                         size="sm"
                         color="primary"
                     />
+
                 );
+
             default:
                 return cellValue;
         }
@@ -194,11 +248,6 @@ function TableSeguimientos() {
         }
     }, [page, pages]);
 
-    const onPreviousPage = useCallback(() => {
-        if (page > 1) {
-            setPage(prevPage => prevPage - 1);
-        }
-    }, [page]);
 
     const onRowsPerPageChange = useCallback((e) => {
         setRowsPerPage(Number(e.target.value));
@@ -258,7 +307,7 @@ function TableSeguimientos() {
         { key: "seguimiento1", label: "Seguimiento 1" },
         { key: "seguimiento2", label: "Seguimiento 2" },
         { key: "seguimiento3", label: "Seguimiento 3" },
-        { key: "porcentajes", label: "Porcentajes" },
+        { key: "porcentaje", label: "Porcentaje" },
         { key: "acciones", label: "Acciones" },
     ];
 
