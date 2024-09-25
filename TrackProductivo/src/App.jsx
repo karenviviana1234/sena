@@ -11,7 +11,7 @@ import GlobalProvider from './context/GlobalContext';
 import FichasPage from './components/pages/FichasPage.jsx';
 import NominaPage from './components/pages/NominaPage.jsx';
 import MatriculasPage from './components/pages/MatriculasPage.jsx';
-import EmpresaPage from './components/pages/EmpresaPage.jsx';
+
 import SeguimientoPage from './components/pages/SeguimientoPage.jsx';
 import EstadisticasPage from './components/pages/EstadisticasPage.jsx';
 import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
@@ -56,11 +56,7 @@ export const App = () => {
             </WithSidebar>
           } />
 
-          <Route path="/empresa" element={
-            <WithSidebar>
-              <EmpresaPage />
-            </WithSidebar>
-          } />
+
           <Route path="/asignaciones" element={
             <WithSidebar>
               <AsignacionPage />
@@ -126,9 +122,7 @@ export function WithSidebar({ children }) {
         {(userRole !== 'Aprendiz') && (
           <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
         )}
-        {(userRole !== 'Aprendiz') && (
-        <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
-        )}
+
         {(userRole !== 'Aprendiz') && (
         <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
         )}

@@ -41,13 +41,14 @@ export const listarSeguimientoAprendices = async (req, res) => {
             SELECT
                 p.identificacion AS identificacion,
                 p.nombres AS nombres,
+                p.correo AS correo,   -- Agregamos la columna correo
                 f.codigo AS codigo,
                 prg.sigla AS sigla,
                 e.razon_social AS razon_social,
                 s.id_seguimiento AS id_seguimiento,
                 s.seguimiento AS seguimiento,
                 s.fecha AS fecha,
-                s.estado AS estado,  -- Agregamos la columna estado
+                s.estado AS estado,  -- Columna estado ya agregada
                 COUNT(b.id_bitacora) AS total_bitacoras,
                 SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) AS bitacoras_con_pdf,
                 (SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) / 12) * 100 AS porcentaje
@@ -63,7 +64,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
             WHERE
                 p.rol = 'Aprendiz'
             GROUP BY
-                s.id_seguimiento, p.identificacion, s.seguimiento, s.fecha, f.codigo, prg.sigla, e.razon_social, s.estado
+                s.id_seguimiento, p.identificacion, s.seguimiento, s.fecha, f.codigo, prg.sigla, e.razon_social, s.estado, p.correo
             ORDER BY
                 p.identificacion, s.seguimiento;
         `;
@@ -77,6 +78,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
                     aprendizMap[row.identificacion] = {
                         identificacion: row.identificacion,
                         nombres: row.nombres,
+                        correo: row.correo,    // Agregamos el correo al map
                         codigo: row.codigo,
                         sigla: row.sigla,
                         razon_social: row.razon_social,
@@ -124,8 +126,6 @@ export const listarSeguimientoAprendices = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor: ' + error.message });
     }
 };
-
-
 
 
 

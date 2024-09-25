@@ -1,6 +1,10 @@
 import { Router } from "express";
-import { listarHorarios } from "../controllers/Horarios.js";
+import { ActualizarHorarios, CrearHorario, listarHorarios } from "../controllers/Horarios.js";
+import { validarToken } from "../controllers/seguridad.controller.js";
 
 export const rutaHorarios = Router();
 
-rutaHorarios.get('/listar', listarHorarios)
+rutaHorarios.get("/listar", validarToken, listarHorarios);
+rutaHorarios.post("/registrar", validarToken, CrearHorario);
+rutaHorarios.put("/actualizar/:id_horario", validarToken, ActualizarHorarios);
+

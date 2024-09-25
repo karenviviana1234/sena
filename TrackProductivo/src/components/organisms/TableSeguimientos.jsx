@@ -43,7 +43,7 @@ function TableSeguimientos() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
 
-    const seguimientosIds = [1, 2, 3]; 
+    const seguimientosIds = [1, 2, 3];
 
 
     // Fetch seguimientos from API
@@ -70,7 +70,7 @@ function TableSeguimientos() {
     const handleOpenModal = (id_seguimiento, type) => {
         setFormType(type);
         if (type === 'formNovedades') {
-            setBodyContent(<Novedades id_seguimiento={id_seguimiento}/>);
+            setBodyContent(<Novedades id_seguimiento={id_seguimiento} />);
         } else if (type === 'componentSeguimiento') {
             setBodyContent(<ComponentSeguimiento
                 id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado
@@ -143,12 +143,12 @@ function TableSeguimientos() {
         const r = (int >> 16) & 0xFF;
         const g = (int >> 8) & 0xFF;
         const b = int & 0xFF;
-        
+
         // Convertir a un color claro
         const lightR = Math.min(255, r + 100); // Aumenta el rojo
         const lightG = Math.min(255, g + 100); // Aumenta el verde
         const lightB = Math.min(255, b + 100); // Aumenta el azul
-    
+
         return `rgba(${lightR}, ${lightG}, ${lightB}, 0.5)`; // Opacidad del 50%
     };
 
@@ -225,19 +225,19 @@ function TableSeguimientos() {
                         </Dropdown>
                     </div>
                 );
-            case "nombres":
-                return (
-                    <User
-                        name={cellValue}
-                        description={item.correo || "Sin correo"}
-                        avatarSrc="https://via.placeholder.com/150"
+                case "nombres":
+                    return sortedItems.map((item) => (
+                      <User
+                        name={item.nombres}    // Usamos item.nombres para mostrar el nombre correcto
+                        description={item.correo} // Mapear correctamente el correo
+                        avatarSrc="https://via.placeholder.com"
                         bordered
                         as="button"
                         size="sm"
                         color="primary"
-                    />
-
-                );
+                      />
+                    ));
+                  
 
             default:
                 return cellValue;
