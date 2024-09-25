@@ -10,20 +10,19 @@ import {
 } from "@nextui-org/react";
 import axiosClient from '../../configs/axiosClient';
 
-const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, deleteComponent: DeleteComponent }) => {
+const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, deleteComponent: DeleteComponent, refreshTrigger }) => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Default number of rows per page
-  const [selectedItem, setSelectedItem] = useState(null); // State to manage selected item for update
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // State to manage update modal visibility
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State to manage delete modal visibility
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
       const response = await axiosClient.get(dataEndpoint);
       setData(response.data);
-
       setTotalPages(Math.ceil(response.data.length / rowsPerPage));
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -32,8 +31,8 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
 
   useEffect(() => {
     fetchData();
-  }, [dataEndpoint]);
-
+  }, [dataEndpoint, refreshTrigger]);
+  
   useEffect(() => {
     setTotalPages(Math.ceil(data.length / rowsPerPage));
   }, [data, rowsPerPage]);
@@ -79,6 +78,7 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
   };
 
 
+
   return (
     <div>
       <div className="flex flex-col justify-between items-end mb-4 my-2">
@@ -110,12 +110,12 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
               ))}
               <TableCell>
                 <button
-                  className="bg-transparent hover:bg-gray-300 text-gray-600 font-normal py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 ease-in-out mr-2"
+                  className="bg-transparent bg-lime-400 hover:bg-lime-500 text-gray-900 font-normal py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 ease-in-out mr-2"
                   onClick={() => handleUpdateClick(item)}
                 >
                   Actualizar
                 </button>
-          
+              
               </TableCell>
             </TableRow>
           ))}
@@ -133,9 +133,16 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
         />
       </div>
       {isUpdateModalOpen && selectedItem && (
-        <UpdateComponent item={selectedItem} onClose={() => setIsUpdateModalOpen(false)} refreshData={refreshData} />
+        <UpdateComponent 
+          item={selectedItem} 
+          onClose={() => setIsUpdateModalOpen(false)} 
+          refreshData={() => {
+          setIsUpdateModalOpen(false);
+          refreshData();
+          }} 
+        />
       )}
-   
+     
     </div>
   );
 };

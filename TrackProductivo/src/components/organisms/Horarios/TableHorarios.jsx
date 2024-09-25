@@ -1,39 +1,48 @@
-import React from 'react';
-
+import React, { useState } from 'react';
 import GlobalTable from '../../componets_globals/GlobalTable';
+import RegistroHorario from './RegisterHorarios';
+import ActualizarHorario from './updateHorarios';
 
 
 function TableHorariosPage() {
-  const columns = [
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  const handleRegisterSuccess = () => {
+    setRefreshTrigger((prev) => !prev);
+  };
+
+  const refreshData = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+
+  const columns = [
     'dia',
     'horas',
     'hora_inicio',
     'hora_fin',
     'ficha',
     'nombre_amb',
-    'estado'
-
+    'estado',
   ];
-
-
 
   return (
     <>
       <main className='w-full p-3 h-screen'>
         <div className='my-5 flex flex-col py-5'>
-
-          <GlobalTable 
-            columns={columns} 
-            dataEndpoint="/horarios/listar" 
-            //updateComponent={Update} 
-
+          <RegistroHorario onRegisterSuccess={handleRegisterSuccess} />
+          <GlobalTable
+            columns={columns}
+            dataEndpoint="/horarios/listar"
+            refreshTrigger={refreshTrigger}
+            updateComponent={ActualizarHorario}
+            refreshData={refreshData} 
           />
         </div>
-
       </main>
     </>
   );
+
 };
 
 
