@@ -67,32 +67,16 @@ export const registrarBitacora = async (req, res) => {
             message: 'Error del servidor: ' + error
         });
     }
-<<<<<<< HEAD
-}
-/* Cargar Archivo pdf a una bitacora existente. */export const uploadPdfToBitacoras = async (req, res) => {
-    try {
-        const { id_bitacora } = req.params;  // Obtener el ID de la bitácora desde los parámetros de la URL
-        const pdf = req.file?.originalname || null;  // Obtener el nombre del archivo PDF cargado
-        const { instructor } = req.body;  // Obtener el nombre del instructor desde el cuerpo de la solicitud
-=======
 };
 
 export const uploadPdfToBitacoras = async (req, res) => {
     try {
         const { id_bitacora } = req.params;
         const pdf = req.file?.originalname || null;
->>>>>>> 8bcf30ec146c5c21fff989e545aab2c4e844c282
 
         if (!pdf) {
             return res.status(400).json({
                 message: 'No se ha cargado ningún archivo'
-            });
-        }
-
-<<<<<<< HEAD
-        if (!instructor) {
-            return res.status(400).json({
-                message: 'El campo instructor es requerido'
             });
         }
 
@@ -102,19 +86,7 @@ export const uploadPdfToBitacoras = async (req, res) => {
             SET pdf = ?, fecha = NOW(), instructor = ?
             WHERE id_bitacora = ?
         `;
-        const [result] = await pool.query(sqlUpdateBitacora, [pdf, instructor, id_bitacora]);
-=======
-        // Obtener la fecha actual en formato YYYY-MM-DD
-        const fechaActual = new Date().toISOString().slice(0, 10);
-
-        // Actualizar el campo 'pdf' y 'fecha' en la tabla 'bitacoras'
-        const sqlUpdateBitacora = `
-            UPDATE bitacoras
-            SET pdf = ?, fecha = ?
-            WHERE id_bitacora = ?
-        `;
-        const [result] = await pool.query(sqlUpdateBitacora, [pdf, fechaActual, id_bitacora]);
->>>>>>> 8bcf30ec146c5c21fff989e545aab2c4e844c282
+        const [result] = await pool.query(sqlUpdateBitacora, [pdf, id_bitacora]);
 
         if (result.affectedRows > 0) {
             res.status(200).json({

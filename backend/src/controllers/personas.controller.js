@@ -134,27 +134,26 @@ export const registrarInstructor = async (req, res) => {
   try {
     const { identificacion, nombres, correo, telefono, rol, tipo, sede, area } = req.body;
 
-    // Validar que todos los campos estén presentes
-    if (!identificacion || !nombres || !correo || !telefono || !rol || !tipo || !sede || !area) {
+    const sedeValida = ['Yamboro', 'Centro'];
+    if (sede && !sedeValida.includes(sede)) {
+        return res.status(400).json({
+            message: 'Sede no válido'
+        });
+    }
+
+    const tipoValida = ['Contratista', 'Planta'];
+    if (tipo && !tipoValida.includes(tipo)) {
+        return res.status(400).json({
+            message: 'Tipo no válido'
+        });
+    }
+
+
+    // Validar campos requeridos
+    if (!identificacion || !nombres || !correo || !telefono || !rol || !tipo ||!sede ||!area) {
       return res.status(400).json({
         status: 400,
         message: 'Todos los campos son obligatorios.',
-      });
-    }
-
-    // Validar sede
-    const sedeValida = ['Yamboro', 'Centro'];
-    if (!sedeValida.includes(sede)) {
-      return res.status(400).json({
-        message: 'Sede no válida',
-      });
-    }
-
-    // Validar tipo
-    const tipoValido = ['Contratista', 'Planta'];
-    if (!tipoValido.includes(tipo)) {
-      return res.status(400).json({
-        message: 'Tipo no válido',
       });
     }
 
@@ -169,12 +168,13 @@ export const registrarInstructor = async (req, res) => {
       });
     }
 
-    // Usar la identificación como contraseña por defecto y hacer el hash
-    const bcryptPassword = bcrypt.hashSync(identificacion.toString(), 12);
+    // Usar identificacion como contraseña por defecto y hacer el hash
+    const defaultPassword = identificacion.toString(); // Convertir a string si no es ya una cadena
+    const bcryptPassword = bcrypt.hashSync(defaultPassword, 12);
 
     // Consulta SQL para insertar datos
-    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol, tipo, sede, area, cargo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol, tipo, sede, area, 'Instructor', 'Activo'];
+    const query = `INSERT INTO personas (identificacion, nombres, correo, telefono, password, rol,  tipo, sede, area, cargo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)`;
+    const params = [identificacion, nombres, correo, telefono, bcryptPassword, rol,  tipo, sede, area, 'Instructor', 'Activo'];
 
     const [result] = await pool.query(query, params);
 
@@ -190,7 +190,7 @@ export const registrarInstructor = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error del servidor:', error);
+    console.error('Error del servidor:', error);  // Registrar el error en la consola
     res.status(500).json({
       status: 500,
       message: 'Error del servidor: ' + error.message,
@@ -468,38 +468,38 @@ export const actualizarPerfil = async (req, res) => {
   }
 };
 
-
 export const registrarUsuarios = async (req, res) => {
   try {
     const { identificacion, nombres, correo, telefono, password, cargo, sede } = req.body;
 
+    const cargosPermitidos = ["Coordinador", "Administrativo"];
+    if (!cargo || cargo === "$.0" || !cargosPermitidos.includes(cargo.toLowerCase())) {
+      return res.status(400).json({ message: "El cargo no es válido. Solo se permiten 'Coordinador' y 'Administrativo'." });
+    }
+
     const [result] = await pool.query('SELECT COUNT(*) as count FROM personas WHERE cargo = ?', [cargo.toLowerCase()]);
 
-    if (cargo.toLowerCase() === "administrativo" && result[0].count >= 2) {
+    if (cargo.toLowerCase() === "Administrativo" && result[0].count >= 2) {
       return res.status(400).json({ message: "Ya existen 2 usuarios registrados como Administrativos." });
     }
 
-    if (cargo.toLowerCase() === "coordinador" && result[0].count >= 1) {
+    if (cargo.toLowerCase() === "Coordinador" && result[0].count >= 1) {
       return res.status(400).json({ message: "Ya existe 1 usuario registrado como Coordinador." });
     }
 
     let rol;
-    if (cargo.toLowerCase() === "administrativo") {
+    if (cargo.toLowerCase() === "Administrativo") {
       rol = "seguimiento";
-    } else if (cargo.toLowerCase() === "coordinador") {
+    } else if (cargo.toLowerCase() === "Coordinador") {
       rol = "Coordinador"; 
     }
 
     const estado = 'activo';
 
-    // Encripta la contraseña
-    const saltRounds = 12; // Puedes ajustar este valor según tus necesidades
-    const bcryptPassword = bcrypt.hashSync(password, saltRounds);
-
     const [rows] = await pool.query(
       `INSERT INTO personas (identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [identificacion, nombres, correo, bcryptPassword, telefono, rol, cargo, estado, sede]
+      [identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede]
     );
 
     if (rows.affectedRows > 0) {
@@ -517,6 +517,67 @@ export const registrarUsuarios = async (req, res) => {
     res.status(500).json({
       status: 500,
       message: 'Error del servidor: ' + error.message
+    });
+  }
+};
+
+
+//cambiar instructor en etapa practica
+export const cambiarInstructor = async (req, res) => {
+  try {
+    const { id_persona } = req.params;
+    const { id_nuevo_instructor } = req.body;
+
+    const [oldPersona] = await pool.query("SELECT * FROM personas WHERE id_persona =?", [id_persona]);
+
+    if (oldPersona.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: 'Usuario no encontrado',
+      });
+    }
+
+    const [newInstructor] = await pool.query("SELECT * FROM personas WHERE id_persona =?", [id_nuevo_instructor]);
+
+    if (newInstructor.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: 'Nuevo instructor no encontrado',
+      });
+    }
+
+    const updatedUsuario = {
+      cargo: 'Instructor',
+      id_persona: id_nuevo_instructor,
+    };
+
+    const [result] = await pool.query(
+      `UPDATE personas SET 
+          cargo =?,
+          id_persona =?
+         WHERE id_persona =?`,
+      [
+        updatedUsuario.cargo,
+        updatedUsuario.id_persona,
+        id_persona
+      ]
+    );
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({
+        status: 200,
+        message: "El instructor ha sido cambiado.",
+      });
+    } else {
+      res.status(404).json({
+        status: 404,
+        message: "No se pudo cambiar el instructor, inténtalo de nuevo.",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Error en el sistema: " + error.message,
     });
   }
 };

@@ -19,102 +19,7 @@ function Bitacoras({
   id_bitacora,
   onIdSend,
 }) {
-<<<<<<< HEAD
-
-    const [bitacora, setBitacora] = useState('')
-    const [bitacoraPdf, setBitacoraPdf] = useState(null); // Estado para PDF de bitácora
-    const [idPersona, setIdPersona] = useState("");
-    const [bitacorasPdfs, setBitacorasPdfs] = useState([])
-    const [modalBitacora, setModalBitacora] = useState(false)
-    const [fecha, setFecha] = useState("");
-    const [EstadoBitacoraVisible, setEstadoBitacoraVisible] = useState(false);
-    useEffect(() => {
-        const currentDate = new Date().toISOString().slice(0, 10);
-        setFecha(currentDate);
-        const userJson = localStorage.getItem("user");
-        if (userJson && userJson !== "undefined" && userJson !== "null" && userJson !== "") {
-          try {
-            const user = JSON.parse(userJson);
-            if (user && user.id_persona) {
-              setIdPersona(user.id_persona);
-              console.log("ID de persona asignado:", user.id_persona);
-            } else {
-              console.warn("No se encontró un 'id_persona' válido en el usuario.");
-            }
-          } catch (error) {
-            console.error("Error al parsear el JSON del usuario:", error);
-          }
-        } else {
-          console.warn("No se encontró un valor válido para 'user' en localStorage.");
-          setIdPersona(null);
-        }    
-      
-        if (onIdSend && id_seguimiento) {
-          onIdSend(id_seguimiento);
-        }
-      }, [id_seguimiento, onIdSend]);
-      
-      useEffect(() => {
-        if (id_seguimiento) {
-          axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id_seguimiento}`).then((response) => {
-            setBitacorasPdfs(response.data);  // Guardamos las bitácoras obtenidas en el estado
-          }).catch(error => {
-            console.error("Error al obtener las bitácoras:", error);
-          });
-        }
-      }, [id_seguimiento]);
-    
-    
-      // Función para manejar la carga del archivo de bitácora
-      const handleBitacoraPdfSubmit = (file) => {
-        setBitacoraPdf(file);
-        setEstadoBitacoraVisible(true);
-      };
-      // Función para enviar la bitácora
-      const handleSubmitBitacoras = async (bitacora) => {
-        const formData = new FormData();
-        formData.append("fecha", fecha);
-        formData.append("bitacora", bitacora); // Número de bitácora fijo
-        formData.append("seguimiento", 1);
-        formData.append("instructor", idPersona);
-    
-        if (bitacoraPdf) {
-          formData.append("bitacoraPdf", bitacoraPdf);
-        } else {
-          console.warn("No se ha seleccionado ningún archivo PDF.");
-        }
-    
-        try {
-          const response = await axiosClient.post(
-            `/bitacoras/cargarpdf/${bitacora}`,
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
-    
-          if (response.status === 200) {
-            alert("Bitacora registrada correctamente");
-            if (handleSubmit) handleSubmit();
-          } else {
-            alert("Error al registrar la bitacora.");
-          }
-        } catch (error) {
-          console.error("Error del servidor:", error);
-          alert("Error del servidor: " + error.message);
-        }
-      };
-    
-      const [findBitacora, setFindBitacora] = useState([])
-    
-      const handleBuscar = (id) => {
-        axiosClient.get(`/bitacoras/buscar/${id}`).then((response) => {
-          console.log('Bitacora a editar', response.data);
-          setFindBitacora(response.data)
-        })
-=======
+  
   const [bitacoraPdf, setBitacoraPdf] = useState(null);
   const [idPersona, setIdPersona] = useState('');
   const [bitacorasPdfs, setBitacorasPdfs] = useState([]);
@@ -124,9 +29,6 @@ function Bitacoras({
   const [userRole, setUserRole] = useState(null);
   const [bitacora, setBitacora] = useState([]);
   const [estado, setEstado] = useState(null);
-
-
-
 
   useEffect(() => {
     const currentDate = new Date().toISOString().slice(0, 10);
@@ -371,7 +273,6 @@ function Bitacoras({
           icon: "error",
         });
         return;
->>>>>>> 8bcf30ec146c5c21fff989e545aab2c4e844c282
       }
 
       const fileURL = URL.createObjectURL(new Blob([response.data]));
