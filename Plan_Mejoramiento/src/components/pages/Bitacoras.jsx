@@ -1,20 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Text, FlatList, View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { Text, SectionList, View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import Layout from '../Template/Layout';
 import axiosClient from '../../axiosClient';
 import ModalBitacoras from '../moleculas/Modal_Bitacoras';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import SeguimientosContext from '../../Context/ContextSeguimiento';
 
 const Bitacoras = () => {
   const [bitacoras, setBitacoras] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  
+  const { idSeguimiento } = useContext(SeguimientosContext); // Usando el contexto
 
   useEffect(() => {
     const fetchBitacoras = async () => {
       try {
-        const response = await axiosClient.get('/bitacoras/listar');
-        setBitacoras(response.data);
+        const response = await axiosClient.get(`/bitacoras/bitacorasSeguiminetos/${idSeguimiento}`);
+        const groupedBitacoras = groupBySeguimiento(response.data);
+        setBitacoras(groupedBitacoras);
       } catch (error) {
         console.error('Error fetching bitacoras:', error);
       } finally {
@@ -23,7 +27,20 @@ const Bitacoras = () => {
     };
 
     fetchBitacoras();
-  }, []);
+  }, [idSeguimiento]); // Asegúrate de que se ejecute cuando cambie idSeguimiento
+
+  const groupBySeguimiento = (data) => {
+    const grouped = data.reduce((result, item) => {
+      const seguimientoId = item.id_seguimiento;
+      if (!result[seguimientoId]) {
+        result[seguimientoId] = { seguimientoId, data: [] };
+      }
+      result[seguimientoId].data.push(item);
+      return result;
+    }, {});
+    
+    return Object.values(grouped); // Convierte el objeto en un array para la SectionList
+  };
 
   const handleOpenModal = () => {
     setModalVisible(true);
@@ -33,9 +50,12 @@ const Bitacoras = () => {
     setModalVisible(false);
   };
 
+  const handleButtonPress = (id) => {
+    Alert.alert(`'ID del Seguimiento', El ID es: ${id}`); // Mostrar el ID
+  };
+
   const renderBitacora = ({ item }) => {
     const formattedDate = new Date(item.fecha).toLocaleDateString();
-
     return (
       <View style={styles.itemContainer}>
         <Text style={styles.itemTitle}>Fecha: {formattedDate}</Text>
@@ -51,9 +71,21 @@ const Bitacoras = () => {
     );
   };
 
+  const renderSectionHeader = ({ section }) => (
+    <View>
+      <Text style={styles.groupTitle}>Seguimiento ID: {section.seguimientoId}</Text>
+      {/* Botones para mostrar el ID */}
+      <View style={styles.buttonRow}>
+        <TouchableOpacity onPress={() => handleButtonPress(section.seguimientoId)}>
+          <Text style={styles.buttonText}>Mostrar ID</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
-    <Layout title={'Bitácoras'}>
       <View style={styles.container}>
+        <Text style={styles.title}>Bitacoras:</Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleOpenModal}>
             <Icon name="upload" size={20} color="#fff" style={styles.icon} />
@@ -63,10 +95,11 @@ const Bitacoras = () => {
         {loading ? (
           <Text>Cargando bitácoras...</Text>
         ) : (
-          <FlatList
-            data={bitacoras}
-            keyExtractor={(item) => item.id_bitacora.toString()}
+          <SectionList
+            sections={bitacoras}
+            keyExtractor={(item, index) => item.id_bitacora.toString()}
             renderItem={renderBitacora}
+            renderSectionHeader={renderSectionHeader}
             ListEmptyComponent={<Text>No hay bitácoras registradas.</Text>}
           />
         )}
@@ -75,7 +108,6 @@ const Bitacoras = () => {
           onClose={handleCloseModal}
         />
       </View>
-    </Layout>
   );
 };
 
@@ -88,15 +120,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     marginBottom: 15,
   },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
   button: {
-    backgroundColor: '#28a745', // Color verde
+    backgroundColor: '#28a745',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 2, // Para sombra en Android
-    shadowColor: '#000', // Para sombra en iOS
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
@@ -118,6 +155,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
+  groupTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    backgroundColor: '#eee',
+    padding: 10,
+  },
   itemTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -130,6 +174,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'blue',
     marginTop: 5,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
   },
 });
 

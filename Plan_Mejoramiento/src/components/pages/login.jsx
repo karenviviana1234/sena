@@ -23,50 +23,52 @@ const Login = () => {
   const navigation = useNavigation();
 
   const { SetRol, SetId_persona } = usePersonas();
+
   const handleLogin = async () => {
     try {
       console.log("Iniciando login...");
+      console.log({ correo: email, password: password });
+
       const response = await axiosClient.post("/validacion", {
         correo: email,
         password: password,
       });
-  
-      console.log("Respuesta recibida:", response);
 
       if (response.status === 200) {
         console.log("Datos de respuesta:", response.data);
         const { user, token } = response.data;
 
-
+        await AsyncStorage.setItem("token", token);
+        const storedToken = await AsyncStorage.getItem("token");
+        console.log("Token almacenado:", storedToken);
         if (user) {
-          await AsyncStorage.setItem("token", token);
-          const storedToken = await AsyncStorage.getItem("token");
-          console.log("Token almacenado:", storedToken);
-          
 
-          SetRol(user.rol);
+          SetRol(user.cargo);
           SetId_persona(user.id_persona);
 
-          const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
-          if (allowedRoles.includes(user.rol)) {
-            console.log("rol", user.rol, "id", user.id_persona);
-            navigation.navigate("principal"); 
+          await AsyncStorage.setItem('token', token);
+          await AsyncStorage.setItem('user', JSON.stringify(user));
+
+          const allowedRoles = ["Administrativo", "Instructor", "Aprendiz"];
+          if (allowedRoles.includes(user.cargo)) {
+            console.log("rol", user.cargo, "id", user.id_persona);
+            navigation.navigate("principal");
           } else {
             Alert.alert(
               "Acceso denegado",
-              "Los roles permitidos son seguimiento, instructor, y aprendiz."
+              "Los roles permitidos son Seguimiento, Instructor, y Aprendiz."
             );
           }
-          
+                   
         }
       }
     } catch (error) {
       console.log("Error en login:", error);
-    console.log("Detalles del error:", error.response?.data);
+      console.log("Detalles del error:", error.response?.data);
 
       if (error.response && error.response.status === 404) {
         Alert.alert("Error", `${error.response.status}: ${error.response.data.message || 'Error de autenticación'}`);
-n      } else {
+      } else {
         Alert.alert("Error", "Hubo un problema con el servidor.");
       }
     }
@@ -124,9 +126,6 @@ n      } else {
       <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <Text style={styles.button}>Ingresar</Text>
       </TouchableOpacity>
-      {/*       <TouchableOpacity style={styles.buttonContainer}>
-        <Text style={styles.button}>Registrarme</Text>
-      </TouchableOpacity> */}
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.textOlvide}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
@@ -186,7 +185,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 180,
     justifyContent: "center",
-    backgroundColor: "#0c8652" /* #0c8652 */,
+    backgroundColor: "#0c8652",
     alignItems: "center",
     marginTop: 20,
     borderRadius: 10,

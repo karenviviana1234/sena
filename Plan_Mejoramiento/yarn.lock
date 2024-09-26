@@ -2471,6 +2471,11 @@
     "color" "^4.2.3"
     "warn-once" "^0.1.0"
 
+"@remix-run/router@1.19.2":
+  "integrity" "sha512-baiMx18+IMuD1yyvOGaHM9QrVUPGGG0jC+z+IPHnRJWUAUvaKuWKyE8gjDj2rzv3sz9zOGoRSPgeBVHRhZnBlA=="
+  "resolved" "https://registry.npmjs.org/@remix-run/router/-/router-1.19.2.tgz"
+  "version" "1.19.2"
+
 "@rnx-kit/chromium-edge-launcher@^1.0.0":
   "integrity" "sha512-lzD84av1ZQhYUS+jsGqJiCMaJO2dn9u+RTT9n9q6D3SaKVwWqv+7AoRKqBu19bkwyE+iFRl1ymr40QS90jVFYg=="
   "resolved" "https://registry.npmjs.org/@rnx-kit/chromium-edge-launcher/-/chromium-edge-launcher-1.0.0.tgz"
@@ -3107,10 +3112,10 @@
   dependencies:
     "possible-typed-array-names" "^1.0.0"
 
-"axios@^1.7.4":
-  "integrity" "sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw=="
-  "resolved" "https://registry.npmjs.org/axios/-/axios-1.7.4.tgz"
-  "version" "1.7.4"
+"axios@^1.7.7":
+  "integrity" "sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q=="
+  "resolved" "https://registry.npmjs.org/axios/-/axios-1.7.7.tgz"
+  "version" "1.7.7"
   dependencies:
     "follow-redirects" "^1.15.6"
     "form-data" "^4.0.0"
@@ -7688,7 +7693,7 @@
     "shell-quote" "^1.6.1"
     "ws" "^7"
 
-"react-dom@^18.2.0", "react-dom@>= 16.8.0":
+"react-dom@^18.2.0", "react-dom@>= 16.8.0", "react-dom@>=16.8":
   "integrity" "sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g=="
   "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz"
   "version" "18.2.0"
@@ -7826,10 +7831,10 @@
   "resolved" "https://registry.npmjs.org/react-native-tooltip-menu/-/react-native-tooltip-menu-3.0.7.tgz"
   "version" "3.0.7"
 
-"react-native-vector-icons@*", "react-native-vector-icons@^10.1.0":
-  "integrity" "sha512-fdQjCHIdoXmRoTZ5gvN1FmT4sGLQ2wmQiNZHKJQUYnE2tkIwjGnxNch+6Nd4lHAACvMWO7LOzBNot2u/zlOmkw=="
-  "resolved" "https://registry.npmjs.org/react-native-vector-icons/-/react-native-vector-icons-10.1.0.tgz"
-  "version" "10.1.0"
+"react-native-vector-icons@*", "react-native-vector-icons@^10.2.0":
+  "integrity" "sha512-n5HGcxUuVaTf9QJPs/W22xQpC2Z9u0nb0KgLPnVltP8vdUvOp6+R26gF55kilP/fV4eL4vsAHUqUjewppJMBOQ=="
+  "resolved" "https://registry.npmjs.org/react-native-vector-icons/-/react-native-vector-icons-10.2.0.tgz"
+  "version" "10.2.0"
   dependencies:
     "prop-types" "^15.7.2"
     "yargs" "^16.1.1"
@@ -7886,6 +7891,21 @@
   "integrity" "sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA=="
   "resolved" "https://registry.npmjs.org/react-refresh/-/react-refresh-0.14.2.tgz"
   "version" "0.14.2"
+
+"react-router-dom@^6.26.2":
+  "integrity" "sha512-z7YkaEW0Dy35T3/QKPYB1LjMK2R1fxnHO8kWpUMTBdfVzZrWOiY9a7CtN8HqdWtDUWd5FY6Dl8HFsqVwH4uOtQ=="
+  "resolved" "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.26.2.tgz"
+  "version" "6.26.2"
+  dependencies:
+    "@remix-run/router" "1.19.2"
+    "react-router" "6.26.2"
+
+"react-router@6.26.2":
+  "integrity" "sha512-tvN1iuT03kHgOFnLPfLJ8V95eijteveqdOSk+srqfePtQvqCExB8eHOYnlilbOcyJyKnYkr1vJvf7YqotAJu1A=="
+  "resolved" "https://registry.npmjs.org/react-router/-/react-router-6.26.2.tgz"
+  "version" "6.26.2"
+  dependencies:
+    "@remix-run/router" "1.19.2"
 
 "react-shallow-renderer@^16.15.0":
   "integrity" "sha512-oScf2FqQ9LFVQgA73vr86xl2NaOIX73rh+YFqcOp68CWj56tSfgtGKrEbyhCj0rSijyG9M1CYprTh39fBi5hzA=="

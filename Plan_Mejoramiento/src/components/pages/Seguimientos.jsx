@@ -1,31 +1,30 @@
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import { format } from 'date-fns';
-import Layout from "../Template/Layout";
-import Modal_Global from "../moleculas/Modal_Global";
 import { usePersonas } from "../../Context/ContextPersonas.jsx";
-import FormNovedad from "../moleculas/FormNovedad.jsx";
-import ComponentSeguimiento from "../moleculas/ComponentSeguimiento.jsx";
 import SeguimientosContext from "../../Context/ContextSeguimiento.jsx";
-import { useContext, useEffect, useMemo, useState } from 'react';
+import ModalSeguimiento from '../moleculas/Modal_Seguimiento.jsx';
+import ComponentSeguimiento from '../moleculas/ComponentSeguimiento.jsx';
+import Layout from '../Template/Layout';
 
 const Seguimientos = () => {
     const { rol } = usePersonas();
     const { seguimientos, getSeguimientos, getSeguimiento } = useContext(SeguimientosContext);
     const [filterValue, setFilterValue] = useState("");
     const [selectedSeguimientoId, setSelectedSeguimientoId] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
     const [selectedComponent, setSelectedComponent] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
     const [error, setError] = useState(null);
+    const [seguimientoData, setSeguimientoData] = useState(null);
 
     useEffect(() => {
         const fetchSeguimientos = async () => {
             try {
                 await getSeguimientos();
-                setLoading(false);
             } catch (error) {
                 console.error('Error al obtener los seguimientos:', error);
-                setError("Error al obtener los seguimientos: " + error.message);
+                setError(`Error al obtener los seguimientos: ${error.message}`);
+            } finally {
                 setLoading(false);
             }
         };
@@ -35,85 +34,77 @@ const Seguimientos = () => {
     const handleOpenModal = async (id_seguimiento, componentName) => {
         setSelectedComponent(componentName);
         setSelectedSeguimientoId(id_seguimiento);
-        setModalVisible(true);
 
-        if (componentName.startsWith("ComponentSeguimiento")) {
-            try {
-                await getSeguimiento(id_seguimiento);
-            } catch (error) {
-                console.error("Error al obtener el seguimiento:", error);
-            }
+        try {
+            const data = await getSeguimiento(id_seguimiento);
+            setSeguimientoData(data);
+            setModalVisible(true);
+        } catch (error) {
+            console.error("Error al obtener el seguimiento:", error);
         }
-    }
+    };
 
     const handleCloseModal = () => {
         setModalVisible(false);
         setSelectedComponent(null);
-        setSelectedSeguimientoId(null);
+        setSeguimientoData(null);
     };
 
     const filteredItems = useMemo(() => {
-        return seguimientos.filter(seg =>
-            seg.seguimiento.toLowerCase().includes(filterValue.toLowerCase())
+        return seguimientos.filter(seg => 
+            seg.identificacion ||
+            seg.id_seguimiento.toString().includes(filterValue)
         );
     }, [seguimientos, filterValue]);
 
-    const renderItem = ({ item }) => {
-        const formatDate = (date) => {
-            return date ? format(new Date(date), 'dd-MM-yyyy') : "Fecha no disponible";
-        };
-        return (
-            <View style={styles.item}>
-                <Text style={styles.itemText}>Seguimiento: {item.seguimiento}</Text>
-                <Text style={styles.itemText}>Instructor: {item.instructor || 'No asignado'}</Text>
-                <Text style={styles.itemText}>Productiva: {item.productiva}</Text>
-                <Text style={styles.itemText}>Estado: {item.estado}</Text>
-                <Text style={styles.itemText}>Fecha inicio: {formatDate(item.fecha)}</Text>
+    const renderSeguimientoButtons = (item) => (
+        <View style={styles.buttonContainer}>
+            {["seguimiento1", "seguimiento2", "seguimiento3"].map((seguimiento, index) => (
+                <TouchableOpacity
+                    key={index}
+                    style={styles.button}
+                    onPress={() => handleOpenModal(item.identificacion, `ComponentSeguimiento${index + 1}`)}
+                    accessible={true}
+                    accessibilityLabel={`Ver seguimiento ${index + 1} para ${item.nombres}`}
+                >
+                    <Text style={styles.buttonText}>{index + 1}</Text>
+                </TouchableOpacity>
+            ))}
+        </View>
+    );
 
-                {[1, 2, 3].map((num) => (
-                    <TouchableOpacity
-                        key={num}
-                        style={styles.button}
-                        onPress={() => handleOpenModal(item.id_asignacion, `ComponentSeguimiento${num}`)}
-                    >
-                        <Text style={styles.buttonText}>Seguimiento {num} - {formatDate(item.fecha)}</Text>
-                    </TouchableOpacity>
-                ))}
-
-                {rol !== "Aprendiz" && (
-                    <TouchableOpacity
-                        style={styles.novedadButton}
-                        onPress={() => handleOpenModal(null, "FormNovedad")}
-                    >
-                        <Text style={styles.novedadButtonText}>Registrar Novedad</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-        );
-    };
+    const renderItem = ({ item }) => (
+        <View style={styles.item}>
+            <Text style={styles.itemText}>Nombre: {item.nombres}</Text>
+            <Text style={styles.itemText}>Razón Social: {item.razon_social}</Text>
+            <Text style={styles.itemText}>Identificación: {item.identificacion}</Text>
+            <Text style={styles.itemText}>Sigla: {item.sigla}</Text>
+            <Text style={styles.itemText}>Seguimiento 1: {item.seguimiento1}</Text>
+            <Text style={styles.itemText}>Seguimiento 2: {item.seguimiento2}</Text>
+            <Text style={styles.itemText}>Seguimiento 3: {item.seguimiento3}</Text>
+            <Text style={styles.itemText}>Porcentaje: {item.porcentaje}</Text>
+            {renderSeguimientoButtons(item)}
+        </View>
+    );
 
     if (loading) {
         return (
-            <Layout title={"Seguimientos"}>
-                <View style={styles.container}>
-                    <Text>Cargando...</Text>
-                </View>
-            </Layout>
+            <View style={styles.loadingContainer}>
+                <Text>Cargando...</Text>
+            </View>
         );
     }
 
     if (error) {
         return (
-            <Layout title={"Seguimientos"}>
-                <View style={styles.container}>
-                    <Text>{error}</Text>
-                </View>
-            </Layout>
+            <View style={styles.errorContainer}>
+                <Text>{error}</Text>
+            </View>
         );
     }
 
     return (
-        <Layout title={"Seguimientos"}>
+        <Layout title="Seguimientos">
             <View style={styles.container}>
                 <TextInput
                     style={styles.searchInput}
@@ -124,17 +115,33 @@ const Seguimientos = () => {
                 <FlatList
                     data={filteredItems}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item.id_seguimiento.toString()}
+                    keyExtractor={(item, index) => item.id_seguimiento?.toString() || index.toString()}
                 />
-                <Modal_Global visible={modalVisible} onClose={handleCloseModal}>
-                    {selectedComponent && selectedComponent.startsWith("ComponentSeguimiento") && (
+
+                {seguimientoData && (
+                    <View style={styles.seguimientoDetails}>
+                        <Text style={styles.detailsTitle}>
+                            Detalles del Seguimiento {selectedComponent?.slice(-1)}
+                        </Text>
+                        <Text>Nombre: {seguimientoData.nombres}</Text>
+                        <Text>Razón Social: {seguimientoData.razon_social}</Text>
+                        <Text>Identificación: {seguimientoData.identificacion}</Text>
+                        <Text>Sigla: {seguimientoData.sigla}</Text>
+                    </View>
+                )}
+
+                <ModalSeguimiento
+                    visible={modalVisible}
+                    onClose={handleCloseModal}
+                    id_seguimiento={selectedSeguimientoId}
+                >
+                    {selectedComponent?.startsWith("ComponentSeguimiento") && (
                         <ComponentSeguimiento
                             id_seguimiento={selectedSeguimientoId}
                             numero={selectedComponent.slice(-1)}
                         />
                     )}
-                    {selectedComponent === "FormNovedad" && <FormNovedad />}
-                </Modal_Global>
+                </ModalSeguimiento>
             </View>
         </Layout>
     );
@@ -163,29 +170,44 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 4,
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
     button: {
         backgroundColor: '#FFA000',
         padding: 12,
         borderRadius: 5,
-        marginTop: 10,
+        flex: 1,
+        marginHorizontal: 5,
         alignItems: 'center',
     },
     buttonText: {
         color: 'white',
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
     },
-    novedadButton: {
-        backgroundColor: '#4CAF50',
-        padding: 12,
-        borderRadius: 5,
-        marginTop: 10,
+    seguimientoDetails: {
+        marginTop: 20,
+        padding: 16,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 8,
+    },
+    detailsTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
     },
-    novedadButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

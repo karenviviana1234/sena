@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Función para listar seguimientos
-export const listarSeguimiento = async (req, res) => {
+export const  listarSeguimiento = async (req, res) => {
     try {
         const sql = `SELECT * FROM seguimientos`;
         const [result] = await pool.query(sql);
