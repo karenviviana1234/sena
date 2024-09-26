@@ -1,42 +1,112 @@
-import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../../configs/axiosClient';
+import ModalAcciones from './ModalAcciones';
+import FormActividades from './FormActividades';
+import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad';
+import ButtonDesactivar from '../atoms/ButtonDesactivar';
 
-// Componente GlobalModal
-const ModalAcciones = ({ isOpen, onClose, title, bodyContent, footerActions = []}) => {
-  return (      
-    <Modal 
-      isOpen={isOpen} 
-      onClose={onClose}
-      className="w-auto max-w-fit"  // Ajusta el ancho del modal
-    >
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-            <ModalBody className='overflow-y-auto max-h-[80vh] w-auto'>
-              {bodyContent}
-            </ModalBody>
-            <ModalFooter className="flex justify-end gap-2">
-              {Array.isArray(footerActions) && footerActions.length > 0 && footerActions.map((action, index) => (
-                <Button
-                  key={index}
-                  color={action.color}
-                  onPress={() => {
-                    if (action.onPress) {
-                      action.onPress(); // Ejecuta la acción definida
-                    }
-                    onClose(); // Cierra el modal al hacer clic en el botón
-                  }}
-                >
-                  {action.label}
-                </Button>
-              ))}
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+const ListActividad = ({ selectedInstructor, item }) => {
+  const [instructor, setInstructor] = useState("");
+  const [actividades, setActividades] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bodyContent, setBodyContent] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(null);
+
+  const handleOpenModal = (formType, data = null) => {
+    if (formType === "formActividades") {
+      setBodyContent(
+        <FormActividades
+          selectedInstructor={selectedInstructor}  // Asegúrate de pasar el instructor aquí
+          actividadSeleccionada={data}
+          onClose={handleCloseModal}
+        />
+      );
+    } 
+    setIsModalOpen(true);  // Muestra el modal
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);  // Oculta el modal
+  };
+
+  useEffect(() => {
+    if (selectedInstructor) {
+      setInstructor(selectedInstructor.id_persona);
+      fetchData(selectedInstructor.id_persona);  // Llama a fetchData con el ID del instructor
+    }
+  }, [selectedInstructor]);
+
+  const fetchData = async (id_persona) => {
+    setIsLoading(true); 
+    setHasError(null); 
+    try {
+        const response = await axiosClient.get(`/actividades/listar/${id_persona}`);
+        setActividades(response.data);
+    } catch (error) {
+        setHasError('Error fetching activities');
+        console.log("Error al listar las actividades", error);
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const desactivarActividad = async (id_actividad) => {
+    try {
+      const response = await axiosClient.put(`/actividades/desactivar/${id_actividad}`);
+      if (response.status === 200) {
+        alert('La actividad ha sido desactivada exitosamente.');
+        fetchData(instructor);
+      } else {
+        alert('Hubo un problema al desactivar la actividad.');
+      }
+    } catch (error) {
+      alert('Error al intentar desactivar la actividad.');
+      console.log(error);
+    }
+  };
+
+  const formatFecha = (fecha) => {
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-bold">Lista de Actividades</h3>
+        <ButtonRegistrarActividad
+          onClick={() => handleOpenModal("formActividades", item)}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {actividades.map((actividad) => (
+          <div key={actividad.id_actividad} className="bg-white shadow-md rounded-lg p-4 relative">
+            <h4 className="text-lg font-semibold mb-2">Actividad: {actividad.id_actividad}</h4>
+            <div className="absolute top-2 right-2">
+              <ButtonDesactivar onClick={() => desactivarActividad(actividad.id_actividad)} />  
+            </div>
+            <p className="text-sm text-gray-600"><strong>Estado: </strong>{actividad.estado}</p>
+            <p className="text-sm text-gray-600"><strong>Fecha de inicio: </strong>{formatFecha(actividad.fecha_inicio)}</p>
+            <p className="text-sm text-gray-600"><strong>Fecha de fin: </strong>{formatFecha(actividad.fecha_fin)}</p>
+            <p className="text-sm text-gray-600"><strong>Instructor: </strong>{actividad.instructor}</p>
+            <p className="text-sm text-gray-600"><strong>Horario: </strong>ficha: {actividad.horario_ficha} día: {actividad.horario_dia}</p>
+          </div>
+        ))}
+      </div>
+
+      <ModalAcciones
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        bodyContent={bodyContent}
+      />
+    </div>
   );
 };
 
-export default ModalAcciones;
+export default ListActividad;
