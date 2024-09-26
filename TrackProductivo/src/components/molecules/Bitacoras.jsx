@@ -87,7 +87,6 @@ function Bitacoras({
         },
         buttonsStyling: false,
       });
-      onSuccess();
       return;
     }
 

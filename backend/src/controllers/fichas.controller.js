@@ -1,29 +1,26 @@
-import { pool } from './../database/conexion.js'
+import { pool } from '../database/conexion.js'
+
 export const listarFichas = async (req, res) => {
     try {
-        let sql = `SELECT f.codigo, f.estado, 
-                          DATE_FORMAT(f.inicio_ficha, '%Y-%m-%d') as inicio_ficha, 
-                          DATE_FORMAT(f.fin_lectiva, '%Y-%m-%d') as fin_lectiva, 
-                          DATE_FORMAT(f.fin_ficha, '%Y-%m-%d') as fin_ficha, 
-                          f.sede, 
-                          p.nombre_programa 
+        let sql = `SELECT f.*, p.nombre_programa 
                     FROM fichas f
-                    INNER JOIN programas p ON f.programa = p.id_programa`;
+                    INNER JOIN programas p ON f.programa = p.id_programa
+                    `
 
-        const [results] = await pool.query(sql);
-        if (results.length > 0) {
-            res.status(200).json(results);
-        } else {
+        const [results] = await pool.query(sql)
+        if(results.length>0){
+            res.status(200).json(results)
+        }else{
             res.status(404).json({
                 message: 'No hay fichas registradas'
-            });
+            })
         }
     } catch (error) {
         res.status(500).json({
             message: 'Error del servidor'
-        });
+        })
     }
-};
+}
 
 export const obtenerFichaPorId = async (req, res) => {
     try {
@@ -51,53 +48,6 @@ export const obtenerFichaPorId = async (req, res) => {
         })
     }
 }
-
-
-export const listarCodigo = async (req, res) => {
-    try {
-        let sql = `SELECT codigo FROM fichas`;
-
-        const [results] = await pool.query(sql);
-        if (results.length > 0) {
-            res.status(200).json(results);
-        } else {
-            res.status(404).json({
-                message: 'No hay fichas registradas'
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: 'Error del servidor'
-        });
-    }
-};
-
-
-
-export const registrarFichas = async (req, res) => {
-    try {
-        const { codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede } = req.body
-
-        let sql = `INSERT INTO fichas (codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, estado) VALUES (?, ?, ?, ?, ?, ?, 1)`
-
-        const [rows] = await pool.query(sql, [codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede])
-
-        if(rows.affectedRows>0){
-            res.status(200).json({
-                message: 'Ficha registrada con éxito'
-            })
-        }else{
-            res.status(403).json({
-                message: 'No fue posible registrar la ficha'
-            })
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: 'Error del servidor' + error
-        })
-    }
-}
-
 
 export const actualizarFicha = async (req, res) => {
     
@@ -129,6 +79,33 @@ export const actualizarFicha = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor', error: error.message });
     }
 };
+export const registrarFichas = async (req, res) => {
+    try {
+        const { codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, instructor_lider } = req.body; // Agregamos instructor_lider
+
+        // Modificamos la consulta SQL para incluir instructor_lider
+        let sql = `INSERT INTO fichas (codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, instructor_lider, estado) VALUES (?, ?, ?, ?, ?, ?, ?, 1)`;
+
+        // Incluimos instructor_lider en el arreglo de parámetros de la consulta
+        const [rows] = await pool.query(sql, [codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, instructor_lider]);
+
+        if(rows.affectedRows > 0) {
+            res.status(200).json({
+                message: 'Ficha registrada con éxito'
+            });
+        } else {
+            res.status(403).json({
+                message: 'No fue posible registrar la ficha'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error
+        });
+    }
+};
+
+
 
 export const electivaFicha = async (req, res) => {
     try {
@@ -175,3 +152,23 @@ export const finalizarFicha = async (req, res) => {
         })
     }
 }
+
+
+export const listarCodigo = async (req, res) => {
+    try {
+        let sql = `SELECT codigo FROM fichas`;
+
+        const [results] = await pool.query(sql);
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
+            res.status(404).json({
+                message: 'No hay fichas registradas'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor'
+        });
+    }
+};

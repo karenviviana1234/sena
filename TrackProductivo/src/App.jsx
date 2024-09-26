@@ -124,8 +124,9 @@ export function WithSidebar({ children }) {
         {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
           <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
         )}
-
-
+       {/*  {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
+        <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
+        )} */}
         {(userRole !== 'Aprendiz'  && userRol !== 'Instructor') && (
         <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
         )}

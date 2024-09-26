@@ -99,7 +99,6 @@ const Novedades = () => {
         console.log('Novedad guardada:', selectedNovedad);
         listarN(); // Refrescar las novedades después de la acción
         handleCloseModal();
-        onSuccess();
     };
 
     const handleSeguimientoChange = (event) => {

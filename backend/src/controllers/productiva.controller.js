@@ -1,6 +1,7 @@
 import { pool } from "../database/conexion.js";
 import multer from "multer";
-import { format, addMonths } from 'date-fns';
+import { addMonths, format, isValid } from 'date-fns';
+
 
 
 export const listarProductiva = async (req, res) => {
@@ -92,7 +93,7 @@ export const registrarProductiva = async (req, res) => {
         const consulta = req.files?.consulta?.[0]?.originalname || null;
 
         // Verificar que la matrícula existe en la tabla matriculas
-        const sqlCheckMatricula = 'SELECT id_matricula FROM matriculas WHERE id_matricula =?';
+        const sqlCheckMatricula = 'SELECT id_matricula FROM matriculas WHERE id_matricula = ?';
         const [rowsMatricula] = await pool.query(sqlCheckMatricula, [matricula]);
 
         if (rowsMatricula.length === 0) {
@@ -101,11 +102,21 @@ export const registrarProductiva = async (req, res) => {
             });
         }
 
+        // Verificar que las fechas son válidas
+        const fechaInicio = new Date(fecha_inicio);
+        const fechaFin = new Date(fecha_fin);
+
+        if (!isValid(fechaInicio) || !isValid(fechaFin)) {
+            return res.status(400).json({
+                message: 'Fecha inválida proporcionada'
+            });
+        }
+
         // Registrar etapa productiva
         const sqlProductiva = `
             INSERT INTO productivas
             (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
-            VALUES (?,?,?,?,?, 1,?,?,?,?)
+            VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
         `;
         const [resultProductiva] = await pool.query(sqlProductiva, [
             matricula, empresa, fecha_inicio, fecha_fin, alternativa, acuerdo, arl, consulta, aprendiz
@@ -115,9 +126,6 @@ export const registrarProductiva = async (req, res) => {
             const productivaId = resultProductiva.insertId;
 
             // Calcular fechas para seguimientos
-            const fechaInicio = new Date(fecha_inicio);
-            const fechaFin = new Date(fecha_fin);
-
             const fechaSeguimiento1 = addMonths(fechaInicio, 2);
             const fechaSeguimiento2 = addMonths(fechaInicio, 4);
             const fechaSeguimiento3 = fechaFin;
@@ -125,18 +133,17 @@ export const registrarProductiva = async (req, res) => {
             // Insertar tres seguimientos asociados a la etapa productiva
             const sqlSeguimiento = `
                 INSERT INTO seguimientos (fecha, seguimiento, estado, pdf, productiva, instructor) 
-                VALUES (?, 1, 1,?,?,?),
-                       (?, 2, 1,?,?,?),
-                       (?, 3, 1,?,?,?)
+                VALUES (?, 1, 1, ?, ?, ?),
+                       (?, 2, 1, ?, ?, ?),
+                       (?, 3, 1, ?, ?, ?)
             `;
-
             const [resultSeguimiento] = await pool.query(sqlSeguimiento, [
                 format(fechaSeguimiento1, 'yyyy-MM-dd'), null, productivaId, instructor,
                 format(fechaSeguimiento2, 'yyyy-MM-dd'), null, productivaId, instructor,
                 format(fechaSeguimiento3, 'yyyy-MM-dd'), null, productivaId, instructor
             ]);
 
-            if (resultSeguimiento.affectedRows >= 3) { 
+            if (resultSeguimiento.affectedRows >= 3) {
                 const seguimientoIds = [
                     resultSeguimiento.insertId,
                     resultSeguimiento.insertId + 1,
@@ -147,18 +154,18 @@ export const registrarProductiva = async (req, res) => {
                 const sqlBitacoras = `
                     INSERT INTO bitacoras (fecha, bitacora, seguimiento, pdf, estado, instructor) 
                     VALUES 
-                        (?, '1',?,?, 1,?),
-                        (?, '2',?,?, 1,?),
-                        (?, '3',?,?, 1,?),
-                        (?, '4',?,?, 1,?),
-                        (?, '5',?,?, 1,?),
-                        (?, '6',?,?, 1,?),
-                        (?, '7',?,?, 1,?),
-                        (?, '8',?,?, 1,?),
-                        (?, '9',?,?, 1,?),
-                        (?, '10',?,?, 1,?),
-                        (?, '11',?,?, 1,?),
-                        (?, '12',?,?, 1,?)
+                        (?, '1', ?, ?, 1, ?),
+                        (?, '2', ?, ?, 1, ?),
+                        (?, '3', ?, ?, 1, ?),
+                        (?, '4', ?, ?, 1, ?),
+                        (?, '5', ?, ?, 1, ?),
+                        (?, '6', ?, ?, 1, ?),
+                        (?, '7', ?, ?, 1, ?),
+                        (?, '8', ?, ?, 1, ?),
+                        (?, '9', ?, ?, 1, ?),
+                        (?, '10', ?, ?, 1, ?),
+                        (?, '11', ?, ?, 1, ?),
+                        (?, '12', ?, ?, 1, ?)
                 `;
 
                 const [resultBitacoras] = await pool.query(sqlBitacoras, [
@@ -181,14 +188,14 @@ export const registrarProductiva = async (req, res) => {
                         message: 'Etapa productiva, seguimientos y bitácoras registrados correctamente'
                     });
                 } else {
-                    await pool.query('DELETE FROM seguimientos WHERE productiva =?', [productivaId]);
-                    await pool.query('DELETE FROM productiva WHERE id_productiva =?', [productivaId]);
+                    await pool.query('DELETE FROM seguimientos WHERE productiva = ?', [productivaId]);
+                    await pool.query('DELETE FROM productivas WHERE id_productiva = ?', [productivaId]);
                     res.status(403).json({
                         message: 'Error al registrar las bitácoras'
                     });
                 }
             } else {
-                await pool.query('DELETE FROM productiva WHERE id_productiva =?', [productivaId]);
+                await pool.query('DELETE FROM productivas WHERE id_productiva = ?', [productivaId]);
                 res.status(403).json({
                     message: 'Error al registrar los seguimientos'
                 });
@@ -200,10 +207,11 @@ export const registrarProductiva = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor:' + error.message
+            message: 'Error del servidor: ' + error.message
         });
     }
 };
+
 
 
 

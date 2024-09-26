@@ -6,6 +6,7 @@ import GlobalModal from "../../components/componets_globals/GlobalModal";
 import { useDisclosure } from "@nextui-org/react";
 import { Calendar } from 'lucide-react';
 
+
 export const RegistroFicha = ({ onRegisterSuccess }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [fichaData, setFichaData] = useState({
@@ -14,7 +15,7 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
     fin_lectiva: "",
     fin_ficha: "",
     programa: "",
-    sede: ""
+    sede: "",
   });
   const [programas, setProgramas] = useState([]);
   const [error, setError] = useState("");
@@ -78,11 +79,8 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
     <Popover>
       <PopoverTrigger>
         <Input
-          type="number"
-          label='Numero de Ficha'
-          id='codigo'
-          name="codigo"
-          className="w-96"
+          label={label}
+          placeholder="Selecciona una fecha"
           value={value}
           endContent={<Calendar className="text-default-400" />}
           readOnly
@@ -101,52 +99,42 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex justify-end">
-        <Button onPress={onOpen} className="bg-[#90d12c] text-white">Registrar Ficha</Button>
-      </div>
+      <Button onPress={onOpen} className="max-w-fit">Registrar Ficha</Button>
       <GlobalModal
         isOpen={isOpen}
         onOpenChange={onClose}
-        title="Registro de Ficha"
+        title="Formulario de Registro de Ficha"
         children={
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
               label="Código de Ficha"
-              className="w-96"
               placeholder="Ingresa el código de la ficha"
               name="codigo"
               value={fichaData.codigo}
               onChange={handleInputChange}
               required
             />
-            <Input
+            <DateInput
               label="Inicio de Ficha"
-              type="date"
               name="inicio_ficha"
               value={fichaData.inicio_ficha}
-              className="w-96"
               onChange={handleDateChange}
             />
-            <Input
+            <DateInput
               label="Fin Lectiva"
-              type="date"
-              className="w-96"
               name="fin_lectiva"
               value={fichaData.fin_lectiva}
               onChange={handleDateChange}
             />
-            <Input
+            <DateInput
               label="Fin de Ficha"
-              type="date"
               name="fin_ficha"
-              className="w-96"
               value={fichaData.fin_ficha}
               onChange={handleDateChange}
             />
             <Select
               label="Programa"
               placeholder="Seleccione un programa"
-              className="w-96"
               name="programa"
               value={fichaData.programa}
               onChange={handleInputChange}
@@ -161,7 +149,6 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
             <Select
               label="Sede"
               placeholder="Seleccione una sede"
-              className="w-96"
               name="sede"
               value={fichaData.sede}
               onChange={handleInputChange}
@@ -171,13 +158,14 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
               <SelectItem key="yamboro" value="yamboro">Yamboro</SelectItem>
             </Select>
             {error && <p className="text-red-500">{error}</p>}
-            <div className="flex justify-end gap-5 mr-5 my-5">
-              <Button className="bg-[#92d22e] text-white" type="submit" color="success">
-                Registrar
-                </Button>
-            </div>
+            <Button type="submit" color="primary">Registrar Ficha</Button>
           </form>
         }
+        footer={() => (
+          <Button color="danger" variant="light" onClick={onClose}>
+            Cerrar
+          </Button>
+        )}
       />
     </div>
   );
