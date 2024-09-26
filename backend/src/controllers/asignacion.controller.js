@@ -40,6 +40,7 @@ export const listarasignaciones = async (req, res) => {
 };
 
 export const registrarasignacion = async (req, res) => {
+    const connection = await pool.getConnection(); // Obtener conexión manualmente para usar transacciones
     try {
         const { productiva, actividad } = req.body;
 
@@ -50,10 +51,11 @@ export const registrarasignacion = async (req, res) => {
             });
         }
 
-        console.log('Valores recibidos:', { productiva, actividad });
+        // Iniciar la transacción
+        await connection.beginTransaction();
 
         // Verificar si la actividad existe y está activa
-        const [actividadExist] = await pool.query(
+        const [actividadExist] = await connection.query(
             "SELECT * FROM actividades WHERE id_actividad = ? AND estado = 'Activo'",
             [actividad]
         );
@@ -66,10 +68,25 @@ export const registrarasignacion = async (req, res) => {
         }
 
         // Obtener el id_instructor de la actividad
-        const idInstructor = actividadExist[0].id_instructor;
+        const idInstructor = actividadExist[0].instructor;
+
+        // Obtener el nombre del instructor
+        const [instructorData] = await connection.query(
+            "SELECT nombres FROM personas WHERE id_persona = ?",
+            [idInstructor]
+        );
+
+        if (instructorData.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "Instructor no encontrado."
+            });
+        }
+
+        const nombreInstructor = instructorData[0].nombres;
 
         // Verificar si la etapa productiva existe
-        const [productivaExist] = await pool.query(
+        const [productivaExist] = await connection.query(
             "SELECT * FROM productivas WHERE id_productiva = ?",
             [productiva]
         );
@@ -82,41 +99,36 @@ export const registrarasignacion = async (req, res) => {
         }
 
         // Registrar la asignación en la tabla asignaciones
-        const [result] = await pool.query(
-            "INSERT INTO asignaciones (id_productiva, id_actividad) VALUES (?, ?)",
+        const [result] = await connection.query(
+            "INSERT INTO asignaciones (productiva, actividad) VALUES (?, ?)",
             [productiva, actividad]
         );
 
         if (result.affectedRows > 0) {
-            // Registrar seguimientos (asumiendo que hay 3 seguimientos por productiva)
-            const seguimientoQuery = `
-                INSERT INTO seguimientos (id_productiva, id_instructor, seguimiento_numero)
-                VALUES (?, ?, ?)
+            // Actualizar los seguimientos para agregar el nombre del instructor
+            const seguimientoUpdateQuery = `
+                UPDATE seguimientos 
+                SET instructor = ? 
+                WHERE productiva = ?
             `;
-            for (let i = 1; i <= 3; i++) {
-                await pool.query(seguimientoQuery, [productiva, idInstructor, i]);
-            }
+            await connection.query(seguimientoUpdateQuery, [nombreInstructor, productiva]);
 
-            // Registrar bitacoras (asumiendo que hay 4 bitacoras por cada seguimiento)
-            const bitacoraQuery = `
-                INSERT INTO bitacoras (id_seguimiento, id_instructor, bitacora_numero)
-                VALUES (?, ?, ?)
+            // Actualizar las bitácoras para agregar el nombre del instructor
+            const bitacoraUpdateQuery = `
+                UPDATE bitacoras 
+                SET instructor = ? 
+                WHERE seguimiento IN (
+                    SELECT id_seguimiento FROM seguimientos WHERE productiva = ?
+                )
             `;
+            await connection.query(bitacoraUpdateQuery, [nombreInstructor, productiva]);
 
-            const [seguimientos] = await pool.query(
-                "SELECT id_seguimiento FROM seguimientos WHERE id_productiva = ?",
-                [productiva]
-            );
-
-            for (let seguimiento of seguimientos) {
-                for (let j = 1; j <= 4; j++) {
-                    await pool.query(bitacoraQuery, [seguimiento.id_seguimiento, idInstructor, j]);
-                }
-            }
+            // Confirmar la transacción
+            await connection.commit();
 
             return res.status(200).json({
                 status: 200,
-                message: "Asignación registrada con éxito, incluyendo seguimientos y bitacoras."
+                message: "Asignación registrada con éxito, incluyendo la actualización de seguimientos y bitacoras."
             });
         } else {
             return res.status(403).json({
@@ -125,12 +137,18 @@ export const registrarasignacion = async (req, res) => {
             });
         }
     } catch (error) {
+        await connection.rollback(); // Revertir transacción en caso de error
         return res.status(500).json({
             status: 500,
             message: error.message || "Error en el sistema"
         });
+    } finally {
+        connection.release(); // Liberar la conexión al final
     }
 };
+
+
+
 
 
 export const actualizarasignacion = async (req, res) => {

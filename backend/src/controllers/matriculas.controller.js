@@ -59,16 +59,6 @@ export const listarMatriculas = async (req, res) => {
     }
 };
 
-export const GetMatriculas = async (pool, sql, params) => {
-    try {
-        const [results] = await pool.query(sql, params);
-        return results;
-    } catch (error) {
-        console.error('Error al obtener datos:', error);
-        throw error;
-    }
-};
-
 
 
 export const registrarMatriculas = async (req, res) => {

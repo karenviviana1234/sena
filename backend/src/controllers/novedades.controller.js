@@ -47,31 +47,35 @@ export const registrarNovedad = async (req, res) => {
     }
 };
 
-
 export const listar = async (req, res) => {
     try {
-        let sql = `SELECT * FROM novedades`
+        // Consulta que obtiene las novedades relacionadas con los seguimientos 1, 2 y 3
+        let sql = `
+            SELECT id_novedad, fecha, instructor, descripcion, foto 
+            FROM novedades 
+            WHERE seguimiento IN (1, 2, 3)`; // Filtrar por los seguimientos 1, 2 y 3
 
-        const [results] = await pool.query(sql)
-        
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        const [results] = await pool.query(sql);
+
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
-                message: 'No hay novedades registrados'
-            })
+                message: 'No hay novedades registradas para los seguimientos 1, 2 o 3'
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
-  
+};
+
+
 export const listarnovedades = async (req, res) => {
     try {
         const { id_seguimiento } = req.params; // Obtén el ID del seguimiento desde los parámetros de la solicitud
-        let sql = `SELECT * FROM novedades WHERE seguimiento = ?`;
+        let sql = `SELECT id_novedad, fecha, instructor, descripcion, foto FROM novedades WHERE seguimiento = ?`; // Asegúrate de incluir la columna de imagen
 
         const [results] = await pool.query(sql, [id_seguimiento]);
         if (results.length > 0) {
@@ -86,7 +90,8 @@ export const listarnovedades = async (req, res) => {
             message: 'Error del servidor: ' + error
         });
     }
-}
+};
+
 
 export const actualizarNovedades = async (req, res) => {
     try {

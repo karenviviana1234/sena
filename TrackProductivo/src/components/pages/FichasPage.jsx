@@ -1,15 +1,24 @@
-import TableFichas from '../organisms/Ficha/TableFicha'
-function FichasPage() {
-  return (
-    <>
+import React from 'react';
+import { Tabs, Tab } from "@nextui-org/react";
+import TableFichas from "../organisms/TableFichas";
+import TableHorarios from "../organisms/TableHorario";
 
+function FichasPage() {
+  return ( 
     <>
-    <main className='w-full p-3'>
-        <TableFichas/>
-      </main>
-    </>
-    <div>FichasPage</div></>
-  )
+    <div className="flex min-h-screen flex-col m-10">
+        <Tabs aria-label="Options">
+            <Tab key="fichas" title="fichas">
+              <TableFichas />
+            </Tab>
+            <Tab key="horarios" title="horarios">
+              <TableHorarios />
+            </Tab>
+        </Tabs>
+    </div>
+  </>
+ );
 }
+
 
 export default FichasPage

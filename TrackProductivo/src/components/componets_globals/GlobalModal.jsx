@@ -1,21 +1,20 @@
-// GlobalModal.jsx
-import React from 'react';
-import { Modal, Button } from '@nextui-org/react';
+import React from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 
-const GlobalModal = ({ open, onClose, title, footer, children }) => {
-    return (
-        <Modal open={open} onClose={onClose}>
-            <Modal.Header>
-                <h4>{title}</h4>
-            </Modal.Header>
-            <Modal.Body>
-                {children}
-            </Modal.Body>
-            <Modal.Footer>
-                {footer(onClose)}
-            </Modal.Footer>
-        </Modal>
-    );
+const GlobalModal = ({ isOpen, onOpenChange, title, children, footer }) => {
+  return (
+    <Modal isOpen={isOpen} placement="center" onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
+            <ModalBody>{children}</ModalBody>
+            {footer && <ModalFooter>{footer(onClose)}</ModalFooter>}
+          </>
+        )}
+      </ModalContent>
+    </Modal>
+  );
 };
 
 export default GlobalModal;
