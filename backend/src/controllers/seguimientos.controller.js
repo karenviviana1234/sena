@@ -214,10 +214,6 @@ export const listarSeguimientoAprendices = async (req, res) => {
 };
 
 
-
-
-
-// Función para registrar seguimientos
 export const registrarSeguimiento = async (req, res) => {
     try {
         const seguimientoPdf = req.file ? req.file.originalname : null;

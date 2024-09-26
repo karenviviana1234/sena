@@ -19,10 +19,37 @@ export const validar = async (req, res) => {
                 return res.status(401).json({ message: "Credenciales incorrectas" });
             }
 
+<<<<<<< HEAD
             // Incluir la identificación del usuario y el rol en el token JWT
             const token = Jwt.sign({ userId: user.id_persona, rol: user.rol, cargo: user.cargo, identificacion: user.identificacion }, process.env.AUT_SECRET, { expiresIn: process.env.AUT_EXPIRE });
             
             return res.status(200).json({ user: { id_persona: user.id_persona, nombres: user.nombres, correo: user.correo, cargo: user.cargo, rol: user.rol, cargo:user.cargo, identificacion: user.identificacion  }, token, message: 'Inicio de sesión exitoso' });
+=======
+            // Incluir identificación, rol y cargo en el token JWT
+            const token = Jwt.sign(
+                {
+                    userId: user.id_persona,
+                    identificacion: user.identificacion,  // Añadir identificación
+                    rol: user.rol,                       // Añadir rol
+                    cargo: user.cargo                    // Añadir cargo
+                },
+                process.env.AUT_SECRET, 
+                { expiresIn: process.env.AUT_EXPIRE }
+            );
+            
+            return res.status(200).json({
+                user: {
+                    id_persona: user.id_persona,
+                    nombres: user.nombres,
+                    correo: user.correo,
+                    cargo: user.cargo,
+                    rol: user.rol,
+                    identificacion: user.identificacion
+                },
+                token,
+                message: 'Inicio de sesión exitoso'
+            });
+>>>>>>> 76bd2fe29f0bee2650258bd0fcedd80847282bd6
         } else {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
@@ -43,8 +70,18 @@ export const validarToken = async (req, res, next) => {
                 if (error) {
                     return res.status(403).json({ message: 'Token es inválido o ha expirado' });
                 } else {
+<<<<<<< HEAD
                     // Decodificar el token y establecer req.usuario
                     req.usuario = decoded; // Ahora incluye el rol
+=======
+                    // Decodificar y guardar toda la información del usuario en req.user
+                    req.user = {
+                        userId: decoded.userId,
+                        identificacion: decoded.identificacion,
+                        rol: decoded.rol,
+                        cargo: decoded.cargo
+                    };
+>>>>>>> 76bd2fe29f0bee2650258bd0fcedd80847282bd6
                     next();
                 }
             });

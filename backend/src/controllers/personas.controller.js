@@ -472,34 +472,36 @@ export const registrarUsuarios = async (req, res) => {
   try {
     const { identificacion, nombres, correo, telefono, password, cargo, sede } = req.body;
 
-    const cargosPermitidos = ["Coordinador", "Administrativo"];
-    if (!cargo || cargo === "$.0" || !cargosPermitidos.includes(cargo.toLowerCase())) {
-      return res.status(400).json({ message: "El cargo no es válido. Solo se permiten 'Coordinador' y 'Administrativo'." });
-    }
-
+    // Verifica la cantidad de usuarios registrados por tipo de cargo
     const [result] = await pool.query('SELECT COUNT(*) as count FROM personas WHERE cargo = ?', [cargo.toLowerCase()]);
 
-    if (cargo.toLowerCase() === "Administrativo" && result[0].count >= 2) {
+    if (cargo.toLowerCase() === "administrativo" && result[0].count >= 2) {
       return res.status(400).json({ message: "Ya existen 2 usuarios registrados como Administrativos." });
     }
 
-    if (cargo.toLowerCase() === "Coordinador" && result[0].count >= 1) {
+    if (cargo.toLowerCase() === "coordinador" && result[0].count >= 1) {
       return res.status(400).json({ message: "Ya existe 1 usuario registrado como Coordinador." });
     }
 
+    // Determina el rol según el cargo
     let rol;
-    if (cargo.toLowerCase() === "Administrativo") {
+    if (cargo.toLowerCase() === "administrativo") {
       rol = "seguimiento";
-    } else if (cargo.toLowerCase() === "Coordinador") {
-      rol = "Coordinador"; 
+    } else if (cargo.toLowerCase() === "coordinador") {
+      rol = "coordinador"; 
     }
 
     const estado = 'activo';
 
+    // Encripta la contraseña usando bcrypt
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Inserta el nuevo usuario en la base de datos
     const [rows] = await pool.query(
       `INSERT INTO personas (identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede]
+      [identificacion, nombres, correo, hashedPassword, telefono, rol, cargo, estado, sede]
     );
 
     if (rows.affectedRows > 0) {
@@ -520,7 +522,6 @@ export const registrarUsuarios = async (req, res) => {
     });
   }
 };
-
 
 //cambiar instructor en etapa practica
 export const cambiarInstructor = async (req, res) => {
