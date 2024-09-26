@@ -99,6 +99,7 @@ export const App = () => {
 
 export function WithSidebar({ children }) {
   const [userRole, setUserRole] = useState(null);
+  const [userRol, setUserRol] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -106,6 +107,7 @@ export function WithSidebar({ children }) {
       try {
         const user = JSON.parse(storedUser);
         setUserRole(user.cargo);
+        setUserRol(user.rol);
       } catch (error) {
         console.error("Error al parsear el JSON del usuario:", error);
       }
@@ -120,16 +122,16 @@ export function WithSidebar({ children }) {
         {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
           <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
         )}
-        {(userRole !== 'Aprendiz') && (
+        {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
           <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
         )}
-        {(userRole !== 'Aprendiz') && (
+        {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
           <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
         )}
-        {(userRole !== 'Aprendiz') && (
+        {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
         <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
         )}
-        {(userRole !== 'Aprendiz') && (
+        {(userRole !== 'Aprendiz'  && userRol !== 'Instructor') && (
         <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
         )}
         <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimiento" />
