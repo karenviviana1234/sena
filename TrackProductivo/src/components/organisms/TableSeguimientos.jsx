@@ -70,7 +70,7 @@ function TableSeguimientos() {
     const handleOpenModal = (id_seguimiento, type) => {
         setFormType(type);
         if (type === 'formNovedades') {
-            setBodyContent(<Novedades id_seguimiento={id_seguimiento} />);
+            setBodyContent(<Novedades id_seguimiento={id_seguimiento} onSuccess={handleUpdateData}/>);
         } else if (type === 'componentSeguimiento') {
             setBodyContent(<ComponentSeguimiento
                 id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado

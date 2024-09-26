@@ -93,6 +93,7 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
         },
         buttonsStyling: false,
       });
+      onSuccess();
       return;
     }
 
