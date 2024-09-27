@@ -11,12 +11,16 @@ import {
     TableCell,
     Input,
     Button,
-    Pagination
+    Pagination,
+    Chip
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import FormMatriculas from './FormMatriculas.jsx';
 import FormAprendices from './FormAprendices.jsx';
+import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import ButtonDesactivar from '../atoms/ButtonDesactivar.jsx';
+
 
 function TableMatriculas() {
     const [selectedFicha, setSelectedFicha] = useState('');
@@ -65,13 +69,15 @@ function TableMatriculas() {
 
     // Fetch para obtener las matriculas de la ficha seleccionada
     const fetchMatriculas = useCallback(async () => {
+        // Restablecer el estado de matrículas antes de la nueva carga
+        setMatriculas([]);
+        
         if (selectedFicha) {
             try {
                 const response = await axiosClient.get(`/matriculas/listar/${selectedFicha}`);
                 if (response.data.length > 0) {
                     setMatriculas(response.data);
                 } else {
-                    setMatriculas([]);
                     Swal.fire({
                         title: 'Sin Matrículas',
                         text: 'No hay matrículas registradas para la ficha seleccionada.',
@@ -81,24 +87,53 @@ function TableMatriculas() {
                 }
             } catch (error) {
                 console.error('Error fetching matriculas:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Hubo un error al obtener las matrículas.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
             }
         }
     }, [selectedFicha]);
-
+    
     useEffect(() => {
         fetchMatriculas();
     }, [selectedFicha, page, rowsPerPage, fetchMatriculas]);
 
+    const handleDesactivar = async (id_matricula) => {
+        // Mostrar una alerta de confirmación
+        const result = await Swal.fire({
+          title: "¿Estás seguro?",
+          text: "¿Quieres eliminar esta matrícula? Si lo haces, se borrarán todos los registros asociados, incluida la etapa productiva y los seguimientos si existen.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Sí, Eliminar",
+          cancelButtonText: "No, cancelar",
+          reverseButtons: true,
+          customClass: {
+            confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
+            cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
+          },
+        });
+      
+        // Si el usuario confirma, proceder con la desactivación
+        if (result.isConfirmed) {
+          try {
+            const response = await axiosClient.delete(`/matriculas/cancelada/${id_matricula}`);
+            Swal.fire("Eliminada", response.data.message, "success");
+      
+            // Actualizar el estado para eliminar el instructor desactivado
+            setMatriculas((prevMatriculas) =>
+              prevMatriculas.filter((matricula) => matricula.id_matricula !== id_matricula)
+            );
+          } catch (error) {
+            console.error("Error Eliminando la Matricula:", error);
+            Swal.fire("Error", "No se pudo Eliminar la matricula", "error");
+          }
+        }
+      };
+      
+    
+
     const fetchFile = async (file) => {
         const formData = new FormData();
         formData.append('file', file);  // Asegúrate de que 'file' es el nombre esperado en el backend.
-    
+
         try {
             const response = await axiosClient.post('/excel/import', formData, {
                 headers: {
@@ -124,14 +159,15 @@ function TableMatriculas() {
             });
         }
     };
-    
+
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
         if (selectedFile) {
             fetchFile(selectedFile);  // Llama a la función fetchFile pasando el archivo seleccionado
         }
     };
-    
+
+
 
     const handleClickImportarExcel = () => {
         fileInputRef.current.click(); // Triggers file input click
@@ -153,6 +189,10 @@ function TableMatriculas() {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+    };
+
+    const handleTabChange = (key) => {
+        setSelectedFicha(key);
     };
 
     const filteredItems = useMemo(() => {
@@ -180,19 +220,59 @@ function TableMatriculas() {
 
     const renderCell = useCallback(
         (item, columnKey) => {
+            const cellValue = item[columnKey];
             switch (columnKey) {
                 case "acciones":
                     return (
                         <div className="flex justify-around items-center">
                             <ButtonActualizar onClick={() => handleOpenModal("formMatriculas", item)} />
+                            <ButtonDesactivar onClick={() => handleDesactivar(item.id_matricula)}/>
                         </div>
                     );
+                    case "estado":
+                        return (
+                            <Chip
+                                className="text-[#3c3c3c]"
+                                variant="flat"
+                                style={{ backgroundColor: getColorForFicha(cellValue) || "rgba(240, 240, 240, 0.8)" }} // Color claro por defecto
+                            >
+                                {cellValue}
+                            </Chip>
+                        );
                 default:
                     return item[columnKey];
             }
         },
         [handleOpenModal]
     );
+
+    const hashCode = (str) => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+    };
+
+    const intToColor = (int) => {
+        const r = (int >> 16) & 0xFF;
+        const g = (int >> 8) & 0xFF;
+        const b = int & 0xFF;
+
+        // Convertir a un color claro
+        const lightR = Math.min(255, r + 100); // Aumenta el rojo
+        const lightG = Math.min(255, g + 100); // Aumenta el verde
+        const lightB = Math.min(255, b + 100); // Aumenta el azul
+
+        return `rgba(${lightR}, ${lightG}, ${lightB}, 0.5)`; // Opacidad del 50%
+    };
+    
+    const getColorForFicha = (fichaNumber) => {
+        const hash = hashCode(fichaNumber.toString());
+        return intToColor(hash);
+    };
 
     const topContent = (
         <div className="flex flex-col mt-3">
@@ -207,26 +287,6 @@ function TableMatriculas() {
                     onValueChange={setFilterValue}
                 />
                 <div className="flex items-center gap-3">
-                    <select
-                        id="Ficha"
-                        name="Ficha"
-                        value={selectedFicha}
-                        onChange={(e) => setSelectedFicha(e.target.value)}
-                        required
-                        className="h-10 rounded-xl bg-[#f4f4f5] p-2"
-                    >
-                        <option value="">Seleccionar Ficha</option>
-                        {fichas.length > 0 ? (
-                            fichas.map((ficha) => (
-                                <option key={ficha.codigo} value={ficha.codigo}>
-                                    {ficha.codigo}
-                                </option>
-                            ))
-                        ) : (
-                            <option disabled>Cargando fichas...</option>
-                        )}
-                    </select>
-                    <div>
                         <Button className="bg-[#92d22e] text-white" onClick={handleClickImportarExcel}>
                             Importar Excel
                         </Button>
@@ -238,7 +298,6 @@ function TableMatriculas() {
                             id="fileInput"
                             type="file"
                         />
-                    </div>
 
                     <Button
                         onClick={() => handleOpenModal("formMatriculas")}
@@ -271,6 +330,17 @@ function TableMatriculas() {
                     </select>
                 </label>
             </div>
+            <Tabs
+                        selectedKey={selectedFicha} // Establece la ficha seleccionada
+                        onSelectionChange={handleTabChange} // Maneja el cambio de tab
+                        className='ml-3'
+                    >
+                        {fichas.map((ficha) => (
+                            <Tab key={ficha.codigo} value={ficha.codigo}>
+                                {ficha.codigo}
+                            </Tab>
+                        ))}
+                    </Tabs>
         </div>
     );
 
@@ -314,7 +384,7 @@ function TableMatriculas() {
                         </Table>
                     ) : (
                         <div className="text-center mt-6">
-                            <p>No hay matrículas disponibles.</p>
+                            <p>No hay matrículas registradas en esta ficha.</p>
                         </div>
                     )
                 ) : (
@@ -337,7 +407,7 @@ function TableMatriculas() {
                 bodyContent={bodyContent}
             />
         </>
-    );
+    );    
 }
 
 export default TableMatriculas;

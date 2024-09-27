@@ -15,10 +15,11 @@ export const RegistroEmpresa = ({ onRegisterSuccess }) => {
     correo: "",
     municipio: "",
     jefe_inmediato: "",
- 
+
   });
   const [municipios, setMunicipios] = useState([]);
   const [error, setError] = useState("");
+
 
   useEffect(() => {
     const fetchMunicipios = async () => {
@@ -68,6 +69,9 @@ export const RegistroEmpresa = ({ onRegisterSuccess }) => {
       GlobalAlert.error("Hubo un error al registrar la empresa.");
     }
   };
+
+
+
 
   return (
     <div className="flex flex-col gap-2">

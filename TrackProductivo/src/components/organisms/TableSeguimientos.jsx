@@ -19,7 +19,6 @@ import {
     DropdownItem,
     Chip,
     Pagination,
-    User,
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
@@ -225,18 +224,7 @@ function TableSeguimientos() {
                         </Dropdown>
                     </div>
                 );
-                case "nombres":
-                    return sortedItems.map((item) => (
-                      <User
-                        name={item.nombres}    // Usamos item.nombres para mostrar el nombre correcto
-                        description={item.correo} // Mapear correctamente el correo
-                        avatarSrc="https://via.placeholder.com"
-                        bordered
-                        as="button"
-                        size="sm"
-                        color="primary"
-                      />
-                    ));
+                
                   
 
             default:
@@ -305,6 +293,7 @@ function TableSeguimientos() {
     const columns = [
         { key: "identificacion", label: "Identificación" },
         { key: "nombres", label: "Nombres" },
+        { key: "correo", label: "Correo" },
         { key: "codigo", label: "Ficha" },
         { key: "razon_social", label: "Empresa" },
         { key: "seguimiento1", label: "Seguimiento 1" },

@@ -3,26 +3,44 @@ import multer from "multer";
 import { addMonths, format, isValid } from 'date-fns';
 
 
-
 export const listarProductiva = async (req, res) => {
     try {
-        let sql = `SELECT * FROM productivas`
+        const { rol, userId } = req.user; // Obtener el rol y el ID del usuario autenticado
 
-        const [results] = await pool.query(sql)
+        let sql;
+        let params = [];
 
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        if (rol === 'Lider') {
+            // Consulta que filtra las productivas basadas en el id del líder (userId)
+            sql = `
+                SELECT p.*
+                FROM productivas p
+                JOIN matriculas m ON p.aprendiz = m.aprendiz
+                JOIN fichas f ON m.ficha = f.codigo
+                WHERE f.instructor_lider = ?
+            `;
+            params = [userId];  // Utilizar el id_persona (userId) del líder
+        } else {
+            // Consulta para listar todas las productivas si el usuario no es líder
+            sql = `SELECT * FROM productivas`;
+        }
+
+        const [results] = await pool.query(sql, params);
+
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
                 message: 'No hay productiva registrada'
-            })
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error.message
+        });
     }
-}
+};
+
 
 export const contarProductivasPorEstado = async (req, res) => {
     try {
@@ -87,13 +105,13 @@ export const productivaFiles = upload.fields([
 
 export const registrarProductiva = async (req, res) => {
     try {
-        const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, aprendiz, instructor } = req.body;
+        const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, instructor } = req.body;
         const acuerdo = req.files?.acuerdo?.[0]?.originalname || null;
         const arl = req.files?.arl?.[0]?.originalname || null;
         const consulta = req.files?.consulta?.[0]?.originalname || null;
 
-        // Verificar que la matrícula existe en la tabla matriculas
-        const sqlCheckMatricula = 'SELECT id_matricula FROM matriculas WHERE id_matricula = ?';
+        // Verificar que la matrícula existe en la tabla matriculas y obtener el aprendiz
+        const sqlCheckMatricula = 'SELECT id_matricula, aprendiz FROM matriculas WHERE id_matricula = ?';
         const [rowsMatricula] = await pool.query(sqlCheckMatricula, [matricula]);
 
         if (rowsMatricula.length === 0) {
@@ -101,6 +119,9 @@ export const registrarProductiva = async (req, res) => {
                 message: 'La matrícula no existe'
             });
         }
+
+        // Obtener el ID del aprendiz de la matrícula
+        const aprendiz = rowsMatricula[0].aprendiz;
 
         // Verificar que las fechas son válidas
         const fechaInicio = new Date(fecha_inicio);
@@ -112,7 +133,7 @@ export const registrarProductiva = async (req, res) => {
             });
         }
 
-        // Registrar etapa productiva
+        // Registrar etapa productiva, ahora incluyendo el ID del aprendiz
         const sqlProductiva = `
             INSERT INTO productivas
             (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
@@ -211,9 +232,6 @@ export const registrarProductiva = async (req, res) => {
         });
     }
 };
-
-
-
 
 
 

@@ -1,25 +1,50 @@
 import { pool } from "../database/conexion.js";
+
 export const listarEmpresas = async (req, res) => {
     try {
-        let sql = `SELECT  e.* , m.*
-         FROM empresas e
-         INNER JOIN municipios m ON e.municipio = m.id_municipio`
+        const { rol, userId } = req.user; // Obtener el rol y el ID del usuario autenticado
 
-        const [results] = await pool.query(sql)
+        let sql;
+        let params = [];
 
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        if (rol === 'Lider') {
+            // Consulta para listar solo las empresas relacionadas con las productivas de las fichas del líder (filtrando por el id_persona del líder)
+            sql = `
+                SELECT e.*, m.*
+                FROM empresas e
+                INNER JOIN municipios m ON e.municipio = m.id_municipio
+                INNER JOIN productivas p ON e.id_empresa = p.empresa
+                INNER JOIN matriculas mt ON p.aprendiz = mt.aprendiz
+                INNER JOIN fichas f ON mt.ficha = f.codigo
+                WHERE f.instructor_lider = ?
+            `;
+            params = [userId];  // Utilizar el id_persona (userId) del líder
+        } else {
+            // Consulta para listar todas las empresas para otros roles
+            sql = `
+                SELECT e.*, m.*
+                FROM empresas e
+                INNER JOIN municipios m ON e.municipio = m.id_municipio
+            `;
+        }
+
+        const [results] = await pool.query(sql, params);
+
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
                 message: 'No hay empresas registradas'
-            })
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error.message
+        });
     }
-}
+};
+
+
 
 export const registrarEmpresas = async (req, res) => {
     try {

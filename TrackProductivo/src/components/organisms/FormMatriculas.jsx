@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@nextui-org/react";
+import { Button, User } from "@nextui-org/react";
 import Swal from 'sweetalert2';
 import axiosClient from "../../configs/axiosClient";
 
@@ -27,13 +27,11 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
         fetchAprendices();
     }, []);
 
-
-
     useEffect(() => {
         if (initialData) {
             setMatriculaId(initialData.id_matricula);
             setEstado(initialData.estado || "Selecciona");
-            setAprendizSeleccionado(initialData.aprendiz || "");
+            setAprendizSeleccionado(initialData.id_persona || "");
             setPendientesTecnicos(initialData.pendientes_tecnicos ?? 0);
             setPendientesTransversales(initialData.pendientes_transversales ?? 0);
             setPendienteIngles(initialData.pendiente_ingles ?? 0);
@@ -42,6 +40,11 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
             setIsEditing(false);
         }
     }, [initialData]);
+
+    const handleAprendizClick = (id_persona) => {
+        setAprendizSeleccionado(id_persona); // Establece el ID del aprendiz seleccionado
+
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -53,7 +56,6 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
             return;
         }
 
-        //listado para obtener fichas
         const formData = {
             estado,
             ficha: fichaSeleccionada,
@@ -87,7 +89,7 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: error.response?.data?.message || 'Error desconocido',
+                text: 'Por favor selecciona un estado',
             });
         }
     };
@@ -98,28 +100,14 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                 {isEditing ? "Actualizar Matrícula" : "Registrar Matrícula"}
             </h1>
             <form onSubmit={handleSubmit} className="flex flex-col">
-                <select
-                    id="aprendiz"
-                    name="aprendiz"
-                    value={aprendizSeleccionado}
-                    onChange={(e) => setAprendizSeleccionado(e.target.value)}
-                    required
-                    className="mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2"
-                    disabled={isEditing}
-                >
-                    <option value="">Seleccionar Aprendiz</option>
-                    {aprendices.map((aprendiz) => (
-                        <option key={aprendiz.id_persona} value={aprendiz.id_persona}>
-                            {aprendiz.nombres}
-                        </option>
-                    ))}
-                </select>
-
+                {!isEditing && (
+                    <h2 className="text-lg font-semibold">Selecciona un Estado</h2>
+                )}
                 <select
                     name="estado"
                     value={estado}
                     onChange={(e) => setEstado(e.target.value)}
-                    className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.estado ? 'border-red-500' : ''}`}
+                    className={`my-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.estado ? 'border-red-500' : ''}`}
                     style={{ width: '385px' }}
                 >
                     <option value="Selecciona">Selecciona un Estado</option>
@@ -131,6 +119,25 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                     <option value="Por Certificar">Por Certificar</option>
                     <option value="Certificado">Certificado</option>
                 </select>
+
+                {!isEditing && (
+                    <h2 className="text-lg font-semibold">Selecciona un Aprendiz</h2>
+                )}
+                {aprendices.map((aprendiz) => (
+                    <div
+                        key={aprendiz.id_persona}
+                        className={`flex items-center mt-2 p-2 rounded-lg cursor-pointer hover:bg-gray-200 
+                                ${aprendizSeleccionado === aprendiz.id_persona ? 'border-2 border-green-500' : ''}`}
+                        onClick={() => handleAprendizClick(aprendiz.id_persona, aprendiz.nombres)}
+                    >
+                        <User
+                            avatarProps={{ radius: "lg" }}
+                            description={aprendiz.correo}
+                            name={aprendiz.nombres}
+                        />
+                    </div>
+                ))}
+
 
                 {isEditing && (
                     <>
@@ -165,7 +172,6 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                         {errors.pendiente_ingles && <p className="text-red-500">{errors.pendiente_ingles}</p>}
                     </>
                 )}
-
 
                 <div className="flex justify-end gap-5 mt-5">
                     <Button className="bg-[#92d22e] text-white" type="submit" color="success">

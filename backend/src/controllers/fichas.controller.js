@@ -152,13 +152,26 @@ export const finalizarFicha = async (req, res) => {
         })
     }
 }
-
-
 export const listarCodigo = async (req, res) => {
     try {
-        let sql = `SELECT codigo FROM fichas`;
+        const { rol, userId } = req.user; // Obtener el rol y el ID del usuario logueado
 
-        const [results] = await pool.query(sql);
+        let sql;
+        let params = [];
+
+        if (rol === 'Lider') {
+            // Si es un líder, listar solo las fichas donde es instructor líder
+            console.log('Instructor líder logueado:', userId);
+            sql = `SELECT codigo FROM fichas WHERE instructor_lider = ?`;
+            params = [userId]; // Filtrar por el ID del instructor líder
+        } else {
+            // Si es otro rol, listar todos los códigos de las fichas
+            console.log('Usuario logueado:', userId, 'Rol:', rol);
+            sql = `SELECT codigo FROM fichas`;
+        }
+
+        const [results] = await pool.query(sql, params);
+
         if (results.length > 0) {
             res.status(200).json(results);
         } else {
@@ -168,7 +181,7 @@ export const listarCodigo = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor'
+            message: 'Error del servidor: ' + error.message
         });
     }
 };

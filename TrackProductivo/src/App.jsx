@@ -118,7 +118,7 @@ export function WithSidebar({ children }) {
         {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
           <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
         )}
-        {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
+        {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
           <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
         )}
         {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (

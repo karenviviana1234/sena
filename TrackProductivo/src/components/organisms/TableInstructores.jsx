@@ -23,7 +23,6 @@ import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import ButtonRegistrarActividad from "../atoms/ButtonRegistrarActividad.jsx";
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonListarActividad from "../atoms/ButtonListarActividad.jsx";
-
 import ListActividad from "./ListActividad.jsx";
 
 function TableInstructores() {

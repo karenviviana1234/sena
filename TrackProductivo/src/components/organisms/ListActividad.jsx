@@ -6,6 +6,7 @@ import ModalAcciones from './ModalAcciones';
 import FormActividades from './FormActividades';
 import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad';
 import ButtonDesactivar from '../atoms/ButtonDesactivar';
+import Swal from 'sweetalert2';
 
 const ListActividad = ({ selectedInstructor, item }) => {
   const [instructor, setInstructor] = useState("");
@@ -57,13 +58,25 @@ const ListActividad = ({ selectedInstructor, item }) => {
     try {
       const response = await axiosClient.put(`/actividades/desactivar/${id_actividad}`);
       if (response.status === 200) {
-        alert('La actividad ha sido desactivada exitosamente.');
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Actividad desactivada correctamente',
+      });
         fetchData(instructor);
       } else {
-        alert('Hubo un problema al desactivar la actividad.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un Problema al desactivar la Actividad',
+      });
       }
     } catch (error) {
-      alert('Error al intentar desactivar la actividad.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrio un Error al Desactivar la Actividad',
+      })
       console.log(error);
     }
   };

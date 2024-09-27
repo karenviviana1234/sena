@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
+import Swal from "sweetalert2";
 
 function FormActividades({ selectedInstructor, actividadSeleccionada, onClose }) {
   const [instructor, setInstructor] = useState("");
@@ -71,8 +72,17 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!fechaInicio || !fechaFin || !horario || !tipo || !solicitud) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor completa todos los campos antes de enviar.',
+      });
+      return; // Detiene el envío si faltan campos por completar
+    }
+
     if (!validateDates()) {
-      return; // Detener el envío si la validación falla
+      return; // Detener el envío si la validación de fechas falla
     }
 
     const dataToSend = {
@@ -87,13 +97,37 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
     try {
       const response = await axiosClient.post("/actividades/registrar", dataToSend);
       if (response.status === 200) {
-        alert("Actividad registrada correctamente");
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Actividad registrada correctamente',
+        });
+        onClose(); // Cerrar el modal tras el éxito
       } else {
-        alert("Error al registrar la actividad");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo registrar la actividad. Por favor, inténtalo de nuevo.',
+        });
       }
     } catch (error) {
       console.error("Error del servidor:", error);
-      alert("Error del servidor: " + error.message);
+
+      // Verifica si el error tiene una respuesta del servidor y muestra un mensaje más específico
+      if (error.response) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error del servidor',
+          text: `Error: ${error.response.data.message || 'Ocurrió un problema al procesar tu solicitud.'}`,
+        });
+      } else {
+        // Error sin respuesta del servidor (problemas de conexión, timeout, etc.)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo conectar con el servidor. Verifica tu conexión a internet y vuelve a intentarlo.',
+        });
+      }
     }
   };
 
@@ -104,11 +138,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
     <div>
       <h2 className="text-xl font-bold mb-4">Formulario de Actividades</h2>
       <form onSubmit={handleSubmit}>
-        <Input
-          readOnly
-          label="Instructor"
-          value={instructor}
-        />
+        <Input readOnly label="Instructor" value={instructor} />
 
         <div className="grid grid-cols-2 gap-4 mb-5 mt-5">
           <div className="flex flex-col">
@@ -137,41 +167,37 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
           </div>
         </div>
 
-          <div className="flex flex-col">
-            <Select
-              name="horario"
-              placeholder="Selecciona el horario"
-              value={horario}
-              onChange={(e) => setHorario(e.target.value)}
-            >
-              {horarios.map((hora) => (
-                <SelectItem
-                  key={hora.id_horario}
-                  value={hora.id_horario.toString()}
-                >
-                  {`${hora.id_horario} - ${hora.dia} - ${hora.ficha} - (${hora.hora_inicio} a ${hora.hora_fin})`}
-                </SelectItem>
-              ))}
-            </Select>
-            <Input
-              className="mt-4"
-              label="Horario Seleccionado"
-              value={
-                selectedHorario
-                  ? `${selectedHorario.id_horario} - ${selectedHorario.dia} - ${selectedHorario.ficha} - (${selectedHorario.hora_inicio} a ${selectedHorario.hora_fin})`
-                  : ""
-              }
-              readOnly
-              color={horario ? "success" : "default"}
-            />
-          </div>
-
+        <div className="flex flex-col">
+          <Select
+            name="horario"
+            placeholder="Selecciona el horario"
+            value={horario}
+            onChange={(e) => setHorario(e.target.value)}
+          >
+            {horarios.map((hora) => (
+              <SelectItem
+                key={hora.id_horario}
+                value={hora.id_horario.toString()}
+              >
+                {`${hora.id_horario} - ${hora.dia} - ${hora.ficha} - (${hora.hora_inicio} a ${hora.hora_fin})`}
+              </SelectItem>
+            ))}
+          </Select>
+          <Input
+            className="mt-4"
+            label="Horario Seleccionado"
+            value={
+              selectedHorario
+                ? `${selectedHorario.id_horario} - ${selectedHorario.dia} - ${selectedHorario.ficha} - (${selectedHorario.hora_inicio} a ${selectedHorario.hora_fin})`
+                : ""
+            }
+            readOnly
+            color={horario ? "success" : "default"}
+          />
+        </div>
 
         <div className="flex justify-end gap-5 mt-5">
-          <Button type="button" color="danger" onClick={onClose}>
-            Cerrar
-          </Button>
-          <Button type="submit" color="success" onClick={onClose}>
+          <Button type="submit" className="bg-[#92d22e] text-white" color="success">
             Registrar
           </Button>
         </div>
