@@ -17,7 +17,6 @@ const GlobalProvider = ({ children }) => {
                 <AsignacionProvider>
                     <SeguimientosProvider>
                         <PersonasProvider>
-
                             {children}
                         </PersonasProvider>
                     </SeguimientosProvider>

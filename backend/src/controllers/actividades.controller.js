@@ -60,9 +60,6 @@ export const listarActividades = async (req, res) => {
     }
 };
 
-
-
-
 export const actualizarActividad = async (req, res) => {
     try {
         const { id } = req.params;

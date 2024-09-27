@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
+import Swal from "sweetalert2";
 
 function FormActividades({ selectedInstructor, actividadSeleccionada, onClose }) {
   const [instructor, setInstructor] = useState("");
@@ -87,9 +88,17 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
     try {
       const response = await axiosClient.post("/actividades/registrar", dataToSend);
       if (response.status === 200) {
-        alert("Actividad registrada correctamente");
+        await Swal.fire({
+          title: "Éxito",
+          text: "Actividad registrada correctamente",
+          icon: "success",
+        })
       } else {
-        alert("Error al registrar la actividad");
+        await Swal.fire({
+          title: "Error",
+          text: "Error al registrar la actividad.",
+          icon: "error",
+        });
       }
     } catch (error) {
       console.error("Error del servidor:", error);

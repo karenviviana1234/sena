@@ -14,7 +14,6 @@ export const validar = async (req, res) => {
             
             // Comparar la contraseña ingresada con la contraseña encriptada en la base de datos
             const validPassword = await bcrypt.compare(password, user.password);
-
             if (!validPassword) {
                 return res.status(401).json({ message: "Credenciales incorrectas" });
             }

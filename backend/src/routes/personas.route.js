@@ -4,7 +4,7 @@ import { validarToken } from '../controllers/seguridad.controller.js'
 
 const rutaPersona = Router()
 
-rutaPersona.get('/listar',  validarToken, listarPersonas)
+rutaPersona.get('/listar',  /* validarToken, */ listarPersonas)
 rutaPersona.get('/listarM', validarToken, listarMunicipios)
 rutaPersona.get('/listarA', validarToken, listarAprendices)
 rutaPersona.get('/listarI', /* validarToken,  */listarInstructores)
