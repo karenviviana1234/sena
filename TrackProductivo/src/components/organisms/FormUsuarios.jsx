@@ -36,7 +36,6 @@ function FormUsuarios({ initialData }) {
 
   useEffect(() => {
     if (initialData) {
-      console.log('Initial Data:', initialData);
       setIdentificacion(initialData.identificacion || "");
       setNombres(initialData.nombres || "");
       setCorreo(initialData.correo || "");

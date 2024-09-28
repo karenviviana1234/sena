@@ -12,9 +12,8 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
     dia: "",
     horas: "",
     ficha: "",
-    ambiente: "",
-    estado: ""
-  });
+    ambiente: ""
+    });
   const [fichas, setFichas] = useState([]);
   const [ambientes, setAmbientes] = useState([]);
   const [error, setError] = useState("");
@@ -29,9 +28,8 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
         dia: item.dia || "",
         horas: item.horas ? item.horas.toString() : "",
         ficha: item.ficha ? item.ficha.toString() : "",
-        ambiente: item.ambiente ? item.ambiente.toString() : "",
-        estado: item.estado || ""
-      });
+        ambiente: item.ambiente ? item.ambiente.toString() : ""
+            });
     }
     fetchFichas();
     fetchAmbientes();
@@ -71,7 +69,7 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
     event.preventDefault();
     console.log("Iniciando actualización de horario. Datos actuales:", horarioData);
 
-    if (!horarioData.hora_inicio || !horarioData.hora_fin || !horarioData.dia || !horarioData.horas || !horarioData.ficha || !horarioData.ambiente || !horarioData.estado) {
+    if (!horarioData.hora_inicio || !horarioData.hora_fin || !horarioData.dia || !horarioData.horas || !horarioData.ficha || !horarioData.ambiente ) {
       setError("Todos los campos son obligatorios");
       console.error("Error de validación: Campos incompletos", horarioData);
       return;
@@ -87,7 +85,6 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
         horas: parseInt(horarioData.horas),
         ficha: parseInt(horarioData.ficha),
         ambiente: parseInt(horarioData.ambiente),
-        estado: horarioData.estado
       };
       console.log("Datos a enviar:", dataToSend);
 
@@ -99,7 +96,6 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
     } catch (error) {
       console.error("Error completo:", error);
       console.error("Respuesta del servidor:", error.response?.data);
-      console.error("Estado de la respuesta:", error.response?.status);
       console.error("Headers de la respuesta:", error.response?.headers);
       const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
       GlobalAlert.error(`Error al actualizar el horario: ${errorMessage}`);
@@ -181,28 +177,14 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
               </SelectItem>
             ))}
           </Select>
-          <Select
-            label="Estado"
-            placeholder="Seleccione el estado"
-            name="estado"
-            selectedKeys={horarioData.estado ? [horarioData.estado] : []}
-            onChange={(e) => handleInputChange({ target: { name: 'estado', value: e.target.value } })}
-            required
-          >
-            <SelectItem key="Activo" value="Activo">Activo</SelectItem>
-            <SelectItem key="Inactivo" value="Inactivo">Inactivo</SelectItem>
-          </Select>
           {error && <p className="text-red-500">{error}</p>}
-          <Button color="primary" type="submit">
-            Actualizar Horario
-          </Button>
+          <div className="flex justify-end gap-5 mr-5 my-5">
+              <Button className="bg-[#92d22e] text-white" type="submit" color="success">
+                Actualizar
+              </Button>
+            </div>
         </form>
       }
-      footer={() => (
-        <Button color="danger" variant="light" onPress={onClose}>
-          Cerrar
-        </Button>
-      )}
     />
   );
 };

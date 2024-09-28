@@ -33,12 +33,15 @@ export const listarasignaciones = async (req, res) => {
         if (result.length > 0) {
             return res.status(200).json(result);
         } else {
-            return res.status(404).json({
-                status: 404,
-                message: "No se encontraron asignaciones."
+            // En lugar de devolver un error, simplemente devolvemos un mensaje de éxito con data vacía
+            return res.status(200).json({
+                status: 200,
+                message: "No se encontraron asignaciones.",
+                data: [] // Aquí se devuelve un array vacío
             });
         }
     } catch (error) {
+        console.error("Error en el servidor:", error); // Log para depuración
         return res.status(500).json({
             status: 500,
             message: error.message || "Error interno del servidor."
@@ -46,7 +49,9 @@ export const listarasignaciones = async (req, res) => {
     }
 };
 
+
 export const registrarasignacion = async (req, res) => {
+    const connection = await pool.getConnection(); // Obtener conexión manualmente para usar transacciones
     try {
         const { productiva, actividad } = req.body;
 
@@ -57,9 +62,11 @@ export const registrarasignacion = async (req, res) => {
             });
         }
 
-        console.log('Valores recibidos:', { productiva, actividad });
+        // Iniciar la transacción
+        await connection.beginTransaction();
 
-        const [actividadExist] = await pool.query(
+        // Verificar si la actividad existe y está activa
+        const [actividadExist] = await connection.query(
             "SELECT * FROM actividades WHERE id_actividad = ? AND estado = 'Activo'",
             [actividad]
         );
@@ -71,7 +78,26 @@ export const registrarasignacion = async (req, res) => {
             });
         }
 
-        const [productivaExist] = await pool.query(
+        // Obtener el id_instructor de la actividad
+        const idInstructor = actividadExist[0].instructor;
+
+        // Obtener el nombre del instructor
+        const [instructorData] = await connection.query(
+            "SELECT nombres FROM personas WHERE id_persona = ?",
+            [idInstructor]
+        );
+
+        if (instructorData.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "Instructor no encontrado."
+            });
+        }
+
+        const nombreInstructor = instructorData[0].nombres;
+
+        // Verificar si la etapa productiva existe
+        const [productivaExist] = await connection.query(
             "SELECT * FROM productivas WHERE id_productiva = ?",
             [productiva]
         );
@@ -83,15 +109,37 @@ export const registrarasignacion = async (req, res) => {
             });
         }
 
-        const [result] = await pool.query(
+        // Registrar la asignación en la tabla asignaciones
+        const [result] = await connection.query(
             "INSERT INTO asignaciones (productiva, actividad) VALUES (?, ?)",
             [productiva, actividad]
         );
 
         if (result.affectedRows > 0) {
+            // Actualizar los seguimientos para agregar el nombre del instructor
+            const seguimientoUpdateQuery = `
+                UPDATE seguimientos 
+                SET instructor = ? 
+                WHERE productiva = ?
+            `;
+            await connection.query(seguimientoUpdateQuery, [nombreInstructor, productiva]);
+
+            // Actualizar las bitácoras para agregar el nombre del instructor
+            const bitacoraUpdateQuery = `
+                UPDATE bitacoras 
+                SET instructor = ? 
+                WHERE seguimiento IN (
+                    SELECT id_seguimiento FROM seguimientos WHERE productiva = ?
+                )
+            `;
+            await connection.query(bitacoraUpdateQuery, [nombreInstructor, productiva]);
+
+            // Confirmar la transacción
+            await connection.commit();
+
             return res.status(200).json({
                 status: 200,
-                message: "Asignación registrada con éxito."
+                message: "Asignación registrada con éxito, incluyendo la actualización de seguimientos y bitacoras."
             });
         } else {
             return res.status(403).json({
@@ -100,17 +148,21 @@ export const registrarasignacion = async (req, res) => {
             });
         }
     } catch (error) {
+        await connection.rollback(); // Revertir transacción en caso de error
         return res.status(500).json({
             status: 500,
             message: error.message || "Error en el sistema"
         });
+    } finally {
+        connection.release(); // Liberar la conexión al final
     }
 };
 
 
+
 export const actualizarasignacion = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id_asignacion } = req.params;
         const { productiva, actividad } = req.body;
 
         // Verificar si el instructor existe
@@ -140,7 +192,7 @@ export const actualizarasignacion = async (req, res) => {
         // Verificar si la asignación existe
         const [asignacionExist] = await pool.query(
             "SELECT * FROM asignaciones WHERE id_asignacion = ?",
-            [id]
+            [id_asignacion]
         );
         if (asignacionExist.length === 0) {
             return res.status(404).json({
@@ -154,7 +206,7 @@ export const actualizarasignacion = async (req, res) => {
             `UPDATE asignaciones 
              SET productiva = ?, actividad = ?
              WHERE id_asignacion = ?`,
-            [productiva, actividad, id]
+            [productiva, actividad, id_asignacion]
         );
 
         if (result.affectedRows > 0) {
@@ -179,7 +231,7 @@ export const actualizarasignacion = async (req, res) => {
 
 export const buscarasignacion = async (req, res) => { 
     try {
-        const { id } = req.params;
+        const { id_asignacion } = req.params;
         const [result] = await pool.query(
             `SELECT 
                 p.id_asignacion, 
@@ -193,7 +245,7 @@ export const buscarasignacion = async (req, res) => {
                 actividades AS act ON p.actividad = act.id_actividad
             WHERE 
                 p.id_asignacion = ?`,
-            [id]
+            [id_asignacion]
         );
 
         if (result.length > 0) {
@@ -211,3 +263,57 @@ export const buscarasignacion = async (req, res) => {
         });
     }
 };
+
+export const eliminarAsignacion = async (req, res) => {
+    const connection = await pool.getConnection(); // Obtener conexión manualmente para usar transacciones
+    try {
+        // Obtener el id_asignacion desde los parámetros de la ruta
+        const { id_asignacion } = req.params;
+
+        if (!id_asignacion) {
+            return res.status(400).json({
+                status: 400,
+                message: "Datos incompletos. Por favor, envíe el ID de la asignación."
+            });
+        }
+
+        // Iniciar la transacción
+        await connection.beginTransaction();
+
+        // Verificar si la asignación existe
+        const [asignacionExist] = await connection.query(
+            "SELECT * FROM asignaciones WHERE id_asignacion = ?",
+            [id_asignacion]
+        );
+
+        if (asignacionExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "La asignación no existe."
+            });
+        }
+
+        // Eliminar la asignación
+        await connection.query(
+            "DELETE FROM asignaciones WHERE id_asignacion = ?",
+            [id_asignacion]
+        );
+
+        // Confirmar la transacción
+        await connection.commit();
+
+        return res.status(200).json({
+            status: 200,
+            message: "Asignación eliminada con éxito."
+        });
+    } catch (error) {
+        await connection.rollback(); // Revertir transacción en caso de error
+        return res.status(500).json({
+            status: 500,
+            message: error.message || "Error en el sistema"
+        });
+    } finally {
+        connection.release(); // Liberar la conexión al final
+    }
+};
+

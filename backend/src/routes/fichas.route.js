@@ -1,6 +1,6 @@
 //modificaciones
 import Router from 'express'
-import { listarFichas, registrarFichas, actualizarFicha, electivaFicha, finalizarFicha, listarCodigo, obtenerFichaPorId } from '../controllers/fichas.controller.js'
+import { listarFichas, registrarFichas, actualizarFicha, electivaFicha, finalizarFicha, listarCodigo, obtenerFichaPorId, finFicha } from '../controllers/fichas.controller.js'
 import { validarToken } from './../controllers/seguridad.controller.js' 
 
 const rutaFichas = Router()
@@ -12,5 +12,6 @@ rutaFichas.post('/registrar', validarToken, registrarFichas)
 rutaFichas.put('/actualizar/:codigo', validarToken, actualizarFicha)
 rutaFichas.put('/electiva/:id', validarToken, electivaFicha)
 rutaFichas.put('/finalizar/:id', validarToken, finalizarFicha)
+rutaFichas.post('/fin/:codigo', validarToken, finFicha)
 
 export default rutaFichas

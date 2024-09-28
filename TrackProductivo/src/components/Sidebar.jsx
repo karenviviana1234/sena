@@ -1,5 +1,5 @@
 import { ChevronFirst, ChevronLast, Power, ChevronDown, ChevronUp } from "lucide-react";
-import logo from "../assets/img/logo-sena-verde.png";
+import logo from "../assets/img/LOGOTIC.png";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ModalLogout } from "../configs/ModalLogout";
@@ -13,7 +13,7 @@ export default function Sidebar({ children }) {
     <aside className="h-screen bg-white text-black shadow-md border-r-1">
       <nav className="h-full flex flex-col justify-between">
         <div>
-          <div className="px-4 py-3 flex justify-between items-center bg-gradient-to-r from-lime-100 to-lime-500">
+          <div className="px-4 py-3 flex justify-between items-center bg-gradient-to-r from-lime-200 to-[#0c8652]">
             <div className="flex items-center gap-2">
               <img
                 src={logo}
@@ -30,8 +30,8 @@ export default function Sidebar({ children }) {
               {expanded ? <ChevronFirst /> : <ChevronLast />}
             </button>
           </div>
-          <div className="mt-4 pt-3 border-t border-gray-200">
-            <span className="ml-3 h-8 flex items-center text-gray-600">MENU</span>
+          <div className="mt-4 pt-3 ">
+            <span className="ml-3 h-8 flex items-center text-[#0d324c] font-semibold">MENÚ</span>
             <SidebarContext.Provider value={{ expanded, setExpanded }}>
               <ul className="flex-1 px-2 mt-4 py-6 border-b border-gray-200">
                 {children}

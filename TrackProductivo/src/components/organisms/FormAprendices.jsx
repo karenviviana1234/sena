@@ -57,8 +57,8 @@ function FormAprendices({ initialData }) {
       municipio: selectedMunicipio,
     };
 
-/*     console.log("Campos enviados:", formData);
- */
+    /*     console.log("Campos enviados:", formData);
+     */
 
     try {
       if (isEditing) {
@@ -167,7 +167,7 @@ function FormAprendices({ initialData }) {
           />
         </div>
         <select
-          className="mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.sede ? 'border-red-500' : ''}"
+          className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
           id="municipios"
           name="Municipio"
           value={selectedMunicipio}

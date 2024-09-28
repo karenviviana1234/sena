@@ -8,7 +8,7 @@ const GlobalModal = ({ isOpen, onOpenChange, title, children, footer }) => {
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-            <ModalBody>{children}</ModalBody>
+            <ModalBody className="max-h-[80vh] overflow-y-auto">{children}</ModalBody>
             {footer && <ModalFooter>{footer(onClose)}</ModalFooter>}
           </>
         )}

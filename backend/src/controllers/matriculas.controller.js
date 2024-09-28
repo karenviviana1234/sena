@@ -197,6 +197,7 @@ export const condicionadaMatricula = async (req, res) => {
         })
     }
 }
+
 export const canceladaMatricula = async (req, res) => {
     try {
         const { id_matricula } = req.params;

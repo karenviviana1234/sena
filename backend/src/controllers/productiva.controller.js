@@ -1,8 +1,6 @@
 import { pool } from "../database/conexion.js";
 import multer from "multer";
 import { addMonths, format, isValid } from 'date-fns';
-
-
 export const listarProductiva = async (req, res) => {
     try {
         const { rol, userId } = req.user; // Obtener el rol y el ID del usuario autenticado
@@ -13,16 +11,21 @@ export const listarProductiva = async (req, res) => {
         if (rol === 'Lider') {
             // Consulta que filtra las productivas basadas en el id del líder (userId)
             sql = `
-                SELECT p.*
+                SELECT p.*, pe.nombres AS aprendiz_nombre
                 FROM productivas p
                 JOIN matriculas m ON p.aprendiz = m.aprendiz
                 JOIN fichas f ON m.ficha = f.codigo
+                JOIN personas pe ON p.aprendiz = pe.id_persona
                 WHERE f.instructor_lider = ?
             `;
             params = [userId];  // Utilizar el id_persona (userId) del líder
         } else {
             // Consulta para listar todas las productivas si el usuario no es líder
-            sql = `SELECT * FROM productivas`;
+            sql = `
+                SELECT p.*, pe.nombres AS aprendiz_nombre
+                FROM productivas p
+                JOIN personas pe ON p.aprendiz = pe.id_persona
+            `;
         }
 
         const [results] = await pool.query(sql, params);
@@ -40,7 +43,6 @@ export const listarProductiva = async (req, res) => {
         });
     }
 };
-
 
 export const contarProductivasPorEstado = async (req, res) => {
     try {

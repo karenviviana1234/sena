@@ -7,7 +7,7 @@ const rutaEmpresas = Router();
 rutaEmpresas.get("/listar", validarToken, listarEmpresas);
 rutaEmpresas.post("/registrar", validarToken, registrarEmpresas);
 rutaEmpresas.put("/actualizar/:id_empresa", validarToken, actualizarEmpresas);
-rutaEmpresas.put("/inactivar/:id", validarToken, inactivarEmpresa);
+rutaEmpresas.post("/inactivar/:id_empresa", validarToken, inactivarEmpresa);
 rutaEmpresas.put("/activar/:id", validarToken, activarEmpresa);
 
 export default rutaEmpresas;

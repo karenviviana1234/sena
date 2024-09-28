@@ -18,9 +18,9 @@ export const AsignacionProvider = ({ children }) => {
         }
     };
 
-    const getAsignacion = async (id) => {
+    const getAsignacion = async (id_asignacion) => {
         try {
-            const response = await axiosClient.get(`/buscar/${id}`);
+            const response = await axiosClient.get(`/buscar/${id_asignacion}`);
             console.log(response.data);
             setAsignacion(response.data);
         } catch (error) {

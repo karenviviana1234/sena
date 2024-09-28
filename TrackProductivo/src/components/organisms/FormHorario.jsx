@@ -109,11 +109,18 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Button onPress={onOpen} className="max-w-fit">Registrar Horario</Button>
+    <div className="relative z-20 flex items-center justify-end gap-3">
+      <Button
+        onPress={onOpen}
+        className="bg-[#90d12c] text-white absolute top-0 z-30" // Aseguramos que el botón tenga un z-index alto
+      >
+        Registrar Horario
+      </Button>
+    </div>
       <GlobalModal
         isOpen={isOpen}
         onOpenChange={onClose}
-        title="Formulario de Registro de Horario"
+        title="Registro de Horarios"
         children={
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <TimeInput
@@ -180,14 +187,13 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
               ))}
             </Select>
             {error && <p className="text-red-500">{error}</p>}
-            <Button type="submit" color="primary">Registrar Horario</Button>
+            <div className="flex justify-end gap-5 mr-5 my-5">
+              <Button className="bg-[#92d22e] text-white" type="submit" color="success">
+                Registrar
+              </Button>
+            </div>
           </form>
         }
-        footer={() => (
-          <Button color="danger" variant="light" onClick={onClose}>
-            Cerrar
-          </Button>
-        )}
       />
     </div>
   );

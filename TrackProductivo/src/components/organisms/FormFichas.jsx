@@ -18,6 +18,7 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
     sede: "",
   });
   const [programas, setProgramas] = useState([]);
+  const [personas, setLideres] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -39,6 +40,25 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
     fetchProgramas();
   }, []);
 
+  useEffect(() => {
+    const fetchLideres = async () => {
+      try {
+        const response = await axiosClient.get("/personas/listarL");
+        const uniqueLideres = response.data.reduce((acc, curr) => {
+          if (!acc.find(p => p.id_persona === curr.id_persona)) {
+            acc.push({ id_persona: curr.id_persona, nombres: curr.nombres });
+          }
+          return acc;
+        }, []);
+        setLideres(uniqueLideres);
+      } catch (error) {
+        console.error("Error al obtener los lideres:", error);
+        GlobalAlert.error("Hubo un error al obtener los lideres.");
+      }
+    };
+    fetchLideres();
+  }, []);
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFichaData({ ...fichaData, [name]: value });
@@ -50,7 +70,7 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!fichaData.codigo || !fichaData.inicio_ficha || !fichaData.fin_lectiva || !fichaData.fin_ficha || !fichaData.programa || !fichaData.sede) {
+    if (!fichaData.codigo ||  !fichaData.instructor_lider || !fichaData.inicio_ficha || !fichaData.fin_lectiva || !fichaData.fin_ficha || !fichaData.programa || !fichaData.sede) {
       setError("Todos los campos son obligatorios");
       return;
     }
@@ -64,6 +84,7 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
         inicio_ficha: "",
         fin_lectiva: "",
         fin_ficha: "",
+        instructor_lider: "",
         programa: "",
         sede: ""
       });
@@ -99,21 +120,44 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Button onPress={onOpen} className="max-w-fit">Registrar Ficha</Button>
+      <div className="relative z-20 flex items-center justify-end gap-3">
+        <Button
+          onPress={onOpen}
+          className="bg-[#90d12c] text-white absolute top-0 z-30" // Aseguramos que el botón tenga un z-index alto
+        >
+          Registrar Ficha
+        </Button>
+      </div>
+
       <GlobalModal
         isOpen={isOpen}
         onOpenChange={onClose}
-        title="Formulario de Registro de Ficha"
+        title="Registro de Fichas"
         children={
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
               label="Código de Ficha"
               placeholder="Ingresa el código de la ficha"
               name="codigo"
+              type="number"
               value={fichaData.codigo}
               onChange={handleInputChange}
               required
             />
+            <Select
+              label="Instructor"
+              placeholder="Seleccione un Instructor Lider"
+              name="instructor_lider"
+              value={fichaData.instructor_lider}
+              onChange={handleInputChange}
+              required
+            >
+              {personas.map((instructor_lider) => (
+                <SelectItem key={instructor_lider.id_persona} value={instructor_lider.id_persona}>
+                  {instructor_lider.nombres}
+                </SelectItem>
+              ))}
+            </Select>
             <DateInput
               label="Inicio de Ficha"
               name="inicio_ficha"
@@ -158,14 +202,13 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
               <SelectItem key="yamboro" value="yamboro">Yamboro</SelectItem>
             </Select>
             {error && <p className="text-red-500">{error}</p>}
-            <Button type="submit" color="primary">Registrar Ficha</Button>
+            <div className="flex justify-end gap-5 mr-5 my-5">
+              <Button className="bg-[#92d22e] text-white" type="submit" color="success">
+                Registrar
+              </Button>
+            </div>
           </form>
         }
-        footer={() => (
-          <Button color="danger" variant="light" onClick={onClose}>
-            Cerrar
-          </Button>
-        )}
       />
     </div>
   );

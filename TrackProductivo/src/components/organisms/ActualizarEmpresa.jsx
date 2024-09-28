@@ -13,7 +13,6 @@ const UpdateEmpresa = ({ item, onClose, refreshData }) => {
     correo: '',
     municipio: '',
     jefe_inmediato: '',
-    estado: '',
   });
   const [municipios, setMunicipios] = useState([]);
   const [error, setError] = useState('');
@@ -28,7 +27,6 @@ const UpdateEmpresa = ({ item, onClose, refreshData }) => {
         correo: item.correo || '',
         municipio: item.municipio ? item.municipio.toString() : '',
         jefe_inmediato: item.jefe_inmediato || '',
-        estado: item.estado || '',
       });
     }
     obtenerMunicipios();
@@ -63,8 +61,7 @@ const UpdateEmpresa = ({ item, onClose, refreshData }) => {
       !datosEmpresa.telefono ||
       !datosEmpresa.correo ||
       !datosEmpresa.municipio ||
-      !datosEmpresa.jefe_inmediato ||
-      !datosEmpresa.estado
+      !datosEmpresa.jefe_inmediato
     ) {
       setError('Todos los campos son obligatorios');
       console.error('Error de validación: Campos incompletos', datosEmpresa);
@@ -81,7 +78,6 @@ const UpdateEmpresa = ({ item, onClose, refreshData }) => {
         correo: datosEmpresa.correo,
         municipio: parseInt(datosEmpresa.municipio),
         jefe_inmediato: datosEmpresa.jefe_inmediato,
-        estado: datosEmpresa.estado === 'Activo' ? 'Activo' : 'Inactivo',
       };
       console.log('Datos a enviar:', datosAEnviar);
 
@@ -93,7 +89,6 @@ const UpdateEmpresa = ({ item, onClose, refreshData }) => {
     } catch (error) {
       console.error('Error completo:', error);
       console.error('Respuesta del servidor:', error.response?.data);
-      console.error('Estado de la respuesta:', error.response?.status);
       console.error('Headers de la respuesta:', error.response?.headers);
       const mensajeDeError = error.response?.data?.message || error.message || 'Error desconocido';
       GlobalAlert.error(`Error al actualizar la empresa: ${mensajeDeError}`);
@@ -155,24 +150,13 @@ const UpdateEmpresa = ({ item, onClose, refreshData }) => {
           onChange={manejarCambioDeEntrada}
           required
         />
-        <Select
-          label="Estado"
-          name="estado"
-          selectedKeys={datosEmpresa.estado ? [datosEmpresa.estado] : []}
-          onChange={(e) => manejarCambioDeEntrada({ target: { name: 'estado', value: e.target.value } })}
-          required
-        >
-          <SelectItem key="Activo" value="Activo">Activo</SelectItem>
-          <SelectItem key="Inactivo" value="Inactivo">Inactivo</SelectItem>
-        </Select>
         {error && <p className="text-red-500">{error}</p>}
-        <Button color="primary" type="submit">
-          Actualizar Empresa
-        </Button>
+        <div className="flex justify-end gap-5 mr-5 my-5">
+              <Button className="bg-[#92d22e] text-white" type="submit" color="success">
+                Actualizar
+              </Button>
+            </div>
       </form>
-      <Button color="danger" variant="light" onPress={onClose}>
-        Cerrar
-      </Button>
     </GlobalModal>
   );
 };

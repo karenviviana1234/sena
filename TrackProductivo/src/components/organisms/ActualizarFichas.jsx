@@ -15,6 +15,7 @@ const ActualizarFicha = ({ item, onClose, refreshData }) => {
     estado: ""
   });
   const [programas, setProgramas] = useState([]);
+  const [personas, setLideres] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -24,6 +25,7 @@ const ActualizarFicha = ({ item, onClose, refreshData }) => {
 
       setFichaData({
         codigo: item.codigo ? item.codigo.toString() : "",
+        instructor_lider: item.instructor_lider ? item.instructor_lider.toString() : "",
         inicio_ficha: formatDate(item.inicio_ficha),
         fin_lectiva: formatDate(item.fin_lectiva),
         fin_ficha: formatDate(item.fin_ficha),
@@ -33,6 +35,7 @@ const ActualizarFicha = ({ item, onClose, refreshData }) => {
       });
     }
     fetchProgramas();
+    fetchLideres();
   }, [item]);
 
   const fetchProgramas = async () => {
@@ -42,6 +45,16 @@ const ActualizarFicha = ({ item, onClose, refreshData }) => {
     } catch (error) {
       console.error("Error al obtener los programas:", error);
       GlobalAlert.error("Hubo un error al obtener los programas.");
+    }
+  };
+
+  const fetchLideres = async () => {
+    try {
+      const response = await axiosClient.get("/personas/listarL");
+      setLideres(response.data);
+    } catch (error) {
+      console.error("Error al obtener los lideres:", error);
+      GlobalAlert.error("Hubo un error al obtener los lideres.");
     }
   };
 
@@ -77,7 +90,7 @@ const ActualizarFicha = ({ item, onClose, refreshData }) => {
     event.preventDefault();
     console.log("Iniciando actualización de ficha. Datos actuales:", fichaData);
 
-    if (!fichaData.codigo || !fichaData.inicio_ficha || !fichaData.fin_lectiva || !fichaData.programa || !fichaData.sede || !fichaData.estado) {
+    if (!fichaData.codigo || !fichaData.instructor_lider || !fichaData.inicio_ficha || !fichaData.fin_lectiva || !fichaData.programa || !fichaData.sede || !fichaData.estado) {
       setError("Todos los campos son obligatorios excepto Fin de Ficha");
       console.error("Error de validación: Campos incompletos", fichaData);
       return;
@@ -92,6 +105,7 @@ const ActualizarFicha = ({ item, onClose, refreshData }) => {
       console.log(`Actualizando ficha con código: ${fichaData.codigo}`);
       const dataToSend = {
         codigo: fichaData.codigo,
+        instructor_lider: parseInt(fichaData.instructor_lider),
         inicio_ficha: fichaData.inicio_ficha,
         fin_lectiva: fichaData.fin_lectiva,
         fin_ficha: fichaData.fin_ficha || null,
@@ -130,6 +144,20 @@ const ActualizarFicha = ({ item, onClose, refreshData }) => {
             onChange={(e) => handleInputChange({ target: { name: 'codigo', value: e.target.value } })}
             required
           />
+           <Select
+            label="Instructor"
+            placeholder="Seleccione un Instructor Lider"
+            name="instructor_lider"
+            selectedKeys={fichaData.instructor_lider ? [fichaData.instructor_lider] : []}
+            onChange={(e) => handleInputChange({ target: { name: 'instructor_lider', value: e.target.value } })}
+            required
+          >
+            {personas.map((instructor_lider) => (
+              <SelectItem key={instructor_lider.id_persona.toString()} value={instructor_lider.id_persona.toString()}>
+                {instructor_lider.nombres}
+              </SelectItem>
+            ))}
+          </Select>
           <Input
             label="Inicio de Ficha"
             type="date"

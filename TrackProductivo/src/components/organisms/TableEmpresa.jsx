@@ -9,18 +9,19 @@ function TableEmpresas() {
   const handleRegisterSuccess = () => {
     setRefreshTrigger(prev => !prev);
   };
+
   const columns = [
-    'jefe_inmediato',
-    'telefono',
-    'direccion',
-    'correo',
-    'razon_social',
-    'nombre_mpio',
-    'departamento',
-    'estado',
+    { key: 'id_empresa', label: 'Empresa' },
+    { key: 'razon_social', label: 'Nombre' },
+    { key: 'jefe_inmediato', label: 'Jefe' },
+    { key: 'direccion', label: 'Direccion' },
+    { key: 'correo', label: 'Correo' },
+    { key: 'telefono', label: 'Telefono' },
+    { key: 'nombre_mpio', label: 'Municipio' },
+    { key: 'departamento', label: 'Departamento' },
   ];
 
-
+ 
 
   return (
     <>
@@ -32,7 +33,8 @@ function TableEmpresas() {
             dataEndpoint="/empresas/listar" 
             refreshTrigger={refreshTrigger}
             updateComponent={UpdateEmpresa} 
-        
+            desactivarEndpoint="/empresas/inactivar/" 
+            idField="id_empresa"
           />
         </div>
 

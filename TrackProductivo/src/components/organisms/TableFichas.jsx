@@ -3,24 +3,23 @@ import RegistroFicha from './FormFichas';
 import GlobalTable from '../../components/componets_globals/GlobalTable';
 import ActualizarFicha from './ActualizarFichas';
 
-
 function TableFichasPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const handleRegisterSuccess = () => {
     setRefreshTrigger(prev => !prev);
   };
 
   const columns = [
-    'codigo',
-    'estado',
-    'inicio_ficha',
-    'fin_lectiva',
-    'fin_ficha',
-    'nombre_programa',
-    'sede',
-  
+    { key: 'codigo', label: 'Código' },
+    { key: 'nombre_programa', label: 'Nombre del Programa' },
+    { key: 'nombre_instructor', label: 'Nombre del Instructor' },
+    { key: 'estado', label: 'Estado' },
+    { key: 'inicio_ficha', label: 'Inicio de Ficha' },
+    { key: 'fin_lectiva', label: 'Fin de Lectiva' },
+    { key: 'fin_ficha', label: 'Fin de Ficha' },
+    { key: 'sede', label: 'Sede' },
   ];
-
 
   return (
     <>
@@ -31,15 +30,16 @@ function TableFichasPage() {
             columns={columns}
             dataEndpoint="/fichas/listar"
             refreshTrigger={refreshTrigger}
-            updateComponent={ActualizarFicha} 
-         
+            updateComponent={ActualizarFicha}
+            contentName="fichas"
+            desactivarEndpoint="/fichas/fin/" // Cambiar aquí a minúscula
+            idField="codigo"
           />
-        </div>
 
+        </div>
       </main>
     </>
   );
 };
 
-
-export default TableFichasPage
+export default TableFichasPage;
