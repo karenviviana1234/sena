@@ -25,7 +25,7 @@ export default function Sidebar({ children }) {
             </div>
             <button
               onClick={() => setExpanded((curr) => !curr)}
-              className="p-2 rounded-lg bg-white text-lime-500 hover:bg-gray-100"
+              className="p-2 rounded-lg bg-white text-[#54ae6c] hover:bg-gray-100"
             >
               {expanded ? <ChevronFirst /> : <ChevronLast />}
             </button>
@@ -67,8 +67,8 @@ export function SidebarItem({ nav, icon, text, alert }) {
           expanded ? "px-5" : "pl-4"
         } my-1 font-medium rounded-md cursor-pointer group ${
           isActive
-            ? "bg-lime-500 text-white"
-            : "hover:bg-lime-400 hover:text-white text-gray-700"
+            ? "bg-gradient-to-r from-[#87cb7f] to-[#0c8652] text-white"
+            : "hover:bg-[#66b77c] hover:text-white text-gray-700"
         }`}
       >
         {icon}

@@ -136,7 +136,7 @@ export function WithSidebar({ children }) {
   return (
     <div className="flex">
       <Sidebar>
-        <SidebarItem nav="/" icon={<Home size={20} />} text="Home" />
+        <SidebarItem nav="/home" icon={<Home size={20} />} text="Home" />
         {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
           <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
         )}

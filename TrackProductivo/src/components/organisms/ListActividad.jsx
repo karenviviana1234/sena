@@ -1,12 +1,9 @@
-
-
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../../configs/axiosClient';
 import ModalAcciones from './ModalAcciones';
 import FormActividades from './FormActividades';
 import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad';
 import ButtonDesactivar from '../atoms/ButtonDesactivar';
-import Swal from 'sweetalert2';
 
 const ListActividad = ({ selectedInstructor, item }) => {
   const [instructor, setInstructor] = useState("");
@@ -58,25 +55,13 @@ const ListActividad = ({ selectedInstructor, item }) => {
     try {
       const response = await axiosClient.put(`/actividades/desactivar/${id_actividad}`);
       if (response.status === 200) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Éxito',
-          text: 'Actividad desactivada correctamente',
-      });
+        alert('La actividad ha sido desactivada exitosamente.');
         fetchData(instructor);
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Hubo un Problema al desactivar la Actividad',
-      });
+        alert('Hubo un problema al desactivar la actividad.');
       }
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ocurrio un Error al Desactivar la Actividad',
-      })
+      alert('Error al intentar desactivar la actividad.');
       console.log(error);
     }
   };
@@ -106,11 +91,11 @@ const ListActividad = ({ selectedInstructor, item }) => {
             <div className="absolute top-2 right-2">
               <ButtonDesactivar onClick={() => desactivarActividad(actividad.id_actividad)} />  
             </div>
-            <p className="text-sm text-gray-600"><strong>Estado: </strong>{actividad.estado}</p>
-            <p className="text-sm text-gray-600"><strong>Fecha de inicio: </strong>{formatFecha(actividad.fecha_inicio)}</p>
-            <p className="text-sm text-gray-600"><strong>Fecha de fin: </strong>{formatFecha(actividad.fecha_fin)}</p>
-            <p className="text-sm text-gray-600"><strong>Instructor: </strong>{actividad.instructor}</p>
-            <p className="text-sm text-gray-600"><strong>Horario: </strong>ficha: {actividad.horario_ficha} día: {actividad.horario_dia}</p>
+            <p className="text-sm text-black"><strong>Estado: </strong>{actividad.estado}</p>
+            <p className="text-sm text-black"><strong>Fecha de inicio: </strong>{formatFecha(actividad.fecha_inicio)}</p>
+            <p className="text-sm text-black"><strong>Fecha de fin: </strong>{formatFecha(actividad.fecha_fin)}</p>
+            <p className="text-sm text-black"><strong>Instructor: </strong>{actividad.instructor}</p>
+            <p className="text-sm text-black"><strong>Horario: </strong>ficha: {actividad.horario_ficha} día: {actividad.horario_dia}</p>
           </div>
         ))}
       </div>

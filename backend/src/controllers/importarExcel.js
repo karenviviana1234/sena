@@ -3,7 +3,6 @@ import multer from 'multer';
 import XLSX from 'xlsx';
 import bcrypt from 'bcrypt';
 
-
 // Configuración de multer para almacenar archivos en memoria
 const storage = multer.memoryStorage();
 export const upload = multer({ storage }).single('file'); // Asegúrate de que el campo sea 'file'
@@ -113,7 +112,6 @@ export const importExcel = async (req, res) => {
                 } else {
                     console.error(`No se pudo obtener ID de persona para ${personaData.nombres}`);
                 }
-
             } catch (error) {
                 console.error(`Error al insertar persona ${item.aprendiz}:`, error);
                 continue; // Continúa con la siguiente iteración

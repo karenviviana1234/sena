@@ -36,7 +36,7 @@ function TableMatriculas() {
     const [fichas, setFichas] = useState([]);
     const [matriculas, setMatriculas] = useState([]);
     const [file, setFile] = useState(null);
-    const fileInputRef = useRef(null); // Use ref for file input
+    const fileInputRef = useRef(null); 
 
     // Fetch para obtener las fichas
     useEffect(() => {

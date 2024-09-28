@@ -24,6 +24,8 @@ export const registrarActividad = async (req, res) => {
     }
 };
 export const listarActividades = async (req, res) => {
+    const { id_persona } = req.params;
+
     try {
         // Consulta con JOINs para obtener la información de actividades, horarios, nombre del instructor y el día, hora de inicio y hora de fin
         let sql = `
@@ -37,16 +39,18 @@ export const listarActividades = async (req, res) => {
             FROM actividades a
             JOIN personas p ON a.instructor = p.id_persona  -- Relacionar actividades con personas por id_persona
             JOIN horarios h ON a.horario = h.id_horario  -- Relacionar actividades con horarios por id_horario
-            WHERE a.estado = 'Activo'  -- Solo actividades activas
+            WHERE a.instructor = ?  -- Filtrar por el ID del instructor
+            AND a.estado = 'Activo'  -- Solo actividades activas
+
         `;
 
-        const [results] = await pool.query(sql);
+        const [results] = await pool.query(sql, [id_persona]);
 
         if (results.length > 0) {
             res.status(200).json(results);
         } else {
             res.status(404).json({
-                message: 'No hay actividades registradas'
+                message: 'No hay actividades registradas para este instructor'
             });
         }
     } catch (error) {
@@ -55,7 +59,6 @@ export const listarActividades = async (req, res) => {
         });
     }
 };
-
 
 export const actualizarActividad = async (req, res) => {
     try {

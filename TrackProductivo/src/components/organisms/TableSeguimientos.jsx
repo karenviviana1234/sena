@@ -152,10 +152,13 @@ function TableSeguimientos() {
     };
 
     const getColorForFicha = (fichaNumber) => {
+        if (!fichaNumber) {
+            return "rgba(240, 240, 240, 0.8)";  // Color por defecto si fichaNumber es null o undefined
+        }
         const hash = hashCode(fichaNumber.toString());
         return intToColor(hash);
     };
-
+    
 
     // Render cell based on column key
     const renderCell = useCallback((item, columnKey) => {
