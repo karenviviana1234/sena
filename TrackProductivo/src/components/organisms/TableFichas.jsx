@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import RegistroFicha from './FormFichas';
-import GlobalTable from '../../components/componets_globals/GlobalTable';
-import ActualizarFicha from './ActualizarFichas';
+import RegistroFicha from '../molecules/Fichas/FormFichas';
+import GlobalTable from '../molecules/ComponentsGlobals/GlobalTable';
+import ActualizarFicha from '../molecules/Fichas/ActualizarFichas';
 
 function TableFichasPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);

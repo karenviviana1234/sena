@@ -102,7 +102,7 @@ export const LoginPage = () => {
             <div className="mb-6">
               <div className="relative">
                 <input
-                  className="peer w-full rounded border border-gray-300 bg-white px-3 py-2 placeholder-transparent focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
+                  className="peer w-full rounded border border-gray-300 bg-white px-3 py-2 placeholder-transparent focus:border-[#198d57] focus:outline-none focus:ring-1 focus:ring-[#198d57]"
                   type="email"
                   label="Correo"
                   variant="bordered"
@@ -114,7 +114,7 @@ export const LoginPage = () => {
                 />
                 <label
                   htmlFor="correo"
-                  className={`absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all ${usernameFocused || correo.current?.value ? 'transform -translate-y-4 text-lime-500' : ''}`}
+                  className={`absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all ${usernameFocused || correo.current?.value ? 'transform -translate-y-4 text-[#198d57]' : ''}`}
                 >
                   Correo Electrónico
                 </label>
@@ -124,7 +124,7 @@ export const LoginPage = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="peer w-full rounded border border-gray-300 bg-white px-3 py-2 placeholder-transparent focus:border-lime-500 focus:outline-none focus:ring-1 focus:ring-lime-500"
+                  className="peer w-full rounded border border-gray-300 bg-white px-3 py-2 placeholder-transparent focus:border-[#198d57] focus:outline-none focus:ring-1 focus:ring-[#198d57]"
                   label="Contraseña"
                   variant="bordered"
                   ref={password}
@@ -142,7 +142,7 @@ export const LoginPage = () => {
                 </button>
                 <label
                   htmlFor="password"
-                  className={`absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all ${passwordFocused || password.current?.value ? 'transform -translate-y-4 text-lime-500' : ''}`}
+                  className={`absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all ${passwordFocused || password.current?.value ? 'transform -translate-y-4 text-[#198d57]' : ''}`}
                 >
                   Contraseña
                 </label>
@@ -150,7 +150,7 @@ export const LoginPage = () => {
             </div>
             <div className="mb-6">
               <button
-                className="w-full px-6 py-2.5 rounded bg-[#74cd62] text-white text-sm font-medium leading-normal shadow-md hover:bg-[#0c8652] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-600"
+                className="w-full px-6 py-2.5 rounded bg-[#74cd62] text-white text-sm font-medium leading-normal shadow-md hover:bg-[#0c8652] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#198d57]"
                 type="submit"
               >
                 Log in

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import GlobalTable from '../../components/componets_globals/GlobalTable';
-import RegistroHorario from './FormHorario';
-import ActualizarHorario from './ActualizarHorarios';
+import GlobalTable from '../molecules/ComponentsGlobals/GlobalTable';
+import RegistroHorario from '../molecules/Horarios/FormHorario';
+import ActualizarHorario from '../molecules/Horarios/ActualizarHorarios';
 
 
 function TableHorariosPage() {
