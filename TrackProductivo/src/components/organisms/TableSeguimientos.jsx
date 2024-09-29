@@ -19,6 +19,10 @@ import {
     DropdownItem,
     Chip,
     Pagination,
+<<<<<<< HEAD
+=======
+    User,
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
@@ -42,7 +46,11 @@ function TableSeguimientos() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
 
+<<<<<<< HEAD
     const seguimientosIds = [1, 2, 3];
+=======
+    const seguimientosIds = [1, 2, 3]; 
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
 
     // Fetch seguimientos from API
@@ -69,7 +77,11 @@ function TableSeguimientos() {
     const handleOpenModal = (id_seguimiento, type) => {
         setFormType(type);
         if (type === 'formNovedades') {
+<<<<<<< HEAD
             setBodyContent(<Novedades id_seguimiento={id_seguimiento} />);
+=======
+            setBodyContent(<Novedades id_seguimiento={id_seguimiento}/>);
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         } else if (type === 'componentSeguimiento') {
             setBodyContent(<ComponentSeguimiento
                 id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado
@@ -142,16 +154,25 @@ function TableSeguimientos() {
         const r = (int >> 16) & 0xFF;
         const g = (int >> 8) & 0xFF;
         const b = int & 0xFF;
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         // Convertir a un color claro
         const lightR = Math.min(255, r + 100); // Aumenta el rojo
         const lightG = Math.min(255, g + 100); // Aumenta el verde
         const lightB = Math.min(255, b + 100); // Aumenta el azul
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         return `rgba(${lightR}, ${lightG}, ${lightB}, 0.5)`; // Opacidad del 50%
     };
 
     const getColorForFicha = (fichaNumber) => {
+<<<<<<< HEAD
         if (!fichaNumber) {
             return "rgba(240, 240, 240, 0.8)";  // Color por defecto si fichaNumber es null o undefined
         }
@@ -159,6 +180,12 @@ function TableSeguimientos() {
         return intToColor(hash);
     };
     
+=======
+        const hash = hashCode(fichaNumber.toString());
+        return intToColor(hash);
+    };
+
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
     // Render cell based on column key
     const renderCell = useCallback((item, columnKey) => {
@@ -227,8 +254,24 @@ function TableSeguimientos() {
                         </Dropdown>
                     </div>
                 );
+<<<<<<< HEAD
                 
                   
+=======
+            case "nombres":
+                return (
+                    <User
+                        name={cellValue}
+                        description={item.correo || "Sin correo"}
+                        avatarSrc="https://via.placeholder.com/150"
+                        bordered
+                        as="button"
+                        size="sm"
+                        color="primary"
+                    />
+
+                );
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
             default:
                 return cellValue;
@@ -296,7 +339,10 @@ function TableSeguimientos() {
     const columns = [
         { key: "identificacion", label: "Identificación" },
         { key: "nombres", label: "Nombres" },
+<<<<<<< HEAD
         { key: "correo", label: "Correo" },
+=======
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         { key: "codigo", label: "Ficha" },
         { key: "razon_social", label: "Empresa" },
         { key: "seguimiento1", label: "Seguimiento 1" },

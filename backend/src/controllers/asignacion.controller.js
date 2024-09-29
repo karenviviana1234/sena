@@ -1,9 +1,14 @@
 import { pool } from './../database/conexion.js'
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 export const listarasignaciones = async (req, res) => {
     try {
         const [result] = await pool.query(`
             SELECT 
                 p.id_asignacion, 
+<<<<<<< HEAD
                 per_aprendiz.nombres AS nombre_aprendiz,
                 per_instructor.nombres AS nombre_instructor,
                 CONCAT(
@@ -15,11 +20,24 @@ export const listarasignaciones = async (req, res) => {
                     DATE_FORMAT(act.fecha_inicio, '%Y-%m-%d'), ' a ', 
                     DATE_FORMAT(act.fecha_fin, '%Y-%m-%d')
                 ) AS rango_fechas -- Concatenar fecha de inicio y fin
+=======
+                a.id_productiva  AS productiva, 
+                act.id_actividad AS actividad,
+                act.fecha_inicio,
+                act.fecha_fin,
+                act.tipo,
+                act.solicitud,
+                a.empresa,
+                a.alternativa,
+                a.estado,
+                a.aprendiz
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             FROM 
                 asignaciones AS p
             LEFT JOIN 
                 productivas AS a ON p.productiva = a.id_productiva 
             LEFT JOIN 
+<<<<<<< HEAD
                 actividades AS act ON p.actividad = act.id_actividad
             LEFT JOIN 
                 personas AS per_instructor ON act.instructor = per_instructor.id_persona
@@ -42,6 +60,20 @@ export const listarasignaciones = async (req, res) => {
         }
     } catch (error) {
         console.error("Error en el servidor:", error); // Log para depuración
+=======
+                actividades AS act ON p.actividad = act.id_actividad;
+        `);
+
+        if (result.length > 0) {
+            return res.status(200).json(result);
+        } else {
+            return res.status(404).json({
+                status: 404,
+                message: "No se encontraron asignaciones."
+            });
+        }
+    } catch (error) {
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         return res.status(500).json({
             status: 500,
             message: error.message || "Error interno del servidor."
@@ -49,7 +81,10 @@ export const listarasignaciones = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 export const registrarasignacion = async (req, res) => {
     const connection = await pool.getConnection(); // Obtener conexión manualmente para usar transacciones
     try {
@@ -160,9 +195,17 @@ export const registrarasignacion = async (req, res) => {
 
 
 
+<<<<<<< HEAD
 export const actualizarasignacion = async (req, res) => {
     try {
         const { id_asignacion } = req.params;
+=======
+
+
+export const actualizarasignacion = async (req, res) => {
+    try {
+        const { id } = req.params;
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         const { productiva, actividad } = req.body;
 
         // Verificar si el instructor existe
@@ -192,7 +235,11 @@ export const actualizarasignacion = async (req, res) => {
         // Verificar si la asignación existe
         const [asignacionExist] = await pool.query(
             "SELECT * FROM asignaciones WHERE id_asignacion = ?",
+<<<<<<< HEAD
             [id_asignacion]
+=======
+            [id]
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         );
         if (asignacionExist.length === 0) {
             return res.status(404).json({
@@ -206,7 +253,11 @@ export const actualizarasignacion = async (req, res) => {
             `UPDATE asignaciones 
              SET productiva = ?, actividad = ?
              WHERE id_asignacion = ?`,
+<<<<<<< HEAD
             [productiva, actividad, id_asignacion]
+=======
+            [productiva, actividad, id]
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         );
 
         if (result.affectedRows > 0) {
@@ -231,7 +282,11 @@ export const actualizarasignacion = async (req, res) => {
 
 export const buscarasignacion = async (req, res) => { 
     try {
+<<<<<<< HEAD
         const { id_asignacion } = req.params;
+=======
+        const { id } = req.params;
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         const [result] = await pool.query(
             `SELECT 
                 p.id_asignacion, 
@@ -245,7 +300,11 @@ export const buscarasignacion = async (req, res) => {
                 actividades AS act ON p.actividad = act.id_actividad
             WHERE 
                 p.id_asignacion = ?`,
+<<<<<<< HEAD
             [id_asignacion]
+=======
+            [id]
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         );
 
         if (result.length > 0) {
@@ -263,6 +322,7 @@ export const buscarasignacion = async (req, res) => {
         });
     }
 };
+<<<<<<< HEAD
 
 export const eliminarAsignacion = async (req, res) => {
     const connection = await pool.getConnection(); // Obtener conexión manualmente para usar transacciones
@@ -317,3 +377,5 @@ export const eliminarAsignacion = async (req, res) => {
     }
 };
 
+=======
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a

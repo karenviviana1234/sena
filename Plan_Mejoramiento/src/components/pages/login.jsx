@@ -23,21 +23,33 @@ const Login = () => {
   const navigation = useNavigation();
 
   const { SetRol, SetId_persona } = usePersonas();
+<<<<<<< HEAD
 
   const handleLogin = async () => {
     try {
       console.log("Iniciando login...");
       console.log({ correo: email, password: password });
 
+=======
+  const handleLogin = async () => {
+    try {
+      console.log("Iniciando login...");
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
       const response = await axiosClient.post("/validacion", {
         correo: email,
         password: password,
       });
 
+<<<<<<< HEAD
+=======
+      console.log("Respuesta recibida:", response);
+
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
       if (response.status === 200) {
         console.log("Datos de respuesta:", response.data);
         const { user, token } = response.data;
 
+<<<<<<< HEAD
         await AsyncStorage.setItem("token", token);
         const storedToken = await AsyncStorage.getItem("token");
         console.log("Token almacenado:", storedToken);
@@ -60,14 +72,42 @@ const Login = () => {
             );
           }
                    
+=======
+        if (user) {
+          await AsyncStorage.setItem("token", token);
+          const storedToken = await AsyncStorage.getItem("token");
+          console.log("Token almacenado:", storedToken);
+          
+
+          SetRol(user.rol);
+          SetId_persona(user.id_persona);
+
+          const allowedRoles = ["Seguimiento", "Instructor", "Aprendiz"];
+          if (allowedRoles.includes(user.rol)) {
+            console.log("rol", user.rol, "id", user.id_persona);
+            navigation.navigate("principal"); 
+          } else {
+            Alert.alert(
+              "Acceso denegado",
+              "Los roles permitidos son seguimiento, instructor, y aprendiz."
+            );
+          }
+          
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         }
       }
     } catch (error) {
       console.log("Error en login:", error);
+<<<<<<< HEAD
       console.log("Detalles del error:", error.response?.data);
 
       if (error.response && error.response.status === 404) {
         Alert.alert("Error", `${error.response.status}: ${error.response.data.message || 'Error de autenticación'}`);
+=======
+
+      if (error.response && error.response.status === 404) {
+        Alert.alert("Error", error.response.data.message);
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
       } else {
         Alert.alert("Error", "Hubo un problema con el servidor.");
       }
@@ -126,6 +166,12 @@ const Login = () => {
       <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <Text style={styles.button}>Ingresar</Text>
       </TouchableOpacity>
+<<<<<<< HEAD
+=======
+      {/*       <TouchableOpacity style={styles.buttonContainer}>
+        <Text style={styles.button}>Registrarme</Text>
+      </TouchableOpacity> */}
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.textOlvide}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
@@ -185,7 +231,11 @@ const styles = StyleSheet.create({
     height: 50,
     width: 180,
     justifyContent: "center",
+<<<<<<< HEAD
     backgroundColor: "#0c8652",
+=======
+    backgroundColor: "#0c8652" /* #0c8652 */,
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     alignItems: "center",
     marginTop: 20,
     borderRadius: 10,
@@ -203,4 +253,8 @@ const styles = StyleSheet.create({
   },
 });
 
+<<<<<<< HEAD
 export default Login;
+=======
+export default Login;
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a

@@ -57,8 +57,13 @@ function FormAprendices({ initialData }) {
       municipio: selectedMunicipio,
     };
 
+<<<<<<< HEAD
     /*     console.log("Campos enviados:", formData);
      */
+=======
+/*     console.log("Campos enviados:", formData);
+ */
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
     try {
       if (isEditing) {
@@ -167,7 +172,11 @@ function FormAprendices({ initialData }) {
           />
         </div>
         <select
+<<<<<<< HEAD
           className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+=======
+          className="mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.sede ? 'border-red-500' : ''}"
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
           id="municipios"
           name="Municipio"
           value={selectedMunicipio}

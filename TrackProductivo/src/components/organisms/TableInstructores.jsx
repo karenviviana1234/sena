@@ -20,8 +20,15 @@ import {
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 /* import FormActividades from "./FormActividades.jsx"; */
+<<<<<<< HEAD
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonListarActividad from "../atoms/ButtonListarActividad.jsx";
+=======
+import ButtonRegistrarActividad from "../atoms/ButtonRegistrarActividad.jsx";
+import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
+import ButtonListarActividad from "../atoms/ButtonListarActividad.jsx";
+
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 import ListActividad from "./ListActividad.jsx";
 
 function TableInstructores() {
@@ -236,7 +243,11 @@ function TableInstructores() {
             <div>
               <Button
                 onClick={() => handleOpenModal("formUsuarios")}
+<<<<<<< HEAD
                 className="bg-[#0d324c] text-white"
+=======
+                className="bg-[#90d12c] text-white"
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
               >
                 Registrar Instructor
               </Button>

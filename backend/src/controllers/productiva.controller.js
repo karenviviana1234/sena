@@ -1,5 +1,6 @@
 import { pool } from "../database/conexion.js";
 import multer from "multer";
+<<<<<<< HEAD
 import { addMonths, format, isValid } from 'date-fns';
 export const listarProductiva = async (req, res) => {
     try {
@@ -43,6 +44,30 @@ export const listarProductiva = async (req, res) => {
         });
     }
 };
+=======
+import { format, addMonths } from 'date-fns';
+
+
+export const listarProductiva = async (req, res) => {
+    try {
+        let sql = `SELECT * FROM productivas`
+
+        const [results] = await pool.query(sql)
+
+        if(results.length>0){
+            res.status(200).json(results)
+        }else{
+            res.status(404).json({
+                message: 'No hay productiva registrada'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor' + error
+        })
+    }
+}
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
 export const contarProductivasPorEstado = async (req, res) => {
     try {
@@ -107,13 +132,22 @@ export const productivaFiles = upload.fields([
 
 export const registrarProductiva = async (req, res) => {
     try {
+<<<<<<< HEAD
         const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, instructor } = req.body;
+=======
+        const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, aprendiz, instructor } = req.body;
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         const acuerdo = req.files?.acuerdo?.[0]?.originalname || null;
         const arl = req.files?.arl?.[0]?.originalname || null;
         const consulta = req.files?.consulta?.[0]?.originalname || null;
 
+<<<<<<< HEAD
         // Verificar que la matrícula existe en la tabla matriculas y obtener el aprendiz
         const sqlCheckMatricula = 'SELECT id_matricula, aprendiz FROM matriculas WHERE id_matricula = ?';
+=======
+        // Verificar que la matrícula existe en la tabla matriculas
+        const sqlCheckMatricula = 'SELECT id_matricula FROM matriculas WHERE id_matricula =?';
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         const [rowsMatricula] = await pool.query(sqlCheckMatricula, [matricula]);
 
         if (rowsMatricula.length === 0) {
@@ -122,6 +156,7 @@ export const registrarProductiva = async (req, res) => {
             });
         }
 
+<<<<<<< HEAD
         // Obtener el ID del aprendiz de la matrícula
         const aprendiz = rowsMatricula[0].aprendiz;
 
@@ -140,6 +175,13 @@ export const registrarProductiva = async (req, res) => {
             INSERT INTO productivas
             (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
             VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
+=======
+        // Registrar etapa productiva
+        const sqlProductiva = `
+            INSERT INTO productivas
+            (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
+            VALUES (?,?,?,?,?, 1,?,?,?,?)
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         `;
         const [resultProductiva] = await pool.query(sqlProductiva, [
             matricula, empresa, fecha_inicio, fecha_fin, alternativa, acuerdo, arl, consulta, aprendiz
@@ -149,6 +191,12 @@ export const registrarProductiva = async (req, res) => {
             const productivaId = resultProductiva.insertId;
 
             // Calcular fechas para seguimientos
+<<<<<<< HEAD
+=======
+            const fechaInicio = new Date(fecha_inicio);
+            const fechaFin = new Date(fecha_fin);
+
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             const fechaSeguimiento1 = addMonths(fechaInicio, 2);
             const fechaSeguimiento2 = addMonths(fechaInicio, 4);
             const fechaSeguimiento3 = fechaFin;
@@ -156,17 +204,29 @@ export const registrarProductiva = async (req, res) => {
             // Insertar tres seguimientos asociados a la etapa productiva
             const sqlSeguimiento = `
                 INSERT INTO seguimientos (fecha, seguimiento, estado, pdf, productiva, instructor) 
+<<<<<<< HEAD
                 VALUES (?, 1, 1, ?, ?, ?),
                        (?, 2, 1, ?, ?, ?),
                        (?, 3, 1, ?, ?, ?)
             `;
+=======
+                VALUES (?, 1, 1,?,?,?),
+                       (?, 2, 1,?,?,?),
+                       (?, 3, 1,?,?,?)
+            `;
+
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             const [resultSeguimiento] = await pool.query(sqlSeguimiento, [
                 format(fechaSeguimiento1, 'yyyy-MM-dd'), null, productivaId, instructor,
                 format(fechaSeguimiento2, 'yyyy-MM-dd'), null, productivaId, instructor,
                 format(fechaSeguimiento3, 'yyyy-MM-dd'), null, productivaId, instructor
             ]);
 
+<<<<<<< HEAD
             if (resultSeguimiento.affectedRows >= 3) {
+=======
+            if (resultSeguimiento.affectedRows >= 3) { 
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 const seguimientoIds = [
                     resultSeguimiento.insertId,
                     resultSeguimiento.insertId + 1,
@@ -177,6 +237,7 @@ export const registrarProductiva = async (req, res) => {
                 const sqlBitacoras = `
                     INSERT INTO bitacoras (fecha, bitacora, seguimiento, pdf, estado, instructor) 
                     VALUES 
+<<<<<<< HEAD
                         (?, '1', ?, ?, 1, ?),
                         (?, '2', ?, ?, 1, ?),
                         (?, '3', ?, ?, 1, ?),
@@ -189,6 +250,20 @@ export const registrarProductiva = async (req, res) => {
                         (?, '10', ?, ?, 1, ?),
                         (?, '11', ?, ?, 1, ?),
                         (?, '12', ?, ?, 1, ?)
+=======
+                        (?, '1',?,?, 1,?),
+                        (?, '2',?,?, 1,?),
+                        (?, '3',?,?, 1,?),
+                        (?, '4',?,?, 1,?),
+                        (?, '5',?,?, 1,?),
+                        (?, '6',?,?, 1,?),
+                        (?, '7',?,?, 1,?),
+                        (?, '8',?,?, 1,?),
+                        (?, '9',?,?, 1,?),
+                        (?, '10',?,?, 1,?),
+                        (?, '11',?,?, 1,?),
+                        (?, '12',?,?, 1,?)
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 `;
 
                 const [resultBitacoras] = await pool.query(sqlBitacoras, [
@@ -211,14 +286,23 @@ export const registrarProductiva = async (req, res) => {
                         message: 'Etapa productiva, seguimientos y bitácoras registrados correctamente'
                     });
                 } else {
+<<<<<<< HEAD
                     await pool.query('DELETE FROM seguimientos WHERE productiva = ?', [productivaId]);
                     await pool.query('DELETE FROM productivas WHERE id_productiva = ?', [productivaId]);
+=======
+                    await pool.query('DELETE FROM seguimientos WHERE productiva =?', [productivaId]);
+                    await pool.query('DELETE FROM productiva WHERE id_productiva =?', [productivaId]);
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                     res.status(403).json({
                         message: 'Error al registrar las bitácoras'
                     });
                 }
             } else {
+<<<<<<< HEAD
                 await pool.query('DELETE FROM productivas WHERE id_productiva = ?', [productivaId]);
+=======
+                await pool.query('DELETE FROM productiva WHERE id_productiva =?', [productivaId]);
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 res.status(403).json({
                     message: 'Error al registrar los seguimientos'
                 });
@@ -230,7 +314,11 @@ export const registrarProductiva = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
+<<<<<<< HEAD
             message: 'Error del servidor: ' + error.message
+=======
+            message: 'Error del servidor:' + error.message
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         });
     }
 };
@@ -238,6 +326,11 @@ export const registrarProductiva = async (req, res) => {
 
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 export const actualizarProductiva = async (req, res) => {
     try {
         const {id} = req.params

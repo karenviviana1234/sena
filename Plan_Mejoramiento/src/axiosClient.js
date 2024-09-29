@@ -3,12 +3,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Ip = '192.168.100.155'
 /* Ip de mi casa 192.168.100.155  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 const axiosClient = axios.create({
   baseURL: `http://${Ip}:3000`,
 });
 
+<<<<<<< HEAD
 axiosClient.interceptors.request.use( 
+=======
+axiosClient.interceptors.request.use(
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
   async (config) => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -16,7 +23,11 @@ axiosClient.interceptors.request.use(
         config.headers['token'] = token;
         console.log("Token desde axiosClient",token);
         
+<<<<<<< HEAD
       } 
+=======
+      }
+>>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     } catch (error) {
       console.error("Error getting token from AsyncStorage:", error);
     }
