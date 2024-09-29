@@ -276,7 +276,6 @@ export const uploadPdfToSeguimiento = async (req, res) => {
     }
 };
 
-
 // Función para actualizar seguimientos
 export const actualizarSeguimiento = async (req, res) => {
     try {
@@ -350,9 +349,6 @@ export const rechazarSeguimiento = async (req, res) => {
     }
   };
 
-
-
-
 export const descargarPdf = async (req, res) => {
     try {
         const id_seguimiento = decodeURIComponent(req.params.id_seguimiento);
@@ -389,8 +385,6 @@ export const descargarPdf = async (req, res) => {
         });
     }
 };
-
-
 
   export const listarEstadoSeguimiento = async (req, res) => {
     const { id_seguimiento } = req.params;

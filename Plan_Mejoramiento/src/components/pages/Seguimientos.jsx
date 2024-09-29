@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { usePersonas } from "../../Context/ContextPersonas.jsx";
 import SeguimientosContext from "../../Context/ContextSeguimiento.jsx";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalSeguimiento from '../moleculas/Modal_Seguimiento.jsx';
 import ComponentSeguimiento from '../moleculas/ComponentSeguimiento.jsx';
 import Layout from '../Template/Layout';
@@ -22,7 +23,6 @@ const Seguimientos = () => {
             try {
                 await getSeguimientos();
             } catch (error) {
-                console.error('Error al obtener los seguimientos:', error);
                 setError(`Error al obtener los seguimientos: ${error.message}`);
             } finally {
                 setLoading(false);
@@ -31,25 +31,6 @@ const Seguimientos = () => {
         fetchSeguimientos();
     }, [getSeguimientos]);
 
-    const handleOpenModal = async (id_seguimiento, componentName) => {
-        setSelectedComponent(componentName);
-        setSelectedSeguimientoId(id_seguimiento);
-
-        try {
-            const data = await getSeguimiento(id_seguimiento);
-            setSeguimientoData(data);
-            setModalVisible(true);
-        } catch (error) {
-            console.error("Error al obtener el seguimiento:", error);
-        }
-    };
-
-    const handleCloseModal = () => {
-        setModalVisible(false);
-        setSelectedComponent(null);
-        setSeguimientoData(null);
-    };
-
     const filteredItems = useMemo(() => {
         return seguimientos.filter(seg => 
             seg.identificacion ||
@@ -57,13 +38,38 @@ const Seguimientos = () => {
         );
     }, [seguimientos, filterValue]);
 
+    const handleOpenModal = async (id_seguimiento, componentName) => {
+        try {
+            await AsyncStorage.setItem('idSeguimiento', id_seguimiento.toString());
+            const data = await getSeguimiento(id_seguimiento);
+            setSelectedComponent(componentName);
+            setSeguimientoData(data);
+            setModalVisible(true);
+        } catch (error) {
+            setError(`Error al obtener el seguimiento: ${error.message}`);
+        }
+    };
+
+    const handleCloseModal = async () => {
+        setModalVisible(false);
+        setSelectedComponent(null);
+        setSeguimientoData(null);
+        
+        // Limpiar el AsyncStorage del idSeguimiento al cerrar el modal
+        await AsyncStorage.removeItem('idSeguimiento');
+        
+        // Asegúrate de que el ID de seguimiento seleccionado se borre
+        setSelectedSeguimientoId(null);
+    };
+    
+
     const renderSeguimientoButtons = (item) => (
         <View style={styles.buttonContainer}>
-            {["seguimiento1", "seguimiento2", "seguimiento3"].map((seguimiento, index) => (
+            {["id_seguimiento1", "id_seguimiento2", "id_seguimiento3"].map((seguimientoKey, index) => (
                 <TouchableOpacity
                     key={index}
                     style={styles.button}
-                    onPress={() => handleOpenModal(item.identificacion, `ComponentSeguimiento${index + 1}`)}
+                    onPress={() => handleOpenModal(item[seguimientoKey], `ComponentSeguimiento${index + 1}`)}
                     accessible={true}
                     accessibilityLabel={`Ver seguimiento ${index + 1} para ${item.nombres}`}
                 >
@@ -115,7 +121,7 @@ const Seguimientos = () => {
                 <FlatList
                     data={filteredItems}
                     renderItem={renderItem}
-                    keyExtractor={(item, index) => item.id_seguimiento?.toString() || index.toString()}
+                    keyExtractor={(item) => item.id_seguimiento?.toString()}
                 />
 
                 {seguimientoData && (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,11 +6,13 @@ import {
   View,
   TouchableOpacity,
   Modal,
-  Alert,} from "react-native";
-  import { Picker } from '@react-native-picker/picker'
-  import DocumentPicker from "react-native-document-picker";
-  import DateTimePicker from "@react-native-community/datetimepicker";
-  import axiosClient from "../../axiosClient";
+  Alert,
+} from "react-native";
+import { Picker } from '@react-native-picker/picker'
+import DocumentPicker from "react-native-document-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import axiosClient from "../../axiosClient";
+
 
 const ModalBitacoras = ({ visible, onClose }) => {
   const [fecha, setFecha] = useState(new Date());
@@ -21,6 +23,9 @@ const ModalBitacoras = ({ visible, onClose }) => {
   const [instructores, setInstructores] = useState([]);
   const [seguimientos, setSeguimientos] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [bitacoras, setBitacoras] = useState([]);
+  const [idSeguimiento, setIdSeguimiento] = useState(null);
+
 
   useEffect(() => {
     const fetchInstructores = async () => {
@@ -35,21 +40,28 @@ const ModalBitacoras = ({ visible, onClose }) => {
       }
     };
 
-    const fetchSeguimientos = async () => {
+    const fetchSeguimientos = async (id_seguimiento) => {
       try {
-        const response = await axiosClient.get("/seguimientos/listar"); // Ajusta la ruta de la API
-        setSeguimientos(response.data);
-        if (response.data.length > 0) {
-          setSeguimiento(response.data[0].id_seguimiento); 
-        }
+        const response = await axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id_seguimiento}`);
+        return response.data;
       } catch (error) {
-        console.error("Error fetching seguimientos:", error);
+        Alert.alert("Error fetching seguimiento:", error);
+
       }
     };
 
     fetchInstructores();
     fetchSeguimientos();
   }, []);
+
+  const fetchBitacoras = async (id_seguimiento) => {
+    try {
+      const response = await axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id_seguimiento}`);
+      setBitacoras(response.data);
+    } catch (err) {
+      setBitacoras([]);
+    }
+  };
 
   const handlePickPDF = async () => {
     try {
@@ -80,7 +92,7 @@ const ModalBitacoras = ({ visible, onClose }) => {
     }
 
     const formData = new FormData();
-    formData.append("fecha", fecha.toISOString().split("T")[0]); // Asegúrate de enviar la fecha en el formato correcto
+    formData.append("fecha", fecha.toISOString().split("T")[0]); 
     formData.append("bitacora", bitacora);
     formData.append("seguimiento", seguimiento);
     formData.append("instructor", instructor);
@@ -106,6 +118,10 @@ const ModalBitacoras = ({ visible, onClose }) => {
 
       if (response.status === 200) {
         Alert.alert("Bitácora registrada", "Bitácora registrada exitosamente.");
+        fetchBitacoras(idSeguimiento);
+      setBitacora("");
+      setPdf(null);
+      setFecha(new Date());
       } else {
         Alert.alert(
           "Error",
@@ -117,6 +133,30 @@ const ModalBitacoras = ({ visible, onClose }) => {
     }
 
     onClose();
+  };
+
+  useEffect(() => {
+    const cargarSeguimientos = async () => {
+      try {
+        // Aquí iría tu lógica para cargar los seguimientos
+        const datos = [
+          { id_seguimiento: 1, seguimiento: '1' },
+          { id_seguimiento: 2, seguimiento: '2' },
+          { id_seguimiento: 3, seguimiento: '3' },
+        ];
+        setSeguimientos(datos);
+        setSeguimiento(datos[0]?.id_seguimiento || null);
+      } catch (error) {
+        Alert.alert("Error", `Ocurrió un error: ${error}`);
+      }
+    };
+    cargarSeguimientos();
+  }, []);
+
+  const handleChange = (itemValue) => {
+    if (typeof itemValue === 'string' && itemValue.trim() !== '') {
+      setSeguimiento(itemValue);
+    }
   };
 
   return (
@@ -149,24 +189,24 @@ const ModalBitacoras = ({ visible, onClose }) => {
             onChangeText={setBitacora}
             color="black"
           />
-          
-          <View style={styles.pickerContainer}>
+
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center',margin:12 }}>
             {seguimientos.length > 0 ? (
               <Picker
                 selectedValue={seguimiento}
-                style={styles.picker}
-                onValueChange={(itemValue) => setSeguimiento(itemValue)}
+                style={{ width: 200 }}
+                onValueChange={handleChange}
               >
                 {seguimientos.map((seg) => (
                   <Picker.Item
                     key={seg.id_seguimiento}
-                    label={seg.seguimiento}
-                    value={seg.id_seguimiento}
+                    label={seg.seguimiento || ''}
+                    value={String(seg.id_seguimiento)}
                   />
                 ))}
               </Picker>
             ) : (
-              <Text style={styles.noSeguimientosText}>No hay seguimientos</Text>
+              <Text>No hay seguimientos disponibles</Text>
             )}
           </View>
 

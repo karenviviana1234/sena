@@ -2388,6 +2388,11 @@
     "metro-config" "^0.80.3"
     "metro-runtime" "^0.80.3"
 
+"@react-native/normalize-color@*":
+  "integrity" "sha512-Z1jQI2NpdFJCVgpY+8Dq/Bt3d+YUi1928Q+/CZm/oh66fzM0RUl54vvuXlPJKybH4pdCZey1eDTPaLHkMPNgWA=="
+  "resolved" "https://registry.npmjs.org/@react-native/normalize-color/-/normalize-color-2.1.0.tgz"
+  "version" "2.1.0"
+
 "@react-native/normalize-colors@^0.73.0":
   "integrity" "sha512-bRBcb2T+I88aG74LMVHaKms2p/T8aQd8+BZ7LuuzXlRfog1bMWWn/C5i0HVuvW4RPtXQYgIlGiXVDy9Ir1So/w=="
   "resolved" "https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.73.2.tgz"
@@ -3251,7 +3256,7 @@
   "resolved" "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"
   "version" "1.0.2"
 
-"base-64@^0.1.0":
+"base-64@^0.1.0", "base-64@0.1.0":
   "integrity" "sha512-Y5gU45svrR5tI2Vt/X9GPd3L0HNIKzGu202EjxrXMpuc2V2CiKgemAbUUsqYmZJvPtCXoUKjNZwBJzsNScUbXA=="
   "resolved" "https://registry.npmjs.org/base-64/-/base-64-0.1.0.tgz"
   "version" "0.1.0"
@@ -3815,6 +3820,11 @@
   "resolved" "https://registry.npmjs.org/crypt/-/crypt-0.0.2.tgz"
   "version" "0.0.2"
 
+"crypto-js@4.2.0":
+  "integrity" "sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q=="
+  "resolved" "https://registry.npmjs.org/crypto-js/-/crypto-js-4.2.0.tgz"
+  "version" "4.2.0"
+
 "crypto-random-string@^1.0.0":
   "integrity" "sha512-GsVpkFPlycH7/fRR7Dhcmnoii54gV1nz7y4CWyeFS14N+JVBBhY+r8amRHE4BwSYal7BPTDp8isvAlCxyFt3Hg=="
   "resolved" "https://registry.npmjs.org/crypto-random-string/-/crypto-random-string-1.0.0.tgz"
@@ -4046,6 +4056,15 @@
   "integrity" "sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw=="
   "resolved" "https://registry.npmjs.org/depd/-/depd-2.0.0.tgz"
   "version" "2.0.0"
+
+"deprecated-react-native-prop-types@^2.3.0":
+  "integrity" "sha512-pWD0voFtNYxrVqvBMYf5gq3NA2GCpfodS1yNynTPc93AYA/KEMGeWDqqeUB6R2Z9ZofVhks2aeJXiuQqKNpesA=="
+  "resolved" "https://registry.npmjs.org/deprecated-react-native-prop-types/-/deprecated-react-native-prop-types-2.3.0.tgz"
+  "version" "2.3.0"
+  dependencies:
+    "@react-native/normalize-color" "*"
+    "invariant" "*"
+    "prop-types" "*"
 
 "deprecated-react-native-prop-types@^5.0.0":
   "integrity" "sha512-cIK8KYiiGVOFsKdPMmm1L3tA/Gl+JopXL6F5+C7x39MyPsQYnP57Im/D6bNUzcborD7fcMwiwZqcBdBXXZucYQ=="
@@ -5119,6 +5138,18 @@
     "package-json-from-dist" "^1.0.0"
     "path-scurry" "^1.11.1"
 
+"glob@^10.3.10":
+  "integrity" "sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg=="
+  "resolved" "https://registry.npmjs.org/glob/-/glob-10.4.5.tgz"
+  "version" "10.4.5"
+  dependencies:
+    "foreground-child" "^3.1.0"
+    "jackspeak" "^3.1.2"
+    "minimatch" "^9.0.4"
+    "minipass" "^7.1.2"
+    "package-json-from-dist" "^1.0.0"
+    "path-scurry" "^1.11.1"
+
 "glob@^10.4.2":
   "integrity" "sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg=="
   "resolved" "https://registry.npmjs.org/glob/-/glob-10.4.5.tgz"
@@ -5422,7 +5453,7 @@
     "hasown" "^2.0.0"
     "side-channel" "^1.0.4"
 
-"invariant@^2.2.4":
+"invariant@*", "invariant@^2.2.4":
   "integrity" "sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA=="
   "resolved" "https://registry.npmjs.org/invariant/-/invariant-2.2.4.tgz"
   "version" "2.2.4"
@@ -7606,7 +7637,7 @@
     "kleur" "^3.0.3"
     "sisteransi" "^1.0.5"
 
-"prop-types@^15.7.2", "prop-types@^15.8.1":
+"prop-types@*", "prop-types@^15.7.2", "prop-types@^15.8.1":
   "integrity" "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg=="
   "resolved" "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   "version" "15.8.1"
@@ -7726,6 +7757,14 @@
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz"
   "version" "18.3.1"
 
+"react-native-blob-util@>=0.13.7":
+  "integrity" "sha512-lxaeDzFLYffR6lbRiOce0oTYO6pE3/PyT8Sa7qiz8B+IT9oe4G85SlVCdl5F9xMJh/Zer2onBLw7u+B1AS+GFA=="
+  "resolved" "https://registry.npmjs.org/react-native-blob-util/-/react-native-blob-util-0.19.11.tgz"
+  "version" "0.19.11"
+  dependencies:
+    "base-64" "0.1.0"
+    "glob" "^10.3.10"
+
 "react-native-chart-kit@^6.12.0":
   "integrity" "sha512-nZLGyCFzZ7zmX0KjYeeSV1HKuPhl1wOMlTAqa0JhlyW62qV/1ZPXHgT8o9s8mkFaGxdqbspOeuaa6I9jUQDgnA=="
   "resolved" "https://registry.npmjs.org/react-native-chart-kit/-/react-native-chart-kit-6.12.0.tgz"
@@ -7746,6 +7785,11 @@
   "integrity" "sha512-TepbcagQVUMB6nLuIlVU2ghRpQHAECOeZWe8K04ymW6NqbKbxuczZSDFfdCiABiiQ2dFD+8Dz65y4K7/uUEqGg=="
   "resolved" "https://registry.npmjs.org/react-native-dropdown-select-list/-/react-native-dropdown-select-list-2.0.5.tgz"
   "version" "2.0.5"
+
+"react-native-file-viewer@^2.1.5":
+  "integrity" "sha512-MGC6sx9jsqHdefhVQ6o0akdsPGpkXgiIbpygb2Sg4g4bh7v6K1cardLV1NwGB9A6u1yICOSDT/MOC//9Ez6EUg=="
+  "resolved" "https://registry.npmjs.org/react-native-file-viewer/-/react-native-file-viewer-2.1.5.tgz"
+  "version" "2.1.5"
 
 "react-native-fs@^2.20.0":
   "integrity" "sha512-VkTBzs7fIDUiy/XajOSNk0XazFE9l+QlMAce7lGuebZcag5CnjszB+u4BdqzwaQOdcYb5wsJIsqq4kxInIRpJQ=="
@@ -7778,6 +7822,14 @@
     "@callstack/react-theme-provider" "^3.0.9"
     "color" "^3.1.2"
     "use-latest-callback" "^0.1.5"
+
+"react-native-pdf@^6.7.5":
+  "integrity" "sha512-d1S76p2Vwax2iG+kTnjINiUMvpjtJJvtMiYwHRbgGczT8GJjtXH49YCWOd+HfnUAU29cB+knzsKGYoZBMQM8Ow=="
+  "resolved" "https://registry.npmjs.org/react-native-pdf/-/react-native-pdf-6.7.5.tgz"
+  "version" "6.7.5"
+  dependencies:
+    "crypto-js" "4.2.0"
+    "deprecated-react-native-prop-types" "^2.3.0"
 
 "react-native-picker-select@^9.1.3":
   "integrity" "sha512-O2EmlY4Mg5fZWxECTQJBDhO61as6RDbPYYiNoryaa0gmIkWxhANLsZI+ElEVru1h0Fp9UlCFtBDI5MwhHR9AxA=="
@@ -7839,7 +7891,7 @@
     "prop-types" "^15.7.2"
     "yargs" "^16.1.1"
 
-"react-native@*", "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@^0.74.3", "react-native@>= 0.50.0":
+"react-native@*", "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@^0.74.3", "react-native@>= 0.50.0", "react-native@>=0.47":
   "integrity" "sha512-UFutCC6WEw6HkxlcpQ2BemKqi0JkwrgDchYB5Svi8Sp4Xwt4HA6LGEjNQgZ+3KM44bjyFRpofQym0uh0jACGng=="
   "resolved" "https://registry.npmjs.org/react-native/-/react-native-0.74.3.tgz"
   "version" "0.74.3"
