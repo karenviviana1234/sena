@@ -1,9 +1,5 @@
 import React, { useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import FormAsignacion from '../organisms/FormAsignacion.jsx';
-<<<<<<< HEAD
-=======
-import FormActividades from '../organisms/FormActividades.jsx';
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 import ModalAcciones from '../organisms/ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
@@ -16,7 +12,6 @@ import {
     TableRow,
     TableCell,
     Button,
-<<<<<<< HEAD
     Input,
     Pagination,
 } from "@nextui-org/react";
@@ -25,15 +20,6 @@ import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import { SearchIcon } from '../NextIU/atoms/searchicons.jsx';
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 
-=======
-    Chip,
-    Input,
-} from "@nextui-org/react";
-import { PlusIcon } from "../NextIU/atoms/plusicons.jsx";
-import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
-import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
-import { SearchIcon } from '../NextIU/atoms/searchicons.jsx';
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
 export default function AsignacionPage() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -43,16 +29,11 @@ export default function AsignacionPage() {
     const [modalContent, setModalContent] = useState(null);
     const [filterValue, setFilterValue] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(5);
-<<<<<<< HEAD
     const [sortDescriptor, setSortDescriptor] = useState({
         column: "ID",
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
-=======
-
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
     useEffect(() => {
         peticionGet();
@@ -61,7 +42,6 @@ export default function AsignacionPage() {
     const handleOpenModal = (formType, data = null) => {
         if (formType === 'asignacion') {
             setModalContent(
-<<<<<<< HEAD
                 <FormAsignacion
                     initialData={data}
                     onSubmit={handleFormAsignacionSubmit}
@@ -69,17 +49,6 @@ export default function AsignacionPage() {
                     mode={data ? 'update' : 'create'}
                 />
             );
-=======
-                <FormAsignacion 
-                    initialData={data} 
-                    onSubmit={handleFormAsignacionSubmit} 
-                    onClose={handleCloseModal} 
-                    mode={data ? 'update' : 'create'} // Enviar el modo correcto
-                />
-            );
-        } else if (formType === 'actividades') {
-            setModalContent(<FormActividades />);
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         }
         setModalOpen(true);
     };
@@ -88,35 +57,21 @@ export default function AsignacionPage() {
         setModalOpen(false);
         setInitialData(null);
         setModalContent(null);
-<<<<<<< HEAD
         await peticionGet();
-=======
-        await peticionGet(); 
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     };
 
     const handleFormAsignacionSubmit = async (formData) => {
         try {
-<<<<<<< HEAD
             // Verifica que id_asignacion esté presente en formData antes de realizar la operación
             if (formData.id_asignacion) {
                 const response = await axiosClient.put(`/actualizar/${formData.id_asignacion}`, formData);
                 console.log('Respuesta del servidor:', response.data);
             } else {
-=======
-            if (formData.id_asignacion) {
-                // Actualizar asignación
-                const response = await axiosClient.put(`/actualizar/${formData.id_asignacion}`, formData);
-                console.log('Respuesta del servidor:', response.data);
-            } else {
-                // Registrar nueva asignación
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 const response = await axiosClient.post('/registrar', formData);
                 console.log('Respuesta del servidor:', response.data);
             }
             handleCloseModal();
         } catch (error) {
-<<<<<<< HEAD
             console.error(error);
         }
     };
@@ -137,38 +92,12 @@ export default function AsignacionPage() {
         setFilterValue(value || "");
         setPage(1);
     }, []);
-=======
-        }
-    };
-
-    const handleToggle = (initialData) => {
-        setInitialData(initialData);
-        setAsignacionId(initialData.id_asignacion); 
-        handleOpenModal('asignacion', initialData);
-    };
-
-
-    
-  const onRowsPerPageChange = useCallback((e) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
-
-  const onSearchChange = useCallback((value) => {
-    setFilterValue(value || "");
-    setPage(1);
-  }, []);
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
     const onClear = useCallback(() => {
         setFilterValue("");
         setPage(1);
     }, []);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     const peticionGet = async () => {
         try {
             const response = await axiosClient.get('/listar');
@@ -179,7 +108,6 @@ export default function AsignacionPage() {
             }));
             setAsignaciones(formattedData);
         } catch (error) {
-<<<<<<< HEAD
         }
     };
 
@@ -224,28 +152,12 @@ export default function AsignacionPage() {
         if (hasSearchFilter) {
             filteredAsignaciones = filteredAsignaciones.filter(seg =>
                 seg.nombre_instructor.toLowerCase().includes(filterValue.toLowerCase())
-=======
-            alert('Error en el servidor');
-        }
-    };
-
-    const filteredItems = useMemo(() => {
-        let filteredAsignaciones = asignaciones;
-
-        if (filterValue) {
-            filteredAsignaciones = filteredAsignaciones.filter(seg =>
-                seg.nombres.toLowerCase().includes(filterValue.toLowerCase())
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             );
         }
 
         return filteredAsignaciones;
     }, [asignaciones, filterValue]);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         if (isNaN(date.getTime())) {
@@ -254,7 +166,6 @@ export default function AsignacionPage() {
         return date.toISOString().split('T')[0];
     };
 
-<<<<<<< HEAD
     const pages = useMemo(() => Math.ceil(filteredItems.length / rowsPerPage), [
         filteredItems.length,
         rowsPerPage,
@@ -276,23 +187,16 @@ export default function AsignacionPage() {
         });
     }, [sortDescriptor, items]);
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     const renderCell = (asignacion, columnKey) => {
         const cellValue = asignacion[columnKey];
         switch (columnKey) {
             case "actions":
                 return (
-<<<<<<< HEAD
                     <div className='flex justify-around items-center'>
                         <ButtonActualizar onClick={() => handleToggle(asignacion)} />
                         <ButtonDesactivar
                 onClick={() => handleDesactivar(asignacion.id_asignacion)}
               />
-=======
-                    <div>
-                        <ButtonActualizar onClick={() => handleToggle(asignacion)} />
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                     </div>
                 );
             default:
@@ -302,7 +206,6 @@ export default function AsignacionPage() {
 
     const columns = [
         { key: "id_asignacion", label: "ID" },
-<<<<<<< HEAD
         { key: "nombre_aprendiz", label: "Aprendiz" },
         { key: "nombre_instructor", label: "Instructor" },
         { key: "rango_fechas", label: "Fechas" },
@@ -331,36 +234,6 @@ export default function AsignacionPage() {
                 </div>
                 <div className="flex items-center justify-between">
                     <span className="text-default-400 text-small">
-=======
-        { key: "productiva", label: "Etapa Productiva" },
-        { key: "actividad", label: "Actividad" },
-        { key: "actions", label: "Acciones" },
-    ];
-
-    return (
-        <div className="m-20">
-             <div className="flex flex-col mt-3">
-            <div className="flex justify-between gap-3 items-end mb-4">
-            <Input
-                    isClearable
-                    className="w-full sm:max-w-[44%] bg-[#f4f4f5] rounded"
-                    placeholder="Buscar..."
-                    startContent={<SearchIcon />}
-                    value={filterValue}
-                    onClear={onClear}
-                    onValueChange={onSearchChange}
-                />
-                <Button onClick={() => handleOpenModal('asignacion')} className="bg-[#90d12c] text-white ml-60" >
-                    Registrar Asignación
-                </Button>
-                <Button onClick={() => handleOpenModal('actividades')} className="bg-[#5a851b] text-white" >
-                    Registrar Actividad
-                </Button>
-            </div>
-            </div>
-            <div className="flex items-center justify-between mt-2 mb-5">
-                    <span className="text-default-400 text-small mt-2">
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                         Total {asignaciones.length} asignaciones
                     </span>
                     <label className="flex items-center text-default-400 text-small">
@@ -376,7 +249,6 @@ export default function AsignacionPage() {
                         </select>
                     </label>
                 </div>
-<<<<<<< HEAD
             </div>
         );
     }, [
@@ -393,12 +265,6 @@ export default function AsignacionPage() {
             <Table
                 aria-labelledby="Tabla de Asignaciones"
                 css={{ height: "auto", minWidth: "100%" }}
-=======
-
-            <Table
-                aria-label="Tabla"
-                isHeaderSticky
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 sortDescriptor={{ column: "fecha", direction: "ascending" }}
             >
                 <TableHeader>
@@ -406,11 +272,7 @@ export default function AsignacionPage() {
                         <TableColumn key={column.key}>{column.label}</TableColumn>
                     ))}
                 </TableHeader>
-<<<<<<< HEAD
                 <TableBody emptyContent={"No hay asignaciones registradas"} items={sortedItems}>
-=======
-                <TableBody emptyContent={"No hay asignaciones registradas"} items={asignaciones}>
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                     {(item) => (
                         <TableRow key={item.id_asignacion}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -418,7 +280,6 @@ export default function AsignacionPage() {
                     )}
                 </TableBody>
             </Table>
-<<<<<<< HEAD
             <div className="flex justify-start mt-4">
                 <Pagination
                     total={pages}
@@ -429,9 +290,6 @@ export default function AsignacionPage() {
                     showControls
                 />
             </div>
-=======
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             <ModalAcciones
                 isOpen={modalOpen}
                 onClose={handleCloseModal}
@@ -441,7 +299,4 @@ export default function AsignacionPage() {
         </div>
     );
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a

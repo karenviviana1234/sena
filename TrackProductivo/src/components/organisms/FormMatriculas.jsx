@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-<<<<<<< HEAD
 import { Button, User } from "@nextui-org/react";
-=======
-import { Button } from "@nextui-org/react";
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 import Swal from 'sweetalert2';
 import axiosClient from "../../configs/axiosClient";
 
@@ -31,20 +27,11 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
         fetchAprendices();
     }, []);
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     useEffect(() => {
         if (initialData) {
             setMatriculaId(initialData.id_matricula);
             setEstado(initialData.estado || "Selecciona");
-<<<<<<< HEAD
             setAprendizSeleccionado(initialData.id_persona || "");
-=======
-            setAprendizSeleccionado(initialData.aprendiz || "");
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             setPendientesTecnicos(initialData.pendientes_tecnicos ?? 0);
             setPendientesTransversales(initialData.pendientes_transversales ?? 0);
             setPendienteIngles(initialData.pendiente_ingles ?? 0);
@@ -54,14 +41,11 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
         }
     }, [initialData]);
 
-<<<<<<< HEAD
     const handleAprendizClick = (id_persona) => {
         setAprendizSeleccionado(id_persona); // Establece el ID del aprendiz seleccionado
 
     };
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -72,10 +56,6 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
             return;
         }
 
-<<<<<<< HEAD
-=======
-        //listado para obtener fichas
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         const formData = {
             estado,
             ficha: fichaSeleccionada,
@@ -109,11 +89,7 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-<<<<<<< HEAD
                 text: 'Por favor selecciona un estado',
-=======
-                text: error.response?.data?.message || 'Error desconocido',
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             });
         }
     };
@@ -124,38 +100,14 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                 {isEditing ? "Actualizar Matrícula" : "Registrar Matrícula"}
             </h1>
             <form onSubmit={handleSubmit} className="flex flex-col">
-<<<<<<< HEAD
                 {!isEditing && (
                     <h2 className="text-lg font-semibold">Selecciona un Estado</h2>
                 )}
-=======
-                <select
-                    id="aprendiz"
-                    name="aprendiz"
-                    value={aprendizSeleccionado}
-                    onChange={(e) => setAprendizSeleccionado(e.target.value)}
-                    required
-                    className="mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2"
-                    disabled={isEditing}
-                >
-                    <option value="">Seleccionar Aprendiz</option>
-                    {aprendices.map((aprendiz) => (
-                        <option key={aprendiz.id_persona} value={aprendiz.id_persona}>
-                            {aprendiz.nombres}
-                        </option>
-                    ))}
-                </select>
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 <select
                     name="estado"
                     value={estado}
                     onChange={(e) => setEstado(e.target.value)}
-<<<<<<< HEAD
                     className={`my-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.estado ? 'border-red-500' : ''}`}
-=======
-                    className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.estado ? 'border-red-500' : ''}`}
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                     style={{ width: '385px' }}
                 >
                     <option value="Selecciona">Selecciona un Estado</option>
@@ -168,7 +120,6 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                     <option value="Certificado">Certificado</option>
                 </select>
 
-<<<<<<< HEAD
                 {!isEditing && (
                     <h2 className="text-lg font-semibold">Selecciona un Aprendiz</h2>
                 )}
@@ -188,8 +139,6 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                 ))}
 
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 {isEditing && (
                     <>
                         <input
@@ -224,10 +173,6 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                     </>
                 )}
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 <div className="flex justify-end gap-5 mt-5">
                     <Button className="bg-[#92d22e] text-white" type="submit" color="success">
                         {isEditing ? "Actualizar" : "Registrar"}

@@ -42,7 +42,6 @@ export const listarInstructores = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 export const listarInstructoresLider = async (req, res) => {
   try {
     const sql = 'SELECT * FROM personas WHERE cargo = ? AND rol = ? AND estado = ?';
@@ -64,8 +63,6 @@ export const listarInstructoresLider = async (req, res) => {
 };
 
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
 
 export const listarAprendices = async (req, res) => {
@@ -496,7 +493,6 @@ export const registrarUsuarios = async (req, res) => {
   try {
     const { identificacion, nombres, correo, telefono, password, cargo, sede } = req.body;
 
-<<<<<<< HEAD
     // Verifica la cantidad de usuarios registrados por tipo de cargo
     const [result] = await pool.query('SELECT COUNT(*) as count FROM personas WHERE cargo = ?', [cargo.toLowerCase()]);
 
@@ -514,33 +510,10 @@ export const registrarUsuarios = async (req, res) => {
       rol = "seguimiento";
     } else if (cargo.toLowerCase() === "coordinador") {
       rol = "coordinador"; 
-=======
-    const cargosPermitidos = ["Coordinador", "Administrativo"];
-    if (!cargo || cargo === "$.0" || !cargosPermitidos.includes(cargo.toLowerCase())) {
-      return res.status(400).json({ message: "El cargo no es válido. Solo se permiten 'Coordinador' y 'Administrativo'." });
-    }
-
-    const [result] = await pool.query('SELECT COUNT(*) as count FROM personas WHERE cargo = ?', [cargo.toLowerCase()]);
-
-    if (cargo.toLowerCase() === "Administrativo" && result[0].count >= 2) {
-      return res.status(400).json({ message: "Ya existen 2 usuarios registrados como Administrativos." });
-    }
-
-    if (cargo.toLowerCase() === "Coordinador" && result[0].count >= 1) {
-      return res.status(400).json({ message: "Ya existe 1 usuario registrado como Coordinador." });
-    }
-
-    let rol;
-    if (cargo.toLowerCase() === "Administrativo") {
-      rol = "seguimiento";
-    } else if (cargo.toLowerCase() === "Coordinador") {
-      rol = "Coordinador"; 
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     }
 
     const estado = 'activo';
 
-<<<<<<< HEAD
     // Encripta la contraseña usando bcrypt
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -550,12 +523,6 @@ export const registrarUsuarios = async (req, res) => {
       `INSERT INTO personas (identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [identificacion, nombres, correo, hashedPassword, telefono, rol, cargo, estado, sede]
-=======
-    const [rows] = await pool.query(
-      `INSERT INTO personas (identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [identificacion, nombres, correo, password, telefono, rol, cargo, estado, sede]
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     );
 
     if (rows.affectedRows > 0) {
@@ -577,10 +544,6 @@ export const registrarUsuarios = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 //cambiar instructor en etapa practica
 export const cambiarInstructor = async (req, res) => {
   try {

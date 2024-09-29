@@ -139,11 +139,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
             </View>
           </TouchableOpacity>
         )}
-<<<<<<< HEAD
         {(rol === "Instructor" || rol === "Administrativo" || rol === "Aprendiz") && (
-=======
-        {(rol === "Instructor" || rol === "Seguimiento" || rol === "Aprendiz") && (
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
           <>
             <TouchableOpacity style={styles.menuItem}         onPress={() => navigation.navigate("seguimiento")} /* onPress={toggleSubMenu} */>
               <View style={styles.menuItemContent}>
@@ -182,11 +178,7 @@ const Sidebar = ({ menuVisible, toggleMenu }) => {
           </>
         )}
 
-<<<<<<< HEAD
         {rol === "Administrativo" && (
-=======
-        {rol === "Seguimiento" && (
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate("personas")}

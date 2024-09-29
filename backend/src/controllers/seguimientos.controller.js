@@ -34,7 +34,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 export const cargarSeguimiento = upload.single('seguimientoPdf');
-<<<<<<< HEAD
 
 export const listarSeguimientoAprendices = async (req, res) => {
     const { identificacion, rol } = req.user; // Obtiene la información del usuario
@@ -204,51 +203,6 @@ export const listarSeguimientoAprendices = async (req, res) => {
                         identificacion: row.identificacion,
                         nombres: row.nombres,
                         correo: row.correo,  // Agrega el correo al objeto
-=======
-export const listarSeguimientoAprendices = async (req, res) => {
-    const { sigla } = req.params; 
-    try {
-        const sql = `
-            SELECT
-                p.identificacion AS identificacion,
-                p.nombres AS nombres,
-                f.codigo AS codigo,
-                prg.sigla AS sigla,
-                e.razon_social AS razon_social,
-                s.id_seguimiento AS id_seguimiento,
-                s.seguimiento AS seguimiento,
-                s.fecha AS fecha,
-                s.estado AS estado,  -- Agregamos la columna estado
-                COUNT(b.id_bitacora) AS total_bitacoras,
-                SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) AS bitacoras_con_pdf,
-                (SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) / 12) * 100 AS porcentaje
-            FROM
-                seguimientos s
-                LEFT JOIN productivas pr ON s.productiva = pr.id_productiva
-                LEFT JOIN matriculas m ON pr.matricula = m.id_matricula
-                LEFT JOIN personas p ON m.aprendiz = p.id_persona
-                LEFT JOIN empresas e ON pr.empresa = e.id_empresa
-                LEFT JOIN fichas f ON m.ficha = f.codigo
-                LEFT JOIN programas prg ON f.programa = prg.id_programa
-                LEFT JOIN bitacoras b ON b.seguimiento = s.id_seguimiento
-            WHERE
-                p.rol = 'Aprendiz'
-            GROUP BY
-                s.id_seguimiento, p.identificacion, s.seguimiento, s.fecha, f.codigo, prg.sigla, e.razon_social, s.estado
-            ORDER BY
-                p.identificacion, s.seguimiento;
-        `;
-        const [result] = await pool.query(sql);
-
-        if (result.length > 0) {
-            const aprendizMap = {};
-
-            result.forEach(row => {
-                if (!aprendizMap[row.identificacion]) {
-                    aprendizMap[row.identificacion] = {
-                        identificacion: row.identificacion,
-                        nombres: row.nombres,
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                         codigo: row.codigo,
                         sigla: row.sigla,
                         razon_social: row.razon_social,
@@ -258,7 +212,6 @@ export const listarSeguimientoAprendices = async (req, res) => {
                         seguimiento1: null,
                         seguimiento2: null,
                         seguimiento3: null,
-<<<<<<< HEAD
                         estado1: null,
                         estado2: null,
                         estado3: null,
@@ -294,56 +247,11 @@ export const listarSeguimientoAprendices = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Error en el servidor.' });
-=======
-                        estado1: null,  // Añadimos estado para cada seguimiento
-                        estado2: null,
-                        estado3: null,
-                        porcentaje: 0,
-                    };
-                }
-
-                if (row.seguimiento === '1') {
-                    aprendizMap[row.identificacion].id_seguimiento1 = row.id_seguimiento;
-                    aprendizMap[row.identificacion].seguimiento1 = row.fecha;
-                    aprendizMap[row.identificacion].estado1 = row.estado;  // Guardamos el estado
-                } else if (row.seguimiento === '2') {
-                    aprendizMap[row.identificacion].id_seguimiento2 = row.id_seguimiento;
-                    aprendizMap[row.identificacion].seguimiento2 = row.fecha;
-                    aprendizMap[row.identificacion].estado2 = row.estado;
-                } else if (row.seguimiento === '3') {
-                    aprendizMap[row.identificacion].id_seguimiento3 = row.id_seguimiento;
-                    aprendizMap[row.identificacion].seguimiento3 = row.fecha;
-                    aprendizMap[row.identificacion].estado3 = row.estado;
-                }
-
-                aprendizMap[row.identificacion].porcentaje += (row.bitacoras_con_pdf / 12) * 100;
-            });
-
-            Object.values(aprendizMap).forEach(aprendiz => {
-                aprendiz.porcentaje = Math.min(aprendiz.porcentaje, 100);
-                aprendiz.porcentaje = Math.round(aprendiz.porcentaje) + '%';
-            });
-
-            const resultArray = Object.values(aprendizMap);
-            res.status(200).json(resultArray);
-        } else {
-            res.status(404).json({ error: 'No hay seguimientos registrados para aprendices' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Error del servidor: ' + error.message });
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     }
 };
 
 
 
-<<<<<<< HEAD
-=======
-
-
-
-// Función para registrar seguimientos
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 export const registrarSeguimiento = async (req, res) => {
     try {
         const seguimientoPdf = req.file ? req.file.originalname : null;

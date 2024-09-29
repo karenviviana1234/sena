@@ -11,23 +11,16 @@ import {
     TableCell,
     Input,
     Button,
-<<<<<<< HEAD
     Pagination,
     Chip
-=======
-    Pagination
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import FormMatriculas from './FormMatriculas.jsx';
 import FormAprendices from './FormAprendices.jsx';
-<<<<<<< HEAD
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import ButtonDesactivar from '../atoms/ButtonDesactivar.jsx';
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
 function TableMatriculas() {
     const [selectedFicha, setSelectedFicha] = useState('');
@@ -43,11 +36,7 @@ function TableMatriculas() {
     const [fichas, setFichas] = useState([]);
     const [matriculas, setMatriculas] = useState([]);
     const [file, setFile] = useState(null);
-<<<<<<< HEAD
     const fileInputRef = useRef(null); 
-=======
-    const fileInputRef = useRef(null); // Use ref for file input
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
     // Fetch para obtener las fichas
     useEffect(() => {
@@ -80,22 +69,15 @@ function TableMatriculas() {
 
     // Fetch para obtener las matriculas de la ficha seleccionada
     const fetchMatriculas = useCallback(async () => {
-<<<<<<< HEAD
         // Restablecer el estado de matrículas antes de la nueva carga
         setMatriculas([]);
         
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         if (selectedFicha) {
             try {
                 const response = await axiosClient.get(`/matriculas/listar/${selectedFicha}`);
                 if (response.data.length > 0) {
                     setMatriculas(response.data);
                 } else {
-<<<<<<< HEAD
-=======
-                    setMatriculas([]);
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                     Swal.fire({
                         title: 'Sin Matrículas',
                         text: 'No hay matrículas registradas para la ficha seleccionada.',
@@ -105,28 +87,14 @@ function TableMatriculas() {
                 }
             } catch (error) {
                 console.error('Error fetching matriculas:', error);
-<<<<<<< HEAD
             }
         }
     }, [selectedFicha]);
     
-=======
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Hubo un error al obtener las matrículas.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        }
-    }, [selectedFicha]);
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     useEffect(() => {
         fetchMatriculas();
     }, [selectedFicha, page, rowsPerPage, fetchMatriculas]);
 
-<<<<<<< HEAD
     const handleDesactivar = async (id_matricula) => {
         // Mostrar una alerta de confirmación
         const result = await Swal.fire({
@@ -166,12 +134,6 @@ function TableMatriculas() {
         const formData = new FormData();
         formData.append('file', file);  // Asegúrate de que 'file' es el nombre esperado en el backend.
 
-=======
-    const fetchFile = async (file) => {
-        const formData = new FormData();
-        formData.append('file', file);  // Asegúrate de que 'file' es el nombre esperado en el backend.
-    
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         try {
             const response = await axiosClient.post('/excel/import', formData, {
                 headers: {
@@ -197,23 +159,15 @@ function TableMatriculas() {
             });
         }
     };
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
         if (selectedFile) {
             fetchFile(selectedFile);  // Llama a la función fetchFile pasando el archivo seleccionado
         }
     };
-<<<<<<< HEAD
 
 
-=======
-    
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
     const handleClickImportarExcel = () => {
         fileInputRef.current.click(); // Triggers file input click
@@ -237,13 +191,10 @@ function TableMatriculas() {
         setIsModalOpen(false);
     };
 
-<<<<<<< HEAD
     const handleTabChange = (key) => {
         setSelectedFicha(key);
     };
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     const filteredItems = useMemo(() => {
         if (!filterValue) return matriculas;
         return matriculas.filter(matricula =>
@@ -269,16 +220,12 @@ function TableMatriculas() {
 
     const renderCell = useCallback(
         (item, columnKey) => {
-<<<<<<< HEAD
             const cellValue = item[columnKey];
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             switch (columnKey) {
                 case "acciones":
                     return (
                         <div className="flex justify-around items-center">
                             <ButtonActualizar onClick={() => handleOpenModal("formMatriculas", item)} />
-<<<<<<< HEAD
                             <ButtonDesactivar onClick={() => handleDesactivar(item.id_matricula)}/>
                         </div>
                     );
@@ -292,10 +239,6 @@ function TableMatriculas() {
                                 {cellValue}
                             </Chip>
                         );
-=======
-                        </div>
-                    );
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                 default:
                     return item[columnKey];
             }
@@ -303,7 +246,6 @@ function TableMatriculas() {
         [handleOpenModal]
     );
 
-<<<<<<< HEAD
     const hashCode = (str) => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
@@ -332,8 +274,6 @@ function TableMatriculas() {
         return intToColor(hash);
     };
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     const topContent = (
         <div className="flex flex-col mt-3">
             <div className="flex justify-between gap-3 items-end">
@@ -347,29 +287,6 @@ function TableMatriculas() {
                     onValueChange={setFilterValue}
                 />
                 <div className="flex items-center gap-3">
-<<<<<<< HEAD
-=======
-                    <select
-                        id="Ficha"
-                        name="Ficha"
-                        value={selectedFicha}
-                        onChange={(e) => setSelectedFicha(e.target.value)}
-                        required
-                        className="h-10 rounded-xl bg-[#f4f4f5] p-2"
-                    >
-                        <option value="">Seleccionar Ficha</option>
-                        {fichas.length > 0 ? (
-                            fichas.map((ficha) => (
-                                <option key={ficha.codigo} value={ficha.codigo}>
-                                    {ficha.codigo}
-                                </option>
-                            ))
-                        ) : (
-                            <option disabled>Cargando fichas...</option>
-                        )}
-                    </select>
-                    <div>
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                         <Button className="bg-[#92d22e] text-white" onClick={handleClickImportarExcel}>
                             Importar Excel
                         </Button>
@@ -381,10 +298,6 @@ function TableMatriculas() {
                             id="fileInput"
                             type="file"
                         />
-<<<<<<< HEAD
-=======
-                    </div>
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
                     <Button
                         onClick={() => handleOpenModal("formMatriculas")}
@@ -417,7 +330,6 @@ function TableMatriculas() {
                     </select>
                 </label>
             </div>
-<<<<<<< HEAD
             <Tabs
                         selectedKey={selectedFicha} // Establece la ficha seleccionada
                         onSelectionChange={handleTabChange} // Maneja el cambio de tab
@@ -429,8 +341,6 @@ function TableMatriculas() {
                             </Tab>
                         ))}
                     </Tabs>
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         </div>
     );
 
@@ -474,11 +384,7 @@ function TableMatriculas() {
                         </Table>
                     ) : (
                         <div className="text-center mt-6">
-<<<<<<< HEAD
                             <p>No hay matrículas registradas en esta ficha.</p>
-=======
-                            <p>No hay matrículas disponibles.</p>
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                         </div>
                     )
                 ) : (
@@ -501,11 +407,7 @@ function TableMatriculas() {
                 bodyContent={bodyContent}
             />
         </>
-<<<<<<< HEAD
     );    
-=======
-    );
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 }
 
 export default TableMatriculas;

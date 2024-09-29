@@ -1,5 +1,4 @@
 import { pool } from "../database/conexion.js";
-<<<<<<< HEAD
 export const listarHorarios = async (req, res) => {
     try {
         let sql = `
@@ -8,12 +7,6 @@ export const listarHorarios = async (req, res) => {
             INNER JOIN fichas f ON h.ficha = f.codigo
             INNER JOIN ambientes a ON h.ambiente = a.id_ambiente
             WHERE h.estado = 1`; // Filtrar por estado activo (suponiendo que 1 significa activo)
-=======
-
-export const listarHorarios = async (req, res) => {
-    try {
-        let sql = `SELECT * FROM horarios`;
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
         const [results] = await pool.query(sql);
         if (results.length > 0) {
@@ -30,7 +23,6 @@ export const listarHorarios = async (req, res) => {
     }
 };
 
-<<<<<<< HEAD
 export const ActualizarHorarios = async (req, res) => {
     const { id_horario } = req.params;
     const { hora_inicio, hora_fin, dia, horas, ficha, ambiente  } = req.body;
@@ -100,6 +92,3 @@ export const DesactivarHorario = async (req, res) => {
 };
 
 
-=======
-/* Registrar horarios  */
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a

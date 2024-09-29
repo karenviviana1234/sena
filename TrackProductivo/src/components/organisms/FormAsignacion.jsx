@@ -2,11 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { ModalFooter, Button } from "@nextui-org/react";
 import axiosClient from '../../configs/axiosClient';
 import AsignacionContext from '../../context/AsignacionesContext';
-<<<<<<< HEAD
 import { format } from 'date-fns';
 import Swal from 'sweetalert2';
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
 const FormAsignacion = ({ onSubmit, onClose, actionLabel, mode, initialData }) => {
   const [productiva, setProductiva] = useState([]);
@@ -56,7 +53,6 @@ const handleSubmit = async (e) => {
   const dataToSend = {
       actividad: selectedActividad,
       productiva: selectedProductiva,
-<<<<<<< HEAD
       id_asignacion: mode === 'update' ? initialData?.id_asignacion : undefined // Usar el operador de encadenamiento opcional
   };
 
@@ -75,16 +71,6 @@ const handleSubmit = async (e) => {
               title: 'Éxito',
               text: 'Asignación registrada correctamente',
           });
-=======
-      id_asignacion: mode === 'update' ? initialData.id_asignacion : undefined // Agrega esto
-  };
-
-  try {
-      if (mode === 'update') {
-          await axiosClient.put(`/actualizar/${initialData.id_asignacion}`, dataToSend);
-      } else {
-          await axiosClient.post('/registrar', dataToSend);
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
       }
       // Limpiar los campos después de la operación
       setSelectedProductiva('');
@@ -92,12 +78,8 @@ const handleSubmit = async (e) => {
       onSubmit();
       onClose();
   } catch (error) {
-<<<<<<< HEAD
       console.error(error);
       setErrorMessage("Error al procesar la asignación. Intenta de nuevo.");
-=======
-      // Manejo de errores...
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
   }
 };
 
@@ -115,17 +97,10 @@ const handleSubmit = async (e) => {
             onChange={(e) => setSelectedProductiva(e.target.value)}
             required
           >
-<<<<<<< HEAD
             <option value="">Seleccionar Aprendiz</option>
             {productiva.map((prod) => (
               <option key={prod.id_productiva} value={prod.id_productiva}>
                 {prod.aprendiz_nombre}
-=======
-            <option value="">Seleccionar Productiva</option>
-            {productiva.map((prod) => (
-              <option key={prod.id_productiva} value={prod.id_productiva}>
-                {prod.id_productiva}
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
               </option>
             ))}
           </select>
@@ -140,31 +115,17 @@ const handleSubmit = async (e) => {
             onChange={(e) => setSelectedActividad(e.target.value)}
             required
           >
-<<<<<<< HEAD
             <option value="">Seleccionar Instructor y Horario</option>
             {actividad.map((actividades) => (
               <option key={actividades.id_actividad} value={actividades.id_actividad}>
                 {`${actividades.instructor} - ${format(new Date(actividades.fecha_inicio), 'dd-MM-yyyy')} a ${format(new Date(actividades.fecha_fin), 'dd-MM-yyyy')} - ${actividades.horario_inicio} a ${actividades.horario_fin}`}
-=======
-            <option value="">Seleccionar Actividad</option>
-            {actividad.map((activi) => (
-              <option key={activi.id_actividad} value={activi.id_actividad}>
-                {activi.id_actividad}
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
               </option>
             ))}
           </select>
         </div>
 
         <div className="flex justify-end gap-5 mt-5">
-<<<<<<< HEAD
           <Button className="bg-[#92d22e] text-white" type="submit" color="success">
-=======
-          <Button type="button" color="danger" onClick={onClose}>
-            Cerrar
-          </Button>
-          <Button type="submit" color="success">
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             {actionLabel || (mode === 'update' ? 'Actualizar' : 'Registrar')}
           </Button>
         </div>

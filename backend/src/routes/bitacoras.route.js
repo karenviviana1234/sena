@@ -4,7 +4,6 @@ import { validarToken } from '../controllers/seguridad.controller.js'
 
 const rutaBitacoras = Router()
 
-<<<<<<< HEAD
 rutaBitacoras.get('/listar',/*  validarToken,  */listarBitacora)
 rutaBitacoras.post('/registrar', validarToken, cargarBitacora, registrarBitacora)
 
@@ -18,18 +17,3 @@ rutaBitacoras.get('/buscar/:id', validarToken, buscarBitacora)
 rutaBitacoras.get('/download/:id_bitacora', descargarPdfBitacora);
 
 export default rutaBitacoras    
-=======
-rutaBitacoras.get('/listar', validarToken, listarBitacora)
-rutaBitacoras.post('/registrar', /* validarToken, */ cargarBitacora, registrarBitacora)
-
-rutaBitacoras.post('/cargarpdf/:id_bitacora', /* validarToken, */ cargarBitacora,uploadPdfToBitacoras)
-
-rutaBitacoras.put('/actualizar/:id', validarToken, cargarBitacora, actualizarBitacora)
-rutaBitacoras.put('/aprobar/:id/_bitacora', validarToken, aprobarBitacora)
-rutaBitacoras.put('/rechazar/:id_bitacora', validarToken, rechazarBitacora)
-rutaBitacoras.get('/bitacorasSeguimiento/:id', /* validarToken,  */bitacoraSeguimiento)
-rutaBitacoras.get('/buscar/:id', validarToken, buscarBitacora)
-rutaBitacoras.get('/download/:id_bitacora', descargarPdfBitacora);
-
-export default rutaBitacoras
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a

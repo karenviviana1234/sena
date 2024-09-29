@@ -6,11 +6,7 @@ import Principal from './src/components/pages/Principal';
 import Bitacoras from './src/components/pages/Bitacoras';
 import Perfil from './src/components/pages/Perfil';
 import GlobalProvider from './src/Context/GlobalContext';
-<<<<<<< HEAD
 /* import Landing_page from './src/components/pages/Landing_page'; */
-=======
-import Landing_page from './src/components/pages/Landing_page';
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 import Login from './src/components/pages/login';
 import Usuarios from './src/components/pages/Usuarios';
 import Reportes from './src/components/pages/Reportes';
@@ -25,13 +21,8 @@ const App = () => {
   return (
     <GlobalProvider>
       <NavigationContainer>
-<<<<<<< HEAD
         <Stack.Navigator initialRouteName='login'>
 {/*           <Stack.Screen name="landing_page" component={Landing_page} /> */}
-=======
-        <Stack.Navigator initialRouteName='landing_page'>
-          <Stack.Screen name="landing_page" component={Landing_page} />
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
           <Stack.Screen name="login" component={Login} />
           <Stack.Screen 
             name="principal" 

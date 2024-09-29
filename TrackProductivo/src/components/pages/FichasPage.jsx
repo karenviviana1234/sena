@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react';
 import { Tabs, Tab } from "@nextui-org/react";
 import TableFichas from "../organisms/TableFichas";
@@ -22,20 +21,4 @@ function FichasPage() {
 }
 
 
-=======
-import TableFichas from '../organisms/Ficha/TableFicha'
-function FichasPage() {
-  return (
-    <>
-
-    <>
-    <main className='w-full p-3'>
-        <TableFichas/>
-      </main>
-    </>
-    <div>FichasPage</div></>
-  )
-}
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 export default FichasPage

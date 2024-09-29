@@ -200,7 +200,6 @@ export const condicionadaMatricula = async (req, res) => {
 
 export const canceladaMatricula = async (req, res) => {
     try {
-<<<<<<< HEAD
         const { id_matricula } = req.params;
 
         // Desactivar la comprobación de claves foráneas
@@ -251,29 +250,6 @@ export const canceladaMatricula = async (req, res) => {
 };
 
 
-=======
-        const { id } = req.params
-
-        let sql = `UPDATE matriculas SET estado = 4 WHERE id_matricula = ?`;
-
-        const [rows] = await pool.query(sql, [id])
-
-        if (rows.affectedRows > 0) {
-            res.status(200).json({
-                message: 'Matricula cancelada exitosamente'
-            })
-        } else {
-            res.status(403).json({
-                message: 'Error al cancelar la matricula'
-            })
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: 'Error del servidor' + error
-        })
-    }
-}
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
 export const retiroMatricula = async (req, res) => {
     try {
@@ -345,7 +321,6 @@ export const certificadaMatricula = async (req, res) => {
             message: 'Error del servidor' + error
         })
     }
-<<<<<<< HEAD
 }
 
 
@@ -543,6 +518,3 @@ export const listarSeguimientoAprendices = async (req, res) => {
         return res.status(500).json({ error: 'Error en el servidor.' });
     }
 };
-=======
-}
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a

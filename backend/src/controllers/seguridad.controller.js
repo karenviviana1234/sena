@@ -14,15 +14,11 @@ export const validar = async (req, res) => {
             
             // Comparar la contraseña ingresada con la contraseña encriptada en la base de datos
             const validPassword = await bcrypt.compare(password, user.password);
-<<<<<<< HEAD
 
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             if (!validPassword) {
                 return res.status(401).json({ message: "Credenciales incorrectas" });
             }
 
-<<<<<<< HEAD
             // Incluir identificación, rol y cargo en el token JWT
             const token = Jwt.sign(
                 {
@@ -47,12 +43,6 @@ export const validar = async (req, res) => {
                 token,
                 message: 'Inicio de sesión exitoso'
             });
-=======
-            // Incluir la identificación del usuario en el token JWT
-            const token = Jwt.sign({ userId: user.id_persona }, process.env.AUT_SECRET, { expiresIn: process.env.AUT_EXPIRE });
-            
-            return res.status(200).json({ user: { id_persona: user.id_persona, nombres: user.nombres, correo: user.correo, cargo: user.cargo }, token, message: 'Inicio de sesión exitoso' });
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         } else {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
@@ -74,7 +64,6 @@ export const validarToken = async (req, res, next) => {
                 if (error) {
                     return res.status(403).json({ message: 'Token es inválido o ha expirado' });
                 } else {
-<<<<<<< HEAD
                     // Decodificar y guardar toda la información del usuario en req.user
                     req.user = {
                         userId: decoded.userId,
@@ -82,10 +71,6 @@ export const validarToken = async (req, res, next) => {
                         rol: decoded.rol,
                         cargo: decoded.cargo
                     };
-=======
-                    // Decodificar el token y establecer req.usuario
-                    req.usuario = decoded.user;
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                     next();
                 }
             });

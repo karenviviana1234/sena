@@ -36,10 +36,6 @@ function FormUsuarios({ initialData }) {
 
   useEffect(() => {
     if (initialData) {
-<<<<<<< HEAD
-=======
-      console.log('Initial Data:', initialData);
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
       setIdentificacion(initialData.identificacion || "");
       setNombres(initialData.nombres || "");
       setCorreo(initialData.correo || "");

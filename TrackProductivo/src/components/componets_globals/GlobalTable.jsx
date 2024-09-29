@@ -6,7 +6,6 @@ import {
   TableColumn,
   TableRow,
   TableCell,
-<<<<<<< HEAD
   Pagination,
   Input
 } from "@nextui-org/react";
@@ -24,36 +23,17 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-=======
-  Pagination
-} from "@nextui-org/react";
-import axiosClient from '../../configs/axiosClient';
-
-const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, deleteComponent: DeleteComponent }) => {
-  const [data, setData] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Default number of rows per page
-  const [selectedItem, setSelectedItem] = useState(null); // State to manage selected item for update
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // State to manage update modal visibility
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State to manage delete modal visibility
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
   const fetchData = async () => {
     try {
       const response = await axiosClient.get(dataEndpoint);
       setData(response.data);
-<<<<<<< HEAD
-=======
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
       setTotalPages(Math.ceil(response.data.length / rowsPerPage));
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-<<<<<<< HEAD
   const handleDesactivar = async (itemId) => {
     // Mostrar una alerta de confirmación
     const result = await Swal.fire({
@@ -89,11 +69,6 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
   useEffect(() => {
     fetchData();
   }, [dataEndpoint, refreshTrigger]);
-=======
-  useEffect(() => {
-    fetchData();
-  }, [dataEndpoint]);
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
   useEffect(() => {
     setTotalPages(Math.ceil(data.length / rowsPerPage));
@@ -110,23 +85,18 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
 
   const start = (page - 1) * rowsPerPage;
   const end = start + rowsPerPage;
-<<<<<<< HEAD
   const filteredData = data.filter(item =>
     Object.values(item).some(value =>
       String(value).toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
   const paginatedData = filteredData.slice(start, end);
-=======
-  const paginatedData = data.slice(start, end);
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
   const handleUpdateClick = (item) => {
     setSelectedItem(item);
     setIsUpdateModalOpen(true);
   };
 
-<<<<<<< HEAD
   const renderCell = (item, column) => {
     return item[column.key]; // Utilizar key para obtener el valor
   };
@@ -150,41 +120,6 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
         <span className="text-default-400 text-small mt-2">
           Total {filteredData.length} {contentName}
         </span>
-=======
-  const handleDeleteClick = (item) => {
-    setSelectedItem(item);
-    setIsDeleteModalOpen(true);
-  };
-
-  const refreshData = () => {
-    fetchData();
-  };
-
-  const renderCell = (item, column) => {
-    
-        if (column === 'centro_sede') {
-      return item.centro_sede?.nombre || '';
-    }
-
-
-    if (column === 'municipio') {
-      return item.municipio ? item.municipio.nombre : '';
-    }
-    return item[column];
-  };
-
-
-  // const renderTableCell = (item, column) => {
-  //   if (column === 'centro_sede') {
-  //     return item.centro_sede?.nombre || '';
-  //   }
-  //   return item[column];
-  // };
-
-  return (
-    <div>
-      <div className="flex flex-col justify-between items-end mb-4 my-2">
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         <label className="flex items-center text-default-400 text-small">
           Rows per page:
           <select
@@ -198,24 +133,16 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
           </select>
         </label>
       </div>
-<<<<<<< HEAD
 
       <Table aria-label="Example table with pagination">
         <TableHeader>
           {columns.map((column, index) => (
             <TableColumn key={index}>{column.label}</TableColumn> // Usar label
-=======
-      <Table aria-label="Example table with pagination">
-        <TableHeader>
-          {columns.map((column, index) => (
-            <TableColumn key={index}>{column}</TableColumn>
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
           ))}
           <TableColumn>Acciones</TableColumn>
         </TableHeader>
         <TableBody>
           {paginatedData.map((item, index) => (
-<<<<<<< HEAD
             <TableRow key={item[idField]}>
               {columns.map((column, colIndex) => (
                 <TableCell key={colIndex}>{renderCell(item, column)}</TableCell> // Utilizar renderCell
@@ -225,31 +152,11 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
                 <ButtonActualizar onClick={() => handleUpdateClick(item)} />
                 <ButtonDesactivar onClick={() => handleDesactivar(item[idField])} />
                 </div>
-=======
-            <TableRow key={index}>
-              {columns.map((column, colIndex) => (
-                <TableCell key={colIndex}>{renderCell(item, column)}</TableCell>
-              ))}
-              <TableCell>
-                <button
-                  className="bg-transparent hover:bg-gray-300 text-gray-600 font-normal py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 ease-in-out mr-2"
-                  onClick={() => handleUpdateClick(item)}
-                >
-                  Actualizar
-                </button>
-                <button
-                  className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 ease-in-out"
-                  onClick={() => handleDeleteClick(item)}
-                >
-                  Eliminar
-                </button>
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-<<<<<<< HEAD
       
       <div className="flex justify-between mt-4">
         <Pagination
@@ -273,24 +180,6 @@ const GlobalTable = ({ columns, dataEndpoint, updateComponent: UpdateComponent, 
             fetchData();
           }}
         />
-=======
-      <div className="py-2 px-2 flex justify-between my-2 items-center">
-        <Pagination
-          isCompact
-          showControls
-          showShadow
-          color="primary"
-          page={page}
-          total={totalPages}
-          onChange={handlePageChange}
-        />
-      </div>
-      {isUpdateModalOpen && selectedItem && (
-        <UpdateComponent item={selectedItem} onClose={() => setIsUpdateModalOpen(false)} refreshData={refreshData} />
-      )}
-      {isDeleteModalOpen && selectedItem && (
-        <DeleteComponent item={selectedItem} onClose={() => setIsDeleteModalOpen(false)} refreshData={refreshData} />
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
       )}
     </div>
   );

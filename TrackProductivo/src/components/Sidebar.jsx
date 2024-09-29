@@ -1,9 +1,5 @@
 import { ChevronFirst, ChevronLast, Power, ChevronDown, ChevronUp } from "lucide-react";
-<<<<<<< HEAD
 import logo from "../assets/img/LOGOTIC.png";
-=======
-import logo from "../assets/img/logo-sena-verde.png";
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 import { createContext, useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ModalLogout } from "../configs/ModalLogout";
@@ -17,11 +13,7 @@ export default function Sidebar({ children }) {
     <aside className="h-screen bg-white text-black shadow-md border-r-1">
       <nav className="h-full flex flex-col justify-between">
         <div>
-<<<<<<< HEAD
           <div className="px-4 py-3 flex justify-between items-center bg-gradient-to-r from-lime-200 to-[#0c8652]">
-=======
-          <div className="px-4 py-3 flex justify-between items-center bg-gradient-to-r from-lime-100 to-lime-500">
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             <div className="flex items-center gap-2">
               <img
                 src={logo}
@@ -33,22 +25,13 @@ export default function Sidebar({ children }) {
             </div>
             <button
               onClick={() => setExpanded((curr) => !curr)}
-<<<<<<< HEAD
               className="p-2 rounded-lg bg-white text-[#54ae6c] hover:bg-gray-100"
-=======
-              className="p-2 rounded-lg bg-white text-lime-500 hover:bg-gray-100"
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             >
               {expanded ? <ChevronFirst /> : <ChevronLast />}
             </button>
           </div>
-<<<<<<< HEAD
           <div className="mt-4 pt-3 ">
             <span className="ml-3 h-8 flex items-center text-[#0d324c] font-semibold">MENÚ</span>
-=======
-          <div className="mt-4 pt-3 border-t border-gray-200">
-            <span className="ml-3 h-8 flex items-center text-gray-600">MENU</span>
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
             <SidebarContext.Provider value={{ expanded, setExpanded }}>
               <ul className="flex-1 px-2 mt-4 py-6 border-b border-gray-200">
                 {children}
@@ -84,13 +67,8 @@ export function SidebarItem({ nav, icon, text, alert }) {
           expanded ? "px-5" : "pl-4"
         } my-1 font-medium rounded-md cursor-pointer group ${
           isActive
-<<<<<<< HEAD
             ? "bg-gradient-to-r from-[#87cb7f] to-[#0c8652] text-white"
             : "hover:bg-[#66b77c] hover:text-white text-gray-700"
-=======
-            ? "bg-lime-500 text-white"
-            : "hover:bg-lime-400 hover:text-white text-gray-700"
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
         }`}
       >
         {icon}

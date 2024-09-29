@@ -19,10 +19,6 @@ function Bitacoras({
   id_bitacora,
   onIdSend,
 }) {
-<<<<<<< HEAD
-=======
-  
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
   const [bitacoraPdf, setBitacoraPdf] = useState(null);
   const [idPersona, setIdPersona] = useState('');
   const [bitacorasPdfs, setBitacorasPdfs] = useState([]);
@@ -33,7 +29,6 @@ function Bitacoras({
   const [bitacora, setBitacora] = useState([]);
   const [estado, setEstado] = useState(null);
 
-<<<<<<< HEAD
 
 
 
@@ -47,11 +42,6 @@ function Bitacoras({
     
     setFecha(localDate);
     
-=======
-  useEffect(() => {
-    const currentDate = new Date().toISOString().slice(0, 10);
-    setFecha(currentDate);
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     const userJson = localStorage.getItem('user');
     if (userJson) {
       try {
@@ -61,19 +51,12 @@ function Bitacoras({
         console.error('Error al parsear el JSON del usuario:', error);
       }
     }
-<<<<<<< HEAD
   
-=======
-
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
     if (onIdSend && id_seguimiento) {
       onIdSend(id_seguimiento);
     }
   }, [id_seguimiento, onIdSend]);
-<<<<<<< HEAD
   
-=======
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
 
   useEffect(() => {
     if (id_seguimiento) {
@@ -357,11 +340,7 @@ function Bitacoras({
                   <div key={bitacora.id_bitacora} className="relative border shadow-medium rounded-2xl p-4 flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center justify-between">
-<<<<<<< HEAD
                         <h2 className="font-semibold text-lg">Bitácora {bitacora.bitacora}</h2>
-=======
-                        <h2 className="font-semibold text-lg">Bitácora {bitacora.id_bitacora}</h2>
->>>>>>> 2f26bb9f189b1ea7057056e49def6f0ea00a3a9a
                         {bitacora.pdf && (
                             <Chip
                             endContent={icon && React.createElement(icon, { size: 20 })}
