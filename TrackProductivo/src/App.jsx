@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSearch2, UserCheck, BookText, BarChart3Icon } from 'lucide-react';
-import Sidebar, { SidebarItem, SidebarAccordion } from './components/Sidebar';
+import Sidebar, { SidebarItem, SidebarAccordion } from './components/molecules/Menu/Sidebar.jsx';
 import { LoginPage } from '../src/components/pages/LoginPage';
-import { Navbar2 } from './components/Navbar';
+import { Navbar2 } from './components/molecules/Menu/Navbar.jsx';
 import GlobalProvider from './context/GlobalContext';
+import ProtectedRoute from './configs/ProtectedRoute.jsx';
 
 // Importa las páginas directamente
 
@@ -29,65 +30,86 @@ export const App = () => {
           <Route path='/' element={
             <LoginPage />
           } />
-           <Route path='/registro' element={
+          <Route path='/registro' element={
             <Registro />
           } />
           <Route path="/home" element={
-            <WithSidebar>
-              <HomePage />
-            </WithSidebar>
-          } />
+            <ProtectedRoute>
+              <WithSidebar>
+                <HomePage />
+              </WithSidebar>
+            </ProtectedRoute>
+          }
+          />
 
           <Route path="/nomina" element={
-            <WithSidebar>
-              <NominaPage />
-            </WithSidebar>
+            <ProtectedRoute>
+              <WithSidebar>
+                <NominaPage />
+              </WithSidebar>
+            </ProtectedRoute>
+
           } />
 
           <Route path="/fichas" element={
-            <WithSidebar>
-              <FichasPage />
-            </WithSidebar>
+            <ProtectedRoute>
+              <WithSidebar>
+                <FichasPage />
+              </WithSidebar>
+            </ProtectedRoute>
           } />
 
           <Route path="/matriculas" element={
-            <WithSidebar>
-              <MatriculasPage />
-            </WithSidebar>
+            <ProtectedRoute>
+              <WithSidebar>
+                <MatriculasPage />
+              </WithSidebar>
+            </ProtectedRoute>
           } />
 
 
           <Route path="/asignaciones" element={
-            <WithSidebar>
-              <AsignacionPage />
-            </WithSidebar>
+            <ProtectedRoute>
+              <WithSidebar>
+                <AsignacionPage />
+              </WithSidebar>
+            </ProtectedRoute>
           } />
 
           <Route path="/etapapractica" element={
-            <WithSidebar>
-              <EtapaPracticaPage />
-            </WithSidebar>
+            <ProtectedRoute>
+              <WithSidebar>
+                <EtapaPracticaPage />
+              </WithSidebar>
+            </ProtectedRoute>
+
           } />
 
           <Route path="/seguimiento" element={
-            <WithSidebar>
-              <SeguimientoPage />
-            </WithSidebar>
+            <ProtectedRoute>
+              <WithSidebar>
+                <SeguimientoPage />
+              </WithSidebar>
+            </ProtectedRoute>
           } />
 
           <Route path="/estadisticas" element={
-            <WithSidebar>
-              <EstadisticasPage />
-            </WithSidebar>
+            <ProtectedRoute>
+              <WithSidebar>
+                <EstadisticasPage />
+              </WithSidebar>
+            </ProtectedRoute>
           } />
 
           <Route path="/reportes" element={
-            <WithSidebar>
-              <ReportesPage />
-            </WithSidebar>
-          } />
+            <ProtectedRoute>
+              <WithSidebar>
+                <ReportesPage />
+              </WithSidebar>
+              </ProtectedRoute>
+              } />
 
-        </Routes>
+            </Routes>
       </GlobalProvider>
     </BrowserRouter>
   );
@@ -114,27 +136,26 @@ export function WithSidebar({ children }) {
   return (
     <div className="flex">
       <Sidebar>
-        <SidebarItem nav="/" icon={<Home size={20} />} text="Home" />
+        <SidebarItem nav="/home" icon={<Home size={20} />} text="Inicio" />
         {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
           <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
         )}
-        {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
+        {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
           <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
         )}
         {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
           <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
         )}
-       {/*  {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
+        {/*  {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
         <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
         )} */}
-        {(userRole !== 'Aprendiz'  && userRol !== 'Instructor') && (
-        <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
+        {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
+          <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Productivas" />
         )}
-        <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimiento" />
+        <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimientos" />
         {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
           <SidebarItem nav="/estadisticas" icon={<BarChart3Icon size={20} />} text="Estadisticas" />
         )}
-        {/* fin de secciones de el rol de Coordinador */}
       </Sidebar>
       <div className="w-full bg-white h-screen overflow-auto">
         <Navbar2 />

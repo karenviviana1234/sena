@@ -34,6 +34,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 export const cargarSeguimiento = upload.single('seguimientoPdf');
+
 export const listarSeguimientoAprendices = async (req, res) => {
     const { identificacion, rol } = req.user; // Obtiene la información del usuario
     try {
@@ -46,7 +47,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
                 SELECT
                     p.identificacion AS identificacion,
                     p.nombres AS nombres,
-                    p.correo AS correo,  -- Agrega el correo del aprendiz
+                    p.correo AS correo, 
                     f.codigo AS codigo,
                     prg.sigla AS sigla,
                     e.razon_social AS razon_social,
@@ -151,6 +152,44 @@ export const listarSeguimientoAprendices = async (req, res) => {
                     p.identificacion, s.seguimiento;
             `;
             params.push(identificacion);  // Asignar la identificación del aprendiz
+        } else if (rol === 'Lider') {
+            // Si es líder, filtrar seguimientos por las productivas asociadas a su ficha
+            sql = `
+                SELECT
+                    p.identificacion AS identificacion,
+                    p.nombres AS nombres,
+                    p.correo AS correo,  -- Agrega el correo del aprendiz
+                    f.codigo AS codigo,
+                    prg.sigla AS sigla,
+                    e.razon_social AS razon_social,
+                    s.id_seguimiento AS id_seguimiento,
+                    s.seguimiento AS seguimiento,
+                    s.fecha AS fecha,
+                    s.estado AS estado,
+                    COUNT(b.id_bitacora) AS total_bitacoras,
+                    SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) AS bitacoras_con_pdf,
+                    (SUM(CASE WHEN b.pdf IS NOT NULL THEN 1 ELSE 0 END) / 12) * 100 AS porcentaje,
+                    instr.identificacion AS instructor_identificacion
+                FROM
+                    seguimientos s
+                    LEFT JOIN productivas pr ON s.productiva = pr.id_productiva
+                    LEFT JOIN matriculas m ON pr.matricula = m.id_matricula
+                    LEFT JOIN personas p ON m.aprendiz = p.id_persona
+                    LEFT JOIN empresas e ON pr.empresa = e.id_empresa
+                    LEFT JOIN fichas f ON m.ficha = f.codigo
+                    LEFT JOIN programas prg ON f.programa = prg.id_programa
+                    LEFT JOIN bitacoras b ON b.seguimiento = s.id_seguimiento
+                    LEFT JOIN asignaciones asg ON asg.productiva = pr.id_productiva
+                    LEFT JOIN actividades a ON asg.actividad = a.id_actividad
+                    LEFT JOIN personas instr ON a.instructor = instr.id_persona
+                WHERE
+                    f.instructor_lider = ?  -- Filtrar por el ID del líder
+                GROUP BY
+                    s.id_seguimiento, p.identificacion, p.correo, s.seguimiento, s.fecha, f.codigo, prg.sigla, e.razon_social, s.estado, instr.identificacion
+                ORDER BY
+                    p.identificacion, s.seguimiento;
+            `;
+            params.push(req.user.userId);  // Asignar el ID del líder
         }
 
         const [result] = await pool.query(sql, params); // Ejecutar la consulta con los parámetros correspondientes
@@ -180,7 +219,6 @@ export const listarSeguimientoAprendices = async (req, res) => {
                         instructor_identificacion: row.instructor_identificacion
                     };
                 }
-
                 // Asignar seguimiento basado en el número de seguimiento
                 if (row.seguimiento === '1') {
                     personasMap[row.identificacion].id_seguimiento1 = row.id_seguimiento;
@@ -202,7 +240,6 @@ export const listarSeguimientoAprendices = async (req, res) => {
             Object.values(personasMap).forEach(aprendiz => {
                 aprendiz.porcentaje = Math.round(aprendiz.porcentaje);
             });
-
             return res.status(200).json(Object.values(personasMap));
         } else {
             return res.status(404).json({ message: 'No se encontraron datos.' });
@@ -212,6 +249,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
         return res.status(500).json({ error: 'Error en el servidor.' });
     }
 };
+
 
 
 export const registrarSeguimiento = async (req, res) => {

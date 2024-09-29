@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import ActaSeguimiento from '../molecules/ActaSeguimiento.jsx'
-import Bitacoras from "../molecules/Bitacoras.jsx";
+import ActaSeguimiento from '../molecules/Seguimientos/ActaSeguimiento.jsx'
+import Bitacoras from "../molecules/Seguimientos/Bitacoras.jsx";
 
 function ComponentSeguimiento({id_seguimiento}) {
   const seguimientoNumeros = {
@@ -17,7 +17,7 @@ function ComponentSeguimiento({id_seguimiento}) {
       {/* Sección para enviar acta */}
       <ActaSeguimiento id_seguimiento={id_seguimiento}/>
 
-      {/* Sección para registrar bitácoras y actividades */}
+      {/* Sección para registrar bitácoras  */}
      <div>
       
      <Bitacoras id_seguimiento={id_seguimiento} />

@@ -1,22 +1,44 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import TableEmpresas from "../organisms/TableEmpresa";
 import TableEtapaPractica from "../organisms/TablePractica";
+import AsignacionPage from "../pages/AsignacionPage";
+
 function EtapaPracticaPage() {
-    return ( 
+    const [userRole, setUserRole] = useState(null);
+    const [userRol, setUserRol] = useState(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                setUserRole(user.cargo);
+                setUserRol(user.rol);
+            } catch (error) {
+                console.error("Error al parsear el JSON del usuario:", error);
+            }
+        }
+    }, []);
+    return (
         <>
-        <div className="flex min-h-screen flex-col m-10">
-            <Tabs aria-label="Options">
-                <Tab key="aprendiz" title="EtapaPractica">
-                    <TableEtapaPractica />
-                </Tab>
-                <Tab key="instructor" title="Empresa">
-                    <TableEmpresas />
-                </Tab>
-            </Tabs>
-        </div>
-      </>
-     );
+            <div className="flex min-h-screen flex-col m-10">
+                <Tabs aria-label="Options">
+                    <Tab key="instructor" title="Empresas">
+                        <TableEmpresas />
+                    </Tab>
+                    <Tab title="Etapa Practica">
+                        <TableEtapaPractica />
+                    </Tab>
+                    {(userRol !== 'Lider') && (
+                    <Tab title="Asignaciones">
+                        <AsignacionPage />
+                    </Tab>
+                    )}
+                </Tabs>
+            </div>
+        </>
+    );
 }
 
 export default EtapaPracticaPage;

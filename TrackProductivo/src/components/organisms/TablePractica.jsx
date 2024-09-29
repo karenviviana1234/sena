@@ -1,8 +1,9 @@
 import React, { useState, useContext, useMemo } from 'react';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Modal, Input } from "@nextui-org/react";
-import FormEtapaPractica from './FormEtapaPractica';
-import useEtapaPractica from './useEtapaPractica';
+import FormEtapaPractica from '../molecules/Productivas/FormEtapaPractica';
+import useEtapaPractica from '../../context/useEtapaPractica';
 import PersonasContext from '../../context/PersonasContext';
+import ButtonActualizar from '../atoms/ButtonActualizar';
 
 function TablePractica() {
     const {
@@ -37,7 +38,7 @@ function TablePractica() {
 
     const renderActions = (etapa) => (
         <div className="flex gap-2">
-            <Button size="sm" className="bg-[#92d22e] text-white font-bold py-1 px-2 rounded-xl" onClick={() => handleEditEtapa(etapa)}>Editar</Button>
+            <ButtonActualizar onClick={() => handleEditEtapa(etapa)}>Editar</ButtonActualizar>
         </div>
     );
     
@@ -71,7 +72,7 @@ function TablePractica() {
                 </div>
             </div>
 
-            <Button className="bg-[#92d22e] text-white font-bold py-2 px-4 rounded-xl mb-4" onClick={() => setIsOpenModalRegistro(true)}>Registrar nueva etapa</Button>
+            <Button className="bg-[#0d324c] text-white font-bold py-2 px-4 rounded-xl mb-4" onClick={() => setIsOpenModalRegistro(true)}>Registrar nueva etapa</Button>
 
             <Modal open={isOpenModalRegistro} onClose={() => setIsOpenModalRegistro(false)} className="max-w-md" >
                 <FormEtapaPractica

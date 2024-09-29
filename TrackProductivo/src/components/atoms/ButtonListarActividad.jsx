@@ -5,7 +5,7 @@ import { Tooltip } from '@nextui-org/react';
 
 const ButtonListarActividad = ({onClick, ref}) => {
     return (
-        <Tooltip content="Listar actividades">
+        <Tooltip content="Actividades">
             <button ref={ref} className="font-bold py-2 px-4 rounded" onClick={onClick}>
                 <Icons.ListarActividad className='w-5 h-5' />
             </button>

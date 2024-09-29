@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import ComponentSeguimiento from './ComponentSeguimiento.jsx';
-import ModalAcciones from './ModalAcciones.jsx';
+import ModalAcciones from '../molecules/ComponentsGlobals/ModalAcciones.jsx';
 import axiosClient from '../../configs/axiosClient.jsx';
-import FormNovedades from './FormNovedades.jsx';
 import { format } from 'date-fns';
 import {
     Table,
@@ -19,14 +18,13 @@ import {
     DropdownItem,
     Chip,
     Pagination,
-    User,
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import ButtonRegistrarNovedad from '../atoms/ButtonRegistrarNovedades.jsx';
 import ButtonEliminar from '../atoms/ButtonEliminar.jsx';
 import { Tooltip } from '@nextui-org/react';
-import Novedades from './Novedad.jsx';
+import Novedades from '../molecules/Seguimientos/Novedad.jsx';
 
 function TableSeguimientos() {
     const [seguimientos, setSeguimientos] = useState([]);
@@ -153,10 +151,13 @@ function TableSeguimientos() {
     };
 
     const getColorForFicha = (fichaNumber) => {
+        if (!fichaNumber) {
+            return "rgba(240, 240, 240, 0.8)";  // Color por defecto si fichaNumber es null o undefined
+        }
         const hash = hashCode(fichaNumber.toString());
         return intToColor(hash);
     };
-
+    
 
     // Render cell based on column key
     const renderCell = useCallback((item, columnKey) => {
@@ -225,18 +226,7 @@ function TableSeguimientos() {
                         </Dropdown>
                     </div>
                 );
-                case "nombres":
-                    return sortedItems.map((item) => (
-                      <User
-                        name={item.nombres}    // Usamos item.nombres para mostrar el nombre correcto
-                        description={item.correo} // Mapear correctamente el correo
-                        avatarSrc="https://via.placeholder.com"
-                        bordered
-                        as="button"
-                        size="sm"
-                        color="primary"
-                      />
-                    ));
+                
                   
 
             default:
@@ -305,6 +295,7 @@ function TableSeguimientos() {
     const columns = [
         { key: "identificacion", label: "Identificación" },
         { key: "nombres", label: "Nombres" },
+        { key: "correo", label: "Correo" },
         { key: "codigo", label: "Ficha" },
         { key: "razon_social", label: "Empresa" },
         { key: "seguimiento1", label: "Seguimiento 1" },

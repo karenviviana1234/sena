@@ -8,10 +8,10 @@ function FichasPage() {
     <>
     <div className="flex min-h-screen flex-col m-10">
         <Tabs aria-label="Options">
-            <Tab key="fichas" title="fichas">
+            <Tab key="fichas" title="Fichas">
               <TableFichas />
             </Tab>
-            <Tab key="horarios" title="horarios">
+            <Tab key="horarios" title="Horarios">
               <TableHorarios />
             </Tab>
         </Tabs>

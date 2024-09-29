@@ -1,5 +1,5 @@
 import React from 'react'
-import Grafica from '../organisms/Grafica'
+import Grafica from '../molecules/Estadisticas/Grafica'
 
 function HomePage() {
   return (

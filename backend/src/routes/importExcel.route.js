@@ -1,9 +1,9 @@
-import express from 'express';
+import { Router } from 'express';
 import { importExcel, upload } from '../controllers/importarExcel.js'; // Asegúrate de que la ruta sea correcta
 
-const rutaImportarExcel = express.Router();
+const rutaImportarExcel = Router();
 
-// Ruta para importar archivos Excel
-rutaImportarExcel.post('/import', upload.single('file'), importExcel);
+// Solo usa 'upload' aquí, ya que .single('file') está definido en el controlador
+rutaImportarExcel.post('/import', upload, importExcel);
 
 export default rutaImportarExcel;

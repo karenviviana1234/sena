@@ -42,6 +42,27 @@ export const listarInstructores = async (req, res) => {
   }
 };
 
+export const listarInstructoresLider = async (req, res) => {
+  try {
+    const sql = 'SELECT * FROM personas WHERE cargo = ? AND rol = ? AND estado = ?';
+    const values = ['Instructor', 'Lider', 'Activo'];
+    const [results] = await pool.query(sql, values);
+
+    if (results.length > 0) {
+      res.status(200).json(results);
+    } else {
+      res.status(404).json({
+        message: 'No hay instructores líderes activos registrados',
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: `Error del servidor: ${error.message}`,
+    });
+  }
+};
+
+
 
 
 export const listarAprendices = async (req, res) => {

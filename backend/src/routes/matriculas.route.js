@@ -13,6 +13,6 @@ rutaMatriculas.put('/condicionada/:id', validarToken, condicionadaMatricula)
 rutaMatriculas.put('/retiro/:id', validarToken, retiroMatricula)
 rutaMatriculas.put('/porCertificar/:id', validarToken, porCertificarMatricula)
 rutaMatriculas.put('/certificada/:id', validarToken, certificadaMatricula)
-rutaMatriculas.put('/cancelada/:id', validarToken, canceladaMatricula)
+rutaMatriculas.delete('/cancelada/:id_matricula', validarToken, canceladaMatricula)
 
 export default rutaMatriculas

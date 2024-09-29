@@ -1,43 +1,54 @@
 import { pool } from './../database/conexion.js'
-
 export const listarasignaciones = async (req, res) => {
     try {
         const [result] = await pool.query(`
             SELECT 
                 p.id_asignacion, 
-                a.id_productiva  AS productiva, 
-                act.id_actividad AS actividad,
-                act.fecha_inicio,
-                act.fecha_fin,
-                act.tipo,
-                act.solicitud,
-                a.empresa,
-                a.alternativa,
-                a.estado,
-                a.aprendiz
+                per_aprendiz.nombres AS nombre_aprendiz,
+                per_instructor.nombres AS nombre_instructor,
+                CONCAT(
+                    h.hora_inicio, ' - ', 
+                    h.hora_fin, ' (', 
+                    h.dia, ')'
+                ) AS horario, -- Concatenar las columnas de horario
+                CONCAT(
+                    DATE_FORMAT(act.fecha_inicio, '%Y-%m-%d'), ' a ', 
+                    DATE_FORMAT(act.fecha_fin, '%Y-%m-%d')
+                ) AS rango_fechas -- Concatenar fecha de inicio y fin
             FROM 
                 asignaciones AS p
             LEFT JOIN 
                 productivas AS a ON p.productiva = a.id_productiva 
             LEFT JOIN 
-                actividades AS act ON p.actividad = act.id_actividad;
+                actividades AS act ON p.actividad = act.id_actividad
+            LEFT JOIN 
+                personas AS per_instructor ON act.instructor = per_instructor.id_persona
+            LEFT JOIN 
+                personas AS per_aprendiz ON a.aprendiz = per_aprendiz.id_persona
+            LEFT JOIN 
+                horarios AS h ON act.horario = h.id_horario -- Join con la tabla horarios
         `);
 
+        // Verifica que hay resultados
         if (result.length > 0) {
             return res.status(200).json(result);
         } else {
-            return res.status(404).json({
-                status: 404,
-                message: "No se encontraron asignaciones."
+            // En lugar de devolver un error, simplemente devolvemos un mensaje de éxito con data vacía
+            return res.status(200).json({
+                status: 200,
+                message: "No se encontraron asignaciones.",
+                data: [] // Aquí se devuelve un array vacío
             });
         }
     } catch (error) {
+        console.error("Error en el servidor:", error); // Log para depuración
         return res.status(500).json({
             status: 500,
             message: error.message || "Error interno del servidor."
         });
     }
 };
+
 
 export const registrarasignacion = async (req, res) => {
     const connection = await pool.getConnection(); // Obtener conexión manualmente para usar transacciones
@@ -149,11 +160,9 @@ export const registrarasignacion = async (req, res) => {
 
 
 
-
-
 export const actualizarasignacion = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id_asignacion } = req.params;
         const { productiva, actividad } = req.body;
 
         // Verificar si el instructor existe
@@ -183,7 +192,7 @@ export const actualizarasignacion = async (req, res) => {
         // Verificar si la asignación existe
         const [asignacionExist] = await pool.query(
             "SELECT * FROM asignaciones WHERE id_asignacion = ?",
-            [id]
+            [id_asignacion]
         );
         if (asignacionExist.length === 0) {
             return res.status(404).json({
@@ -197,7 +206,7 @@ export const actualizarasignacion = async (req, res) => {
             `UPDATE asignaciones 
              SET productiva = ?, actividad = ?
              WHERE id_asignacion = ?`,
-            [productiva, actividad, id]
+            [productiva, actividad, id_asignacion]
         );
 
         if (result.affectedRows > 0) {
@@ -222,7 +231,7 @@ export const actualizarasignacion = async (req, res) => {
 
 export const buscarasignacion = async (req, res) => { 
     try {
-        const { id } = req.params;
+        const { id_asignacion } = req.params;
         const [result] = await pool.query(
             `SELECT 
                 p.id_asignacion, 
@@ -236,7 +245,7 @@ export const buscarasignacion = async (req, res) => {
                 actividades AS act ON p.actividad = act.id_actividad
             WHERE 
                 p.id_asignacion = ?`,
-            [id]
+            [id_asignacion]
         );
 
         if (result.length > 0) {
@@ -254,3 +263,57 @@ export const buscarasignacion = async (req, res) => {
         });
     }
 };
+
+export const eliminarAsignacion = async (req, res) => {
+    const connection = await pool.getConnection(); // Obtener conexión manualmente para usar transacciones
+    try {
+        // Obtener el id_asignacion desde los parámetros de la ruta
+        const { id_asignacion } = req.params;
+
+        if (!id_asignacion) {
+            return res.status(400).json({
+                status: 400,
+                message: "Datos incompletos. Por favor, envíe el ID de la asignación."
+            });
+        }
+
+        // Iniciar la transacción
+        await connection.beginTransaction();
+
+        // Verificar si la asignación existe
+        const [asignacionExist] = await connection.query(
+            "SELECT * FROM asignaciones WHERE id_asignacion = ?",
+            [id_asignacion]
+        );
+
+        if (asignacionExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "La asignación no existe."
+            });
+        }
+
+        // Eliminar la asignación
+        await connection.query(
+            "DELETE FROM asignaciones WHERE id_asignacion = ?",
+            [id_asignacion]
+        );
+
+        // Confirmar la transacción
+        await connection.commit();
+
+        return res.status(200).json({
+            status: 200,
+            message: "Asignación eliminada con éxito."
+        });
+    } catch (error) {
+        await connection.rollback(); // Revertir transacción en caso de error
+        return res.status(500).json({
+            status: 500,
+            message: error.message || "Error en el sistema"
+        });
+    } finally {
+        connection.release(); // Liberar la conexión al final
+    }
+};
+
