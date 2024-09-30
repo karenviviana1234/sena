@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, User } from "@nextui-org/react";
 import Swal from 'sweetalert2';
-import axiosClient from "../../configs/axiosClient";
+import axiosClient from "../../../configs/axiosClient";
 
 function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
     const [aprendices, setAprendices] = useState([]);

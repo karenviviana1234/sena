@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 04-09-2024 a las 16:56:19
+-- Tiempo de generación: 26-09-2024 a las 12:51:24
 -- Versión del servidor: 8.0.30
 -- Versión de PHP: 8.1.10
 
@@ -63,13 +63,6 @@ CREATE TABLE `areas` (
   `nombre_area` varchar(80) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `areas`
---
-
-INSERT INTO `areas` (`id_area`, `nombre_area`) VALUES
-(1, 'TIC');
-
 -- --------------------------------------------------------
 
 --
@@ -98,25 +91,6 @@ CREATE TABLE `bitacoras` (
   `instructor` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `bitacoras`
---
-
-INSERT INTO `bitacoras` (`id_bitacora`, `fecha`, `bitacora`, `seguimiento`, `pdf`, `estado`, `instructor`) VALUES
-(1, '2024-01-07', '1', 1, NULL, 'solicitud', NULL),
-(2, '2024-01-07', '2', 1, NULL, 'solicitud', NULL),
-(3, '2024-01-07', '3', 1, NULL, 'solicitud', NULL),
-(4, '2024-01-07', '4', 1, NULL, 'solicitud', NULL),
-(5, '2024-01-07', '5', 2, NULL, 'solicitud', NULL),
-(6, '2024-01-07', '6', 2, NULL, 'solicitud', NULL),
-(7, '2024-01-07', '7', 2, NULL, 'solicitud', NULL),
-(8, '2024-01-07', '8', 2, NULL, 'solicitud', NULL),
-(9, '2024-01-07', '9', 3, NULL, 'solicitud', NULL),
-(10, '2024-01-07', '10', 3, NULL, 'solicitud', NULL),
-(11, '2024-01-07', '11', 3, NULL, 'solicitud', NULL),
-(12, '2024-01-07', '12', 3, NULL, 'solicitud', NULL),
-(13, '2024-09-04', '3', 1, 'Candidatos - AutorizaciÃ³n de Tratamiento de Datos Personales - Adage LATAM (3).pdf', 'solicitud', '');
-
 -- --------------------------------------------------------
 
 --
@@ -134,13 +108,6 @@ CREATE TABLE `empresas` (
   `estado` enum('Activo','Inactivo') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `empresas`
---
-
-INSERT INTO `empresas` (`id_empresa`, `razon_social`, `direccion`, `telefono`, `correo`, `municipio`, `jefe_inmediato`, `estado`) VALUES
-(1, 'Technology S.A.S', 'Pitalito Huila', '3209621134', 'Technologysas@gmail.com', 1, 'Yohana Salamanca', 'Activo');
-
 -- --------------------------------------------------------
 
 --
@@ -154,15 +121,9 @@ CREATE TABLE `fichas` (
   `fin_ficha` datetime DEFAULT NULL,
   `programa` int DEFAULT NULL,
   `sede` enum('centro','yamboro') DEFAULT NULL,
-  `estado` enum('Lecttiva','Electiva','Finalizado') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+  `estado` enum('Lecttiva','Electiva','Finalizado') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `instructor_lider` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `fichas`
---
-
-INSERT INTO `fichas` (`codigo`, `inicio_ficha`, `fin_lectiva`, `fin_ficha`, `programa`, `sede`, `estado`) VALUES
-(2692929, '2024-08-22', '2025-08-31', '2026-02-28 11:19:14', 1, 'yamboro', 'Lecttiva');
 
 -- --------------------------------------------------------
 
@@ -197,13 +158,6 @@ CREATE TABLE `matriculas` (
   `pendiente_ingles` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `matriculas`
---
-
-INSERT INTO `matriculas` (`id_matricula`, `ficha`, `aprendiz`, `estado`, `pendiente_tecnicos`, `pendiente_transversales`, `pendiente_ingles`) VALUES
-(1, 2692929, 1, 'Formación', 0, 0, 0);
-
 -- --------------------------------------------------------
 
 --
@@ -215,13 +169,6 @@ CREATE TABLE `municipios` (
   `nombre_mpio` varchar(80) DEFAULT NULL,
   `departamento` varchar(80) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `municipios`
---
-
-INSERT INTO `municipios` (`id_municipio`, `nombre_mpio`, `departamento`) VALUES
-(1, 'saladoblanco', 'Huila');
 
 -- --------------------------------------------------------
 
@@ -250,7 +197,7 @@ CREATE TABLE `personas` (
   `nombres` varchar(80) DEFAULT NULL,
   `correo` varchar(80) DEFAULT NULL,
   `telefono` varchar(40) DEFAULT NULL,
-  `password` varchar(25) DEFAULT NULL,
+  `password` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `rol` enum('Instructor','Coordinador','Lider','Seguimiento','Aprendiz') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `cargo` enum('Instructor','Aprendiz','Coordinador','Administrativo') DEFAULT NULL,
   `municipio` int DEFAULT NULL,
@@ -259,13 +206,6 @@ CREATE TABLE `personas` (
   `area` int DEFAULT NULL,
   `estado` enum('Activo','Inactivo') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `personas`
---
-
-INSERT INTO `personas` (`id_persona`, `identificacion`, `nombres`, `correo`, `telefono`, `password`, `rol`, `cargo`, `municipio`, `tipo`, `sede`, `area`, `estado`) VALUES
-(1, 1081729608, 'Sharit Vargas', 'vargasharit@gmail.com', '3209621134', 'sharit123', 'Aprendiz', 'Aprendiz', 1, 'contratista', 'yamboro', 1, 'Activo');
 
 -- --------------------------------------------------------
 
@@ -287,13 +227,6 @@ CREATE TABLE `productivas` (
   `aprendiz` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `productivas`
---
-
-INSERT INTO `productivas` (`id_productiva`, `matricula`, `empresa`, `fecha_inicio`, `fecha_fin`, `alternativa`, `estado`, `acuerdo`, `arl`, `consulta`, `aprendiz`) VALUES
-(1, 1, 1, '2024-01-07', '2024-07-07', 'Contrato de Aprendizaje', 'Inicio', NULL, NULL, NULL, 2);
-
 -- --------------------------------------------------------
 
 --
@@ -307,13 +240,6 @@ CREATE TABLE `programas` (
   `nivel` enum('Tecnico','Tecnólogo') DEFAULT NULL,
   `estado` enum('activo','inactivo') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `programas`
---
-
-INSERT INTO `programas` (`id_programa`, `nombre_programa`, `sigla`, `nivel`, `estado`) VALUES
-(1, 'Analisis y Desarrollo de Software', 'ADSO', 'Tecnólogo', 'activo');
 
 -- --------------------------------------------------------
 
@@ -330,15 +256,6 @@ CREATE TABLE `seguimientos` (
   `productiva` int DEFAULT NULL,
   `instructor` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `seguimientos`
---
-
-INSERT INTO `seguimientos` (`id_seguimiento`, `fecha`, `seguimiento`, `estado`, `pdf`, `productiva`, `instructor`) VALUES
-(1, '2024-03-06', '1', 'solicitud', NULL, 1, NULL),
-(2, '2024-05-06', '2', 'solicitud', NULL, 1, NULL),
-(3, '2024-07-06', '3', 'solicitud', NULL, 1, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -392,7 +309,8 @@ ALTER TABLE `empresas`
 --
 ALTER TABLE `fichas`
   ADD PRIMARY KEY (`codigo`),
-  ADD KEY `ficha_programa` (`programa`);
+  ADD KEY `ficha_programa` (`programa`),
+  ADD KEY `instructor_lider` (`instructor_lider`);
 
 --
 -- Indices de la tabla `horarios`
@@ -462,7 +380,7 @@ ALTER TABLE `seguimientos`
 -- AUTO_INCREMENT de la tabla `actividades`
 --
 ALTER TABLE `actividades`
-  MODIFY `id_actividad` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_actividad` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `ambientes`
@@ -474,7 +392,7 @@ ALTER TABLE `ambientes`
 -- AUTO_INCREMENT de la tabla `areas`
 --
 ALTER TABLE `areas`
-  MODIFY `id_area` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_area` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `asignaciones`
@@ -486,13 +404,13 @@ ALTER TABLE `asignaciones`
 -- AUTO_INCREMENT de la tabla `bitacoras`
 --
 ALTER TABLE `bitacoras`
-  MODIFY `id_bitacora` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_bitacora` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `empresas`
 --
 ALTER TABLE `empresas`
-  MODIFY `id_empresa` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_empresa` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `horarios`
@@ -504,13 +422,13 @@ ALTER TABLE `horarios`
 -- AUTO_INCREMENT de la tabla `matriculas`
 --
 ALTER TABLE `matriculas`
-  MODIFY `id_matricula` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_matricula` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `municipios`
 --
 ALTER TABLE `municipios`
-  MODIFY `id_municipio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_municipio` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `novedades`
@@ -522,25 +440,25 @@ ALTER TABLE `novedades`
 -- AUTO_INCREMENT de la tabla `personas`
 --
 ALTER TABLE `personas`
-  MODIFY `id_persona` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_persona` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `productivas`
 --
 ALTER TABLE `productivas`
-  MODIFY `id_productiva` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_productiva` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `programas`
 --
 ALTER TABLE `programas`
-  MODIFY `id_programa` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_programa` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `seguimientos`
 --
 ALTER TABLE `seguimientos`
-  MODIFY `id_seguimiento` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_seguimiento` int NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -582,7 +500,8 @@ ALTER TABLE `empresas`
 -- Filtros para la tabla `fichas`
 --
 ALTER TABLE `fichas`
-  ADD CONSTRAINT `ficha_programa` FOREIGN KEY (`programa`) REFERENCES `programas` (`id_programa`);
+  ADD CONSTRAINT `ficha_programa` FOREIGN KEY (`programa`) REFERENCES `programas` (`id_programa`),
+  ADD CONSTRAINT `fichas_ibfk_1` FOREIGN KEY (`instructor_lider`) REFERENCES `personas` (`id_persona`);
 
 --
 -- Filtros para la tabla `horarios`

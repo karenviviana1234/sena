@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import PDFUploader from './Pdf';
-import ButtonEnviar from '../atoms/ButtonEnviar';
+import PDFUploader from './Pdf.jsx';
+import ButtonEnviar from '../../atoms/ButtonEnviar.jsx';
 import { Chip } from '@nextui-org/react';
-import Icons from '../../styles/Variables';
-import axiosClient from "../../configs/axiosClient.jsx";
-import ButtonDescargar from '../atoms/ButtonDescargar.jsx';
+import Icons from '../../../styles/Variables.jsx';
+import axiosClient from "../../../configs/axiosClient.jsx";
+import ButtonDescargar from '../../atoms/ButtonDescargar.jsx';
 import Swal from 'sweetalert2';
-import ButtonAprobado from '../atoms/ButtonAprobado.jsx';
-import ButtonNoAprobado from '../atoms/ButtonNoAprobado.jsx';
+import ButtonAprobado from '../../atoms/ButtonAprobado.jsx';
+import ButtonNoAprobado from '../../atoms/ButtonNoAprobado.jsx';
 
 function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
   const [seguimiento, setSeguimiento] = useState([]);

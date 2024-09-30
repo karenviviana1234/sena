@@ -40,14 +40,13 @@ export const ModalLogout = () => {
                                 <form
                                 >
 
-                                    <ModalHeader className="flex flex-col gap-1">Cerrar Session</ModalHeader>
+                                    <ModalHeader className="flex flex-col gap-1">Cerrar Sesion</ModalHeader>
                                     <ModalBody>
-                                        <h2>Estas Seguro  de Cerrar Session</h2>
+                                        <h2>¿Estas Seguro que deseas Cerrar Sesion?</h2>
 
                                     </ModalBody>
                                     <ModalFooter>
-                                        <Button color="danger" variant="light" onPress={onClose}>Atras</Button>
-                                        <Button color="primary" onClick={handleSubmit} onPress={onClose}>Cerrar</Button>
+                                        <Button  className='bg-[#0d324c] text-white' onClick={handleSubmit} onPress={onClose}>Cerrar</Button>
                                     </ModalFooter>
 
                                 </form>

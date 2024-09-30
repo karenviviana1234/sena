@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import axiosClient from '../../configs/axiosClient';
-import ModalAcciones from './ModalAcciones';
+import axiosClient from '../../../configs/axiosClient';
+import ModalAcciones from '../ComponentsGlobals/ModalAcciones';
 import FormNovedades from './FormNovedades';
-import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad';
-import ButtonDesactivar from '../atoms/ButtonDesactivar';
+import ButtonRegistrarActividad from '../../atoms/ButtonRegistrarActividad';
+import ButtonDesactivar from '../../atoms/ButtonDesactivar';
 import Swal from 'sweetalert2';
 
 const Novedades = () => {

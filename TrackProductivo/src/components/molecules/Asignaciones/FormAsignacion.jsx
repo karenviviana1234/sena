@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ModalFooter, Button } from "@nextui-org/react";
-import axiosClient from '../../configs/axiosClient';
-import AsignacionContext from '../../context/AsignacionesContext';
+import axiosClient from '../../../configs/axiosClient';
+import AsignacionContext from '../../../context/AsignacionesContext';
 import { format } from 'date-fns';
 import Swal from 'sweetalert2';
 
@@ -31,7 +31,6 @@ const FormAsignacion = ({ onSubmit, onClose, actionLabel, mode, initialData }) =
         setActividad(response.data.filter((actividad) => actividad.estado === 'Activo'));
       } catch (error) {
         console.error("Error al cargar actividades:", error);
-        setErrorMessage("Error al cargar actividades. Intenta de nuevo más tarde.");
       }
     };
 

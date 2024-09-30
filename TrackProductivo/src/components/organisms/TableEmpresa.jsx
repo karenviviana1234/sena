@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import GlobalTable from '../componets_globals/GlobalTable';
-import RegistroEmpresa from './FormEmpresa';
-import UpdateEmpresa from './ActualizarEmpresa';
+import GlobalTable from '../molecules/ComponentsGlobals/GlobalTable';
+import RegistroEmpresa from '../molecules/Empresas/FormEmpresa';
+import UpdateEmpresa from '../molecules/Empresas/ActualizarEmpresa';
 
 function TableEmpresas() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);

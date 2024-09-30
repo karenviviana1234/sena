@@ -1,13 +1,13 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Chip } from '@nextui-org/react';
 import React, { useEffect, useState } from 'react';
-import axiosClient from '../../configs/axiosClient';
+import axiosClient from '../../../configs/axiosClient';
 import PDFUploader from './Pdf';
-import ButtonEnviar from '../atoms/ButtonEnviar';
-import ButtonDescargar from '../atoms/ButtonDescargar';
-import Icons from '../../styles/Variables';
+import ButtonEnviar from '../../atoms/ButtonEnviar';
+import ButtonDescargar from '../../atoms/ButtonDescargar';
+import Icons from '../../../styles/Variables';
 import Swal from 'sweetalert2';
-import ButtonAprobado from '../atoms/ButtonAprobado';
-import ButtonNoAprobado from '../atoms/ButtonNoAprobado';
+import ButtonAprobado from '../../atoms/ButtonAprobado';
+import ButtonNoAprobado from '../../atoms/ButtonNoAprobado';
 
 function Bitacoras({
   initialData,

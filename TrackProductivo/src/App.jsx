@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home, Users, BookMarked, BookUser, Building2, GraduationCap, FolderSearch2, UserCheck, BookText, BarChart3Icon } from 'lucide-react';
-import Sidebar, { SidebarItem, SidebarAccordion } from './components/Sidebar';
+import Sidebar, { SidebarItem, SidebarAccordion } from './components/molecules/Menu/Sidebar.jsx';
 import { LoginPage } from '../src/components/pages/LoginPage';
-import { Navbar2 } from './components/Navbar';
+import { Navbar2 } from './components/molecules/Menu/Navbar.jsx';
 import GlobalProvider from './context/GlobalContext';
 import ProtectedRoute from './configs/ProtectedRoute.jsx';
 
@@ -136,7 +136,7 @@ export function WithSidebar({ children }) {
   return (
     <div className="flex">
       <Sidebar>
-        <SidebarItem nav="/home" icon={<Home size={20} />} text="Home" />
+        <SidebarItem nav="/home" icon={<Home size={20} />} text="Inicio" />
         {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
           <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
         )}
@@ -150,13 +150,12 @@ export function WithSidebar({ children }) {
         <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
         )} */}
         {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
-          <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Etapa Practica" />
+          <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Productivas" />
         )}
-        <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimiento" />
+        <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimientos" />
         {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
           <SidebarItem nav="/estadisticas" icon={<BarChart3Icon size={20} />} text="Estadisticas" />
         )}
-        {/* fin de secciones de el rol de Coordinador */}
       </Sidebar>
       <div className="w-full bg-white h-screen overflow-auto">
         <Navbar2 />

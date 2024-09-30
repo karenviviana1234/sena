@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axiosClient from '../../configs/axiosClient';
+import axiosClient from '../configs/axiosClient';
 
 const useEtapaPractica = () => {
     const [etapas, setEtapas] = useState([]);

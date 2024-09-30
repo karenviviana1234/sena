@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
-import axiosClient from '../../configs/axiosClient';
+import axiosClient from '../../../configs/axiosClient';
 
 // Asegúrate de inicializar el módulo de drilldown
 HighchartsDrilldown(Highcharts);
@@ -84,7 +84,7 @@ function Grafica() {
               {
                 name: 'Terminado',
                 y: (data.Terminado / total) * 100,
-                color: '#8cd024', // Verde
+                color: '#198d57', // Verde
                 drilldown: null,
               },
               {

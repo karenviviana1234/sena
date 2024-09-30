@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import axiosClient from "../../configs/axiosClient";
+import axiosClient from "../../../configs/axiosClient";
 import Swal from "sweetalert2";
 
 function FormActividades({ selectedInstructor, actividadSeleccionada, onClose }) {

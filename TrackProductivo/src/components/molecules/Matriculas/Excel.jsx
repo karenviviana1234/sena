@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
-import v from '../../styles/Variables'
+import v from '../../../styles/Variables'
 
 const ExcelUploader = () => {
   const [data, setData] = useState([]);

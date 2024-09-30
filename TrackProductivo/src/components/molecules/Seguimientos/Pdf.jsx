@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ButtonDescargar from "../atoms/ButtonDescargar.jsx";
+import ButtonDescargar from "../../atoms/ButtonDescargar.jsx";
 
 const PDFUploader = ({ onFileSelect, className }) => {
   const [file, setFile] = useState(null);

@@ -2,7 +2,7 @@ import { ChevronFirst, ChevronLast, Power, ChevronDown, ChevronUp } from "lucide
 import logo from "../assets/img/LOGOTIC.png";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ModalLogout } from "../configs/ModalLogout";
+import { ModalLogout } from "../../../configs/ModalLogout";
 
 const SidebarContext = createContext();
 
@@ -33,7 +33,7 @@ export default function Sidebar({ children }) {
           <div className="mt-4 pt-3 ">
             <span className="ml-3 h-8 flex items-center text-[#0d324c] font-semibold">MENÚ</span>
             <SidebarContext.Provider value={{ expanded, setExpanded }}>
-              <ul className="flex-1 px-2 mt-4 py-6 border-b border-gray-200">
+              <ul className="flex-1 px-2 mt-4 py-24">
                 {children}
               </ul>
             </SidebarContext.Provider>
@@ -81,14 +81,14 @@ export function SidebarItem({ nav, icon, text, alert }) {
         </span>
         {alert && (
           <div
-            className={`absolute right-2 w-2 h-2 rounded-full bg-indigo-400 ${
+            className={`absolute right-2 w-2 h-2 rounded-full bg-[#0c8652] z-40 ${
               expanded ? "" : "top-2"
             }`}
           ></div>
         )}
         {!expanded && (
           <div
-            className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-indigo-50 text-indigo-900 text-sm invisible opacity-0 transform -translate-x-3 transition-all duration-300 group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}
+            className={`absolute left-full rounded-md px-2 py-1 ml-6 bg-green-500 bg-opacity-30 text-[#0c8652] text-sm invisible opacity-0 transform -translate-x-3 transition-all duration-300 group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 z-40`}
           >
             {text}
           </div>

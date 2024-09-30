@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import ComponentSeguimiento from './ComponentSeguimiento.jsx';
-import ModalAcciones from './ModalAcciones.jsx';
+import ModalAcciones from '../molecules/ComponentsGlobals/ModalAcciones.jsx';
 import axiosClient from '../../configs/axiosClient.jsx';
-import FormNovedades from './FormNovedades.jsx';
 import { format } from 'date-fns';
 import {
     Table,
@@ -25,7 +24,7 @@ import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import ButtonRegistrarNovedad from '../atoms/ButtonRegistrarNovedades.jsx';
 import ButtonEliminar from '../atoms/ButtonEliminar.jsx';
 import { Tooltip } from '@nextui-org/react';
-import Novedades from './Novedad.jsx';
+import Novedades from '../molecules/Seguimientos/Novedad.jsx';
 
 function TableSeguimientos() {
     const [seguimientos, setSeguimientos] = useState([]);

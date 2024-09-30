@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import axiosClient from '../../configs/axiosClient';
-import ModalAcciones from './ModalAcciones';
+import axiosClient from '../../../configs/axiosClient';
+import ModalAcciones from '../ComponentsGlobals/ModalAcciones';
 import FormActividades from './FormActividades';
-import ButtonRegistrarActividad from '../atoms/ButtonRegistrarActividad';
-import ButtonDesactivar from '../atoms/ButtonDesactivar';
+import ButtonRegistrarActividad from '../../atoms/ButtonRegistrarActividad';
+import ButtonDesactivar from '../../atoms/ButtonDesactivar';
+import { Chip } from '@nextui-org/react';
+
 
 const ListActividad = ({ selectedInstructor, item }) => {
   const [instructor, setInstructor] = useState("");
@@ -84,18 +86,26 @@ const ListActividad = ({ selectedInstructor, item }) => {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {actividades.map((actividad) => (
           <div key={actividad.id_actividad} className="bg-white shadow-md rounded-lg p-4 relative">
             <h4 className="text-lg font-semibold mb-2">Actividad: {actividad.id_actividad}</h4>
             <div className="absolute top-2 right-2">
               <ButtonDesactivar onClick={() => desactivarActividad(actividad.id_actividad)} />  
             </div>
-            <p className="text-sm text-black"><strong>Estado: </strong>{actividad.estado}</p>
+            <div className="absolute top-4 left-32 flex items-center gap-2">
+                <Chip
+                  variant="flat"
+                  className="w-10 bg-green-500 bg-opacity-30"
+                >
+                  {actividad.estado}
+                </Chip>
+              </div>
             <p className="text-sm text-black"><strong>Fecha de inicio: </strong>{formatFecha(actividad.fecha_inicio)}</p>
             <p className="text-sm text-black"><strong>Fecha de fin: </strong>{formatFecha(actividad.fecha_fin)}</p>
-            <p className="text-sm text-black"><strong>Instructor: </strong>{actividad.instructor}</p>
-            <p className="text-sm text-black"><strong>Horario: </strong>ficha: {actividad.horario_ficha} día: {actividad.horario_dia}</p>
+            <p className="text-sm text-black"><strong>Horario: </strong>{actividad.horario_inicio} - {actividad.horario_fin}</p>
+            <p className="text-sm text-black"><strong>Ficha: </strong> {actividad.horario_ficha} </p>
+            <p className="text-sm text-black"><strong>Día: </strong> {actividad.horario_dia} </p>
           </div>
         ))}
       </div>

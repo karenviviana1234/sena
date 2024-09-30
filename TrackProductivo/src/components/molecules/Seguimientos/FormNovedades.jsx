@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button } from "@nextui-org/react";
-import axiosClient from "../../configs/axiosClient";
+import axiosClient from "../../../configs/axiosClient";
 import Swal from 'sweetalert2'; // Importar SweetAlert2
 
 const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) => {
@@ -188,7 +188,7 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
         </div>
 
         <div className="flex justify-end gap-5 mt-5">
-          <Button type="submit" className="bg-[#92d22e] text-white">
+          <Button type="submit" className="bg-[#0d324c] text-white">
             {(mode === 'update' ? 'Actualizar' : 'Registrar')}
           </Button>
         </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import ModalAcciones from './ModalAcciones.jsx';
+import ModalAcciones from '../molecules/ComponentsGlobals/ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../../configs/axiosClient.jsx';
 import {
@@ -16,8 +16,8 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
-import FormMatriculas from './FormMatriculas.jsx';
-import FormAprendices from './FormAprendices.jsx';
+import FormMatriculas from '../molecules/Matriculas/FormMatriculas.jsx';
+import FormAprendices from '../molecules/Matriculas/FormAprendices.jsx';
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import ButtonDesactivar from '../atoms/ButtonDesactivar.jsx';
 
@@ -287,7 +287,7 @@ function TableMatriculas() {
                     onValueChange={setFilterValue}
                 />
                 <div className="flex items-center gap-3">
-                        <Button className="bg-[#92d22e] text-white" onClick={handleClickImportarExcel}>
+                        <Button className="bg-[#34688e] text-white" onClick={handleClickImportarExcel}>
                             Importar Excel
                         </Button>
                         <Input
@@ -301,13 +301,13 @@ function TableMatriculas() {
 
                     <Button
                         onClick={() => handleOpenModal("formMatriculas")}
-                        className="bg-[#90d12c] text-white"
+                        className="bg-[#2b7ab3] text-white"
                     >
                         Matricular
                     </Button>
                     <Button
                         onClick={() => handleOpenModal("formAprendices")}
-                        className="bg-[#3f5819] text-white"
+                        className="bg-[#0d324c] text-white"
                     >
                         Registrar Aprendiz
                     </Button>
