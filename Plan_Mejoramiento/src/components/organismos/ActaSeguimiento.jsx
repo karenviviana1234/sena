@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import axiosClient from '../../axiosClient';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import RNFS from 'react-native-fs';
 
 const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
-  const [seguimiento, setSeguimiento] = useState([]);
-  const [estadoActaVisible, setEstadoActaVisible] = useState(false);
-  const [fecha, setFecha] = useState("");
   const [seguimientoPdf, setSeguimientoPdf] = useState(null);
   const [idPersona, setIdPersona] = useState("");
   const [userRole, setUserRole] = useState(null);
   const [estado, setEstado] = useState(null);
   const [pdfName, setPdfName] = useState(null);
-
+  const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10));
+  
   const seguimientoNumeros = {
     1: 1,
     2: 2,
@@ -22,23 +21,14 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
   };
 
   useEffect(() => {
-    const currentDate = new Date().toISOString().slice(0, 10);
-    setFecha(currentDate);
-    
     const getUserData = async () => {
       try {
         const userJson = await AsyncStorage.getItem("user");
         if (userJson) {
           const user = JSON.parse(userJson);
-          if (user && user.id_persona) {
-            setIdPersona(user.id_persona);
-            console.log("ID de persona asignado:", user.id_persona);
-          } else {
-            console.warn("No se encontró un 'id_persona' válido en el usuario.");
-          }
+          setIdPersona(user?.id_persona || null);
         } else {
           console.warn("No se encontró un valor válido para 'user' en AsyncStorage.");
-          setIdPersona(null);
         }
       } catch (error) {
         console.error("Error al obtener datos del usuario:", error);
@@ -54,7 +44,7 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
 
   useEffect(() => {
     if (id_seguimiento) {
-      axios.get(`/seguimientos/listarEstado/${id_seguimiento}`)
+      axiosClient.get(`/seguimientos/listarEstado/${id_seguimiento}`)
         .then(response => {
           setEstado(response.data.estado);
           setPdfName(response.data.pdf);
@@ -87,56 +77,43 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
         type: [DocumentPicker.types.pdf],
       });
       setSeguimientoPdf(res[0]);
-      setEstadoActaVisible(true);
     } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker
-      } else {
+      if (!DocumentPicker.isCancel(err)) {
         console.error(err);
       }
     }
   };
 
-  const handleSubmitActa = async () => {
+  const handleSubmitActa = useCallback(async () => {
     if (!seguimientoPdf) {
       Alert.alert("Error", "Debes cargar un archivo PDF para poder enviarlo");
       return;
     }
 
-    if (pdfName) {
-      const result = await new Promise((resolve) => {
-        Alert.alert(
-          "¿Estás seguro?",
-          "Ya existe un PDF cargado, ¿quieres reemplazarlo?",
-          [
-            { text: "Cancelar", onPress: () => resolve(false), style: "cancel" },
-            { text: "Sí, reemplazar", onPress: () => resolve(true) }
-          ]
-        );
-      });
+    const result = await new Promise((resolve) => {
+      Alert.alert(
+        "¿Estás seguro?",
+        "Ya existe un PDF cargado, ¿quieres reemplazarlo?",
+        [
+          { text: "Cancelar", onPress: () => resolve(false), style: "cancel" },
+          { text: "Sí, reemplazar", onPress: () => resolve(true) }
+        ]
+      );
+    });
 
-      if (!result) {
-        return;
-      }
-    }
-
-    if (!id_seguimiento) {
-      console.error("ID de seguimiento no definido");
-      Alert.alert("Error", "ID de seguimiento no definido");
+    if (!result) {
       return;
     }
 
     const formData = new FormData();
-    if (seguimientoPdf) {
-      formData.append("seguimientoPdf", {
-        uri: seguimientoPdf.uri,
-        type: seguimientoPdf.type,
-        name: seguimientoPdf.name,
-      });
-    }
+    formData.append("seguimientoPdf", {
+      uri: seguimientoPdf.uri,
+      type: seguimientoPdf.type,
+      name: seguimientoPdf.name,
+    });
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         `/seguimientos/cargarPDF/${id_seguimiento}`,
         formData,
         {
@@ -156,72 +133,50 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
       console.error("Error del servidor:", error);
       Alert.alert("Error del servidor", error.message);
     }
-  };
-
-  const handleAprobar = async (id_seguimiento) => {
-    try {
-      const result = await new Promise((resolve) => {
-        Alert.alert(
-          "¿Estás seguro?",
-          "¿Quieres aprobar esta Acta?",
-          [
-            { text: "No, cancelar", onPress: () => resolve(false), style: "cancel" },
-            { text: "Sí, Aprobar", onPress: () => resolve(true) }
-          ]
-        );
-      });
-
-      if (!result) {
-        return;
-      }
-
-      if (!id_seguimiento) {
-        console.error("ID de seguimiento no proporcionado");
-        Alert.alert("Error", "El ID de seguimiento no está definido.");
-        return;
-      }
-
-      const response = await axios.put(`/seguimientos/aprobar/${id_seguimiento}`);
-
-      if (response.status === 200) {
-        Alert.alert("Aprobado", "El acta ha sido aprobada correctamente");
-
-        setSeguimiento((prevSeguimiento) =>
-          prevSeguimiento.filter((seguimiento) => seguimiento.id_seguimiento !== id_seguimiento)
-        );
-      } else {
-        throw new Error("Error inesperado durante la aprobación.");
-      }
-    } catch (error) {
-      console.error("Error al aprobar el acta:", error);
-      Alert.alert("Error", "No se pudo aprobar el acta. Intenta nuevamente.");
-    }
-  };
-
-  const handleNoAprobar = async (id_seguimiento) => {
-    // Similar to handleAprobar, but with different text and endpoint
-  };
+  }, [seguimientoPdf, id_seguimiento, handleSubmit]);
 
   const downloadFile = async (id_seguimiento) => {
-    Alert.alert("Información", "La funcionalidad de descarga no está disponible en esta versión móvil.");
+    try {
+      const response = await axiosClient.get(`/seguimientos/descargarPdf/${id_seguimiento}`, {
+        responseType: 'blob',
+      });
+  
+      if (response.status === 200) {
+        const pdfFileName = `archivo-${id_seguimiento}.pdf`; // O usa el nombre que necesites
+        const path = `${RNFS.DocumentDirectoryPath}/${pdfFileName}`;
+        
+        // Guardar el archivo
+        await RNFS.writeFile(path, response.data, 'base64'); // Asegúrate de que la respuesta sea base64
+        Alert.alert("Éxito", "Archivo descargado correctamente.");
+        
+        // O puedes usar Linking para abrir el archivo
+        // Linking.openURL(path); // Si quieres abrir el archivo después de descargarlo
+      } else {
+        Alert.alert("Error", "No se pudo descargar el archivo.");
+      }
+    } catch (error) {
+      console.error("Error al descargar el archivo:", error);
+      Alert.alert("Error", `No se pudo descargar el archivo: ${error.message}`);
+    }
   };
+  
 
   const estadoConfig = {
-    aprobado: {
-      color: "green",
-      icon: "check-circle",
-    },
-    noAprobado: {
-      color: "red",
-      icon: "close-circle",
-    },
     solicitud: {
       color: "orange",
       icon: "alert-circle",
     },
+    aprobado: {
+      color: "green",
+      icon: "check-circle",
+    },
+    rechazado: {
+      color: "red",
+      icon: "alert-circle",
+    },
   };
 
-  const { color, icon } = estadoConfig[estado] || {};
+  const { color, icon } = estadoConfig[estado] || { color: "black", icon: "alert-circle" };
 
   return (
     <View style={styles.container}>
@@ -241,35 +196,23 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
               <Text style={styles.buttonText}>Subir PDF</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity style={styles.button} onPress={() => downloadFile(id_seguimiento)}>
-            <Text style={styles.buttonText}>Descargar</Text>
-          </TouchableOpacity>
-          {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
-            <TouchableOpacity style={styles.button} onPress={() => handleAprobar(id_seguimiento)}>
-              <Text style={styles.buttonText}>Aprobar</Text>
-            </TouchableOpacity>
-          )}
-          {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
-            <TouchableOpacity style={styles.button} onPress={() => handleNoAprobar(id_seguimiento)}>
-              <Text style={styles.buttonText}>No Aprobar</Text>
-            </TouchableOpacity>
-          )}
           {estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
             <TouchableOpacity style={styles.button} onPress={handleSubmitActa}>
               <Text style={styles.buttonText}>Enviar</Text>
             </TouchableOpacity>
           )}
+          {estado !== 'aprobado' && (userRole === 'Aprendiz') && (
+            <TouchableOpacity style={styles.button} onPress={() => downloadFile(id_seguimiento)}>
+              <Text style={styles.buttonText}>Descargar</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {pdfName && estado && (
-          <View style={styles.statusContainer}>
-            <Icon name={icon} size={20} color={color} />
-            <Text style={[styles.statusText, { color }]}>{estado}</Text>
+        {estado && (
+          <View style={styles.estadoContainer}>
+            <Icon name={icon} size={24} color={color} />
+            <Text style={[styles.estadoText, { color }]}>{estado}</Text>
           </View>
-        )}
-
-        {pdfName && fecha && (
-          <Text style={styles.dateText}>{fecha}</Text>
         )}
       </View>
     </View>
@@ -281,68 +224,49 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
   },
   card: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
     padding: 16,
+    borderRadius: 8,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    backgroundColor: 'white',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: "bold",
     marginBottom: 8,
   },
   pdfName: {
     fontSize: 14,
-    color: 'gray',
     marginBottom: 8,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginBottom: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007bff",
     padding: 8,
     borderRadius: 4,
-    margin: 4,
   },
   buttonText: {
-    color: 'white',
+    color: "#fff",
     fontSize: 14,
   },
-  statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 16,
-    right: 16,
+  estadoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
   },
-  statusText: {
-    marginLeft: 4,
+  estadoText: {
+    marginLeft: 8,
     fontSize: 14,
-  },
-  dateText: {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    fontSize: 12,
-    color: 'gray',
   },
 });
 
