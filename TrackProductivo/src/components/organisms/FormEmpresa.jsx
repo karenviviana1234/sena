@@ -4,10 +4,10 @@ import axiosClient from "../../configs/axiosClient";
 import GlobalAlert from "../../components/componets_globals/GlobalAlert";
 import GlobalModal from "../../components/componets_globals/GlobalModal";
 import { useDisclosure } from "@nextui-org/react";
-import { Calendar } from 'lucide-react';
 
 export const RegistroEmpresa = ({ onRegisterSuccess }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [empresaData, setEmpresaData] = useState({
     razon_social: "",
     direccion: "",
