@@ -1,6 +1,7 @@
 import { pool } from "../database/conexion.js";
 import multer from "multer";
 import { addMonths, format, isValid } from 'date-fns';
+
 export const listarProductiva = async (req, res) => {
     try {
         const { rol, userId } = req.user; // Obtener el rol y el ID del usuario autenticado

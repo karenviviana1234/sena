@@ -18,6 +18,7 @@ const Perfil = () => {
         const response = await axiosClient.get(`/personas/perfil/${id_persona}`);
         console.log("Datos del usuario recibidos:", response.data);
 
+        
         if (response.data) {
           setUserData(response.data);
         } else {

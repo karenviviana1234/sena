@@ -51,6 +51,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
 
   const today = new Date().toISOString().split('T')[0];
 
+  
   const validateDates = () => {
     let valid = true;
     let newErrors = { fechaInicio: "", fechaFin: "" };
@@ -197,7 +198,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
         </div>
 
         <div className="flex justify-end gap-5 mt-5">
-          <Button type="submit" className="bg-[#0d324c] text-white" color="success">
+          <Button type="submit" className="bg-[#92d22e] text-white" color="success">
             Registrar
           </Button>
         </div>

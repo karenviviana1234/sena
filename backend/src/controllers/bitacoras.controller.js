@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { format } from 'date-fns';
 
 // Obtener el directorio actual del archivo
 const __filename = fileURLToPath(import.meta.url);
@@ -38,16 +39,17 @@ const storage = multer.diskStorage(
     }
 )
 
-const upload = multer({storage: storage})
-export const cargarBitacora = upload.single('bitacoraPdf')
+
+const upload = multer({ storage: storage });
+export const cargarBitacora = upload.single('bitacoraPdf');
 
 export const registrarBitacora = async (req, res) => {
     try {
         const bitacoraPdf = req.file.originalname;
         const { bitacora, seguimiento, instructor } = req.body;
 
-        // Obtener la fecha actual en formato YYYY-MM-DD
-        const fechaActual = new Date().toISOString().slice(0, 10);
+        // Obtener la fecha actual en formato local YYYY-MM-DD usando date-fns
+        const fechaActual = format(new Date(), 'yyyy-MM-dd');
 
         let sql = `INSERT INTO bitacoras (fecha, bitacora, seguimiento, pdf, estado, instructor) VALUES (?, ?, ?, ?, 1, ?)`;
 
@@ -80,8 +82,8 @@ export const uploadPdfToBitacoras = async (req, res) => {
             });
         }
 
-        // Obtener la fecha actual en formato YYYY-MM-DD
-        const fechaActual = new Date().toISOString().slice(0, 10);
+        // Obtener la fecha actual en formato local YYYY-MM-DD
+        const fechaActual = format(new Date(), 'yyyy-MM-dd');
 
         // Actualizar el campo 'pdf' y 'fecha' en la tabla 'bitacoras'
         const sqlUpdateBitacora = `

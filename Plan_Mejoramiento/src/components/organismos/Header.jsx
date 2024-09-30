@@ -8,6 +8,8 @@ const Header = ({ title, toggleMenu }) => {
       <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
         <Icon name="bars" size={30} color="black" />
       </TouchableOpacity>
+      {/* como vamos 
+       */}
       <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
         {title}
       </Text>

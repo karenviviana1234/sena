@@ -33,8 +33,15 @@ function Bitacoras({
 
 
   useEffect(() => {
-    const currentDate = new Date().toISOString().slice(0, 10);
-    setFecha(currentDate);
+    const currentDate = new Date();
+    
+    // Obtener la fecha local en el formato YYYY-MM-DD
+    const localDate = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 10);
+    
+    setFecha(localDate);
+    
     const userJson = localStorage.getItem('user');
     if (userJson) {
       try {
@@ -44,11 +51,12 @@ function Bitacoras({
         console.error('Error al parsear el JSON del usuario:', error);
       }
     }
-
+  
     if (onIdSend && id_seguimiento) {
       onIdSend(id_seguimiento);
     }
   }, [id_seguimiento, onIdSend]);
+  
 
   useEffect(() => {
     if (id_seguimiento) {
@@ -332,7 +340,7 @@ function Bitacoras({
                   <div key={bitacora.id_bitacora} className="relative border shadow-medium rounded-2xl p-4 flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center justify-between">
-                        <h2 className="font-semibold text-lg">Bitácora {bitacora.id_bitacora}</h2>
+                        <h2 className="font-semibold text-lg">Bitácora {bitacora.bitacora}</h2>
                         {bitacora.pdf && (
                             <Chip
                             endContent={icon && React.createElement(icon, { size: 20 })}

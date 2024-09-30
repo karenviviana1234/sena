@@ -124,7 +124,7 @@ const handleSubmit = async (e) => {
         </div>
 
         <div className="flex justify-end gap-5 mt-5">
-          <Button className="bg-[#0d324c] text-white" type="submit" color="success">
+          <Button className="bg-[#92d22e] text-white" type="submit" color="success">
             {actionLabel || (mode === 'update' ? 'Actualizar' : 'Registrar')}
           </Button>
         </div>
