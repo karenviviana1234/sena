@@ -27,7 +27,7 @@ function EtapaPracticaPage() {
                     <Tab key="instructor" title="Empresas">
                         <TableEmpresas />
                     </Tab>
-                    <Tab title="Etapa Practica">
+                    <Tab key= "instrutor" title="Etapa Practica">
                         <TableEtapaPractica />
                     </Tab>
                     {(userRol !== 'Lider') && (

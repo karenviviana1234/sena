@@ -1,5 +1,5 @@
 import { ChevronFirst, ChevronLast, Power, ChevronDown, ChevronUp } from "lucide-react";
-import logo from "../assets/img/LOGOTIC.png";
+import logo from "../../../assets/img/LOGOTIC.png";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ModalLogout } from "../../../configs/ModalLogout";
