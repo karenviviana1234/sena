@@ -21,6 +21,7 @@ function EtapaPracticaPage() {
         }
     }, []);
     return (
+        /* ayudando  */
         <>
             <div className="flex min-h-screen flex-col m-10">
                 <Tabs aria-label="Options">

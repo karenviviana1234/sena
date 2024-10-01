@@ -10,6 +10,17 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
   const [horario, setHorario] = useState("");
   const [tipo, setTipo] = useState("Seguimiento");
   const [solicitud, setSolicitud] = useState("Aprobado");
+  const [fichas, setFichas] = useState([]);
+  const [fichaSeleccionada, setFichaSeleccionada] = useState(""); // Estado para ficha seleccionada
+  const [horarios, setHorarios] = useState([]);
+  const [noHorarios, setNoHorarios] = useState(false); // Nuevo estado para manejar la ausencia de horarios
+  const [errors, setErrors] = useState({
+    fechaInicio: "",
+    fechaFin: "",
+  });
+
+  const tipos = ["Formacion", "Seguimiento", "Administrativo"];
+  const solicitudes = ["Solicitado", "Aprobado", "No Aprobado"];
 
   useEffect(() => {
     if (actividadSeleccionada) {
@@ -21,15 +32,6 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
     }
   }, [actividadSeleccionada]);
 
-  const [horarios, setHorarios] = useState([]);
-  const [errors, setErrors] = useState({
-    fechaInicio: "",
-    fechaFin: "",
-  });
-
-  const tipos = ["Formacion", "Seguimiento", "Administrativo"];
-  const solicitudes = ["Solicitado", "Aprobado", "No Aprobado"];
-
   useEffect(() => {
     if (selectedInstructor) {
       setInstructor(selectedInstructor.nombres);
@@ -37,21 +39,41 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
   }, [selectedInstructor]);
 
   useEffect(() => {
-    const fetchHorarios = async () => {
+    const loadFichas = async () => {
       try {
-        const response = await axiosClient.get("/horarios/listar");
-        setHorarios(response.data);
+        const response = await axiosClient.get("/fichas/listar");
+        setFichas(response.data);
       } catch (error) {
-        console.error("Error al obtener horarios", error);
+        console.error("Error al cargar las fichas:", error);
+        setFichas([]);
       }
     };
 
-    fetchHorarios();
+    loadFichas();
   }, []);
 
-  const today = new Date().toISOString().split('T')[0];
+  const handleFichaChange = async (e) => {
+    const fichaId = e.target.value;
+    setFichaSeleccionada(fichaId);
 
-  
+    try {
+      const response = await axiosClient.get(`/horarios/listarPorFicha/${fichaId}`);
+      if (response.data.length === 0) {
+        setNoHorarios(true); // No hay horarios para la ficha
+        setHorarios([]);
+      } else {
+        setNoHorarios(false); // Hay horarios disponibles
+        setHorarios(response.data);
+      }
+    } catch (error) {
+      console.error("Error al cargar los horarios:", error);
+      setHorarios([]);
+      setNoHorarios(true); // En caso de error, asumimos que no hay horarios disponibles
+    }
+  };
+
+  const today = new Date().toISOString().split("T")[0];
+
   const validateDates = () => {
     let valid = true;
     let newErrors = { fechaInicio: "", fechaFin: "" };
@@ -75,15 +97,15 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
 
     if (!fechaInicio || !fechaFin || !horario || !tipo || !solicitud) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Campos incompletos',
-        text: 'Por favor completa todos los campos antes de enviar.',
+        icon: "warning",
+        title: "Campos incompletos",
+        text: "Por favor completa todos los campos antes de enviar.",
       });
-      return; // Detiene el envío si faltan campos por completar
+      return;
     }
 
     if (!validateDates()) {
-      return; // Detener el envío si la validación de fechas falla
+      return;
     }
 
     const dataToSend = {
@@ -99,41 +121,38 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
       const response = await axiosClient.post("/actividades/registrar", dataToSend);
       if (response.status === 200) {
         Swal.fire({
-          icon: 'success',
-          title: 'Éxito',
-          text: 'Actividad registrada correctamente',
+          icon: "success",
+          title: "Éxito",
+          text: "Actividad registrada correctamente",
         });
-        onClose(); // Cerrar el modal tras el éxito
+        onClose();
       } else {
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo registrar la actividad. Por favor, inténtalo de nuevo.',
+          icon: "error",
+          title: "Error",
+          text: "No se pudo registrar la actividad. Por favor, inténtalo de nuevo.",
         });
       }
     } catch (error) {
       console.error("Error del servidor:", error);
 
-      // Verifica si el error tiene una respuesta del servidor y muestra un mensaje más específico
       if (error.response) {
         Swal.fire({
-          icon: 'error',
-          title: 'Error del servidor',
-          text: `Error: ${error.response.data.message || 'Ocurrió un problema al procesar tu solicitud.'}`,
+          icon: "error",
+          title: "Error del servidor",
+          text: `Error: ${
+            error.response.data.message || "Ocurrió un problema al procesar tu solicitud."
+          }`,
         });
       } else {
-        // Error sin respuesta del servidor (problemas de conexión, timeout, etc.)
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo conectar con el servidor. Verifica tu conexión a internet y vuelve a intentarlo.',
+          icon: "error",
+          title: "Error",
+          text: "No se pudo conectar con el servidor. Verifica tu conexión a internet y vuelve a intentarlo.",
         });
       }
     }
   };
-
-  // Encuentra el horario seleccionado por ID
-  const selectedHorario = horarios.find(h => h.id_horario.toString() === horario);
 
   return (
     <div>
@@ -168,34 +187,44 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
           </div>
         </div>
 
-        <div className="flex flex-col">
-          <Select
-            name="horario"
-            placeholder="Selecciona el horario"
-            value={horario}
-            onChange={(e) => setHorario(e.target.value)}
+        {/* Select para Fichas */}
+        <div className="py-2">
+          <select
+            className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500"
+            value={fichaSeleccionada}
+            onChange={handleFichaChange}
+            required
           >
-            {horarios.map((hora) => (
-              <SelectItem
-                key={hora.id_horario}
-                value={hora.id_horario.toString()}
-              >
-                {`${hora.id_horario} - ${hora.dia} - ${hora.ficha} - (${hora.hora_inicio} a ${hora.hora_fin})`}
-              </SelectItem>
+            <option value="">Seleccionar Ficha</option>
+            {fichas.map((ficha) => (
+              <option key={ficha.id_ficha} value={ficha.id_ficha}>
+                {ficha.codigo}
+              </option>
             ))}
-          </Select>
-          <Input
-            className="mt-4"
-            label="Horario Seleccionado"
-            value={
-              selectedHorario
-                ? `${selectedHorario.id_horario} - ${selectedHorario.dia} - ${selectedHorario.ficha} - (${selectedHorario.hora_inicio} a ${selectedHorario.hora_fin})`
-                : ""
-            }
-            readOnly
-            color={horario ? "success" : "default"}
-          />
+          </select>
         </div>
+
+        {/* Mostrar horarios si existen, sino mostrar un mensaje */}
+        {noHorarios ? (
+          <div className="text-red-500 mt-2">
+            No hay horarios asociados a esta ficha.
+          </div>
+        ) : (
+          <div className="flex flex-col mt-4">
+            <Select
+              name="horario"
+              placeholder="Selecciona el horario"
+              value={horario}
+              onChange={(e) => setHorario(e.target.value)}
+            >
+              {horarios.map((hora) => (
+                <SelectItem key={hora.id_horario} value={hora.id_horario.toString()}>
+                  {`${hora.id_horario} - ${hora.dia} - ${hora.ficha} - (${hora.hora_inicio} a ${hora.hora_fin})`}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+        )}
 
         <div className="flex justify-end gap-5 mt-5">
           <Button type="submit" className="bg-[#92d22e] text-white" color="success">

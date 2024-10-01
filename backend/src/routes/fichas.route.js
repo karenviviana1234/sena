@@ -5,7 +5,8 @@ import { validarToken } from './../controllers/seguridad.controller.js'
 
 const rutaFichas = Router()
 
-rutaFichas.get('/listar', validarToken, listarFichas)
+rutaFichas.get('/listar', /* validarToken, */ listarFichas)
+
 rutaFichas.get('/listar/:id', validarToken, obtenerFichaPorId)
 rutaFichas.get('/listarC', validarToken, listarCodigo)
 rutaFichas.post('/registrar', validarToken, registrarFichas)

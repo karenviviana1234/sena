@@ -43,7 +43,6 @@ export const listarActividades = async (req, res) => {
             JOIN horarios h ON a.horario = h.id_horario  -- Relacionar actividades con horarios por id_horario
             WHERE a.instructor = ?  -- Filtrar por el ID del instructor
             AND a.estado = 'Activo'  -- Solo actividades activas
-
         `;
 
         const [results] = await pool.query(sql, [id_persona]);

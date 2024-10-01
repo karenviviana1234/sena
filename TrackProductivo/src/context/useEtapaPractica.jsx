@@ -37,7 +37,7 @@ const useEtapaPractica = () => {
     const handleSubmitEditar = async (data) => {
         setError(null);
         try {
-            await axiosClient.put(`/productiva/${data.id_productiva}`, data);
+            await axiosClient.put(`/productiva/actualizar/${data.id_productiva}`, data);
             setIsOpenModalEditar(false);
             obtenerEtapas();
         } catch (error) {

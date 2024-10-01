@@ -1,4 +1,6 @@
 import { pool } from "../database/conexion.js";
+
+
 export const listarHorarios = async (req, res) => {
     try {
         let sql = `
@@ -22,6 +24,43 @@ export const listarHorarios = async (req, res) => {
         });
     }
 };
+
+//* Listar los horarios de las fichas  */
+export const listarHorariosPorFicha = async (req, res) => {
+    const { codigo } = req.params; // Recibimos el ID de la ficha como parámetro
+  
+    if (!codigo) {
+      return res.status(400).json({
+        message: 'El ID de la ficha es obligatorio.',
+      });
+    }
+  
+    try {
+      // Consulta SQL para obtener los horarios asociados a la ficha especificada
+      const sql = `
+        SELECT h.*, f.*
+        FROM horarios h
+        INNER JOIN fichas f ON h.ficha = f.codigo
+        WHERE h.ficha = ? AND h.estado = 1
+      `;
+      
+      const [results] = await pool.query(sql, [codigo]);
+  
+      if (results.length > 0) {
+        res.status(200).json(results);
+      } else {
+        res.status(404).json({
+          message: 'No se encontraron horarios asociados a esta ficha.',
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error del servidor: ' + error.message,
+      });
+    }
+  };
+  
+/* fin */
 
 export const ActualizarHorarios = async (req, res) => {
     const { id_horario } = req.params;

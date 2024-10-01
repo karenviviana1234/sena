@@ -4,8 +4,13 @@ import FormEtapaPractica from '../molecules/Productivas/FormEtapaPractica';
 import useEtapaPractica from '../../context/useEtapaPractica';
 import PersonasContext from '../../context/PersonasContext';
 import ButtonActualizar from '../atoms/ButtonActualizar';
+import ModalAcciones from '../molecules/ComponentsGlobals/ModalAcciones';
 
 function TablePractica() {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalContent, setModalContent] = useState(null);
+    const [initialData, setInitialData] = useState(null);
+
     const {
         etapas,
         isOpenModalRegistro,
@@ -31,6 +36,51 @@ function TablePractica() {
         return `${year}-${month}-${day}`;
     };
 
+    const handleOpenModal = (formType, data = null) => {
+        if (formType === 'productiva') {
+            setModalContent(
+                <FormEtapaPractica
+                    initialData={data}
+                    onSubmit={handleFormPracticaSubmit}
+                    onClose={handleCloseModal}
+                    mode={data ? 'update' : 'create'}
+                />
+            );
+        }
+        setModalOpen(true);
+    };
+
+    const handleCloseModal = async () => {
+        setModalOpen(false);
+        setInitialData(null);
+        setModalContent(null);
+        await peticionGet();
+    };
+
+    const handleFormPracticaSubmit = async (formData) => {
+        try {
+            // Verifica que id_asignacion esté presente en formData antes de realizar la operación
+            if (formData.id_productiva) {
+                const response = await axiosClient.put(`/productiva/actualizar/${formData.id_productiva}`, formData);
+                console.log('Respuesta del servidor:', response.data);
+            } else {
+                const response = await axiosClient.post('/productiva/registrar', formData);
+                console.log('Respuesta del servidor:', response.data);
+            }
+            handleCloseModal();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleToggle = (initialData) => {
+        if (initialData) {
+            setInitialData(initialData);
+            setInitialData(initialData.id_productiva); // Asegúrate que este ID exista
+            handleOpenModal('productiva', initialData);
+        }
+    };
+
     const handleEditEtapa = (etapa) => {
         setSelectedEtapa(etapa);
         setIsOpenModalEditar(true);
@@ -38,7 +88,7 @@ function TablePractica() {
 
     const renderActions = (etapa) => (
         <div className="flex gap-2">
-            <ButtonActualizar onClick={() => handleEditEtapa(etapa)}>Editar</ButtonActualizar>
+            <ButtonActualizar onClick={() => handleToggle(etapa)}>Editar</ButtonActualizar>
         </div>
     );
     
@@ -72,9 +122,11 @@ function TablePractica() {
                 </div>
             </div>
 
-            <Button className="bg-[#0d324c] text-white font-bold py-2 px-4 rounded-xl mb-4" onClick={() => setIsOpenModalRegistro(true)}>Registrar nueva etapa</Button>
+            <Button 
+            className="bg-[#0d324c] text-white font-bold py-2 px-4 rounded-xl mb-4" 
+            onClick={() => handleOpenModal('productiva')}>Registrar nueva etapa</Button>
 
-            <Modal open={isOpenModalRegistro} onClose={() => setIsOpenModalRegistro(false)} className="max-w-md" >
+{/*             <Modal open={isOpenModalRegistro} onClose={() => setIsOpenModalRegistro(false)} className="max-w-md" >
                 <FormEtapaPractica
                     open={isOpenModalRegistro}
                     onClose={() => setIsOpenModalRegistro(false)}
@@ -89,7 +141,7 @@ function TablePractica() {
                     onSubmit={handleSubmitEditar}
                     initialValues={selectedEtapa}
                 />
-            </Modal>
+            </Modal> */}
 
             <Table aria-label="Table with dynamic content height" className="w-full">
                 <TableHeader className="bg-gray-100">
@@ -125,6 +177,12 @@ function TablePractica() {
                     )}
                 </TableBody>
             </Table>
+            <ModalAcciones
+                isOpen={modalOpen}
+                onClose={handleCloseModal}
+                title={initialData ? "Actualizar Productiva" : "Registrar Productiva"}
+                bodyContent={modalContent}
+            />
         </div>
     );
 }
