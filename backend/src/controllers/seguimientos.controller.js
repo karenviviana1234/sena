@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Función para listar seguimientos
-export const listarSeguimiento = async (req, res) => {
+export const  listarSeguimiento = async (req, res) => {
     try {
         const sql = `SELECT * FROM seguimientos`;
         const [result] = await pool.query(sql);
@@ -314,7 +314,6 @@ export const uploadPdfToSeguimiento = async (req, res) => {
     }
 };
 
-
 // Función para actualizar seguimientos
 export const actualizarSeguimiento = async (req, res) => {
     try {
@@ -388,48 +387,29 @@ export const rechazarSeguimiento = async (req, res) => {
     }
   };
 
-
-
-
-export const descargarPdf = async (req, res) => {
+  export const descargarPdf = async (req, res) => {
     try {
-        const id_seguimiento = decodeURIComponent(req.params.id_seguimiento);
-
-        // Consultar la bitácora para obtener el nombre del archivo PDF
-        const [result] = await pool.query('SELECT pdf FROM seguimientos WHERE id_seguimiento = ?', [id_seguimiento]);
-
-        if (result.length === 0) {
-            return res.status(404).json({
-                message: 'Bitácora no encontrada'
-            });
-        }
-
-        const pdfFileName = result[0].pdf;
-
-        // Construir la ruta correcta hacia la carpeta public
-        const filePath = path.resolve(__dirname, '../../public/seguimientos', pdfFileName);
-
-        console.log(`Intentando acceder al archivo en: ${filePath}`); // Mensaje de depuración
-
-        // Verificar si el archivo existe
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({
-                message: `Archivo no encontrado en la ruta: ${filePath}`
-            });
-        }
-
-        // Enviar el archivo como respuesta
-        res.download(filePath, pdfFileName);
+      const id_seguimiento = decodeURIComponent(req.params.id_seguimiento);
+      const [result] = await pool.query('SELECT pdf FROM seguimientos WHERE id_seguimiento = ?', [id_seguimiento]);
+  
+      if (result.length === 0) {
+        return res.status(404).json({ message: 'Bitácora no encontrada' });
+      }
+  
+      const pdfFileName = result[0].pdf;
+      const filePath = path.resolve(__dirname, '../../public/seguimientos', pdfFileName);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: `Archivo no encontrado en la ruta: ${filePath}` });
+      }
+  
+      res.sendFile(filePath, { headers: { 'Content-Disposition': `attachment; filename="${pdfFileName}"` } });
     } catch (error) {
-        console.error('Error en el servidor:', error); // Mensaje de depuración
-        res.status(500).json({
-            message: 'Error en el servidor: ' + error.message
-        });
+      console.error('Error en el servidor:', error);
+      res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
-};
-
-
-
+  };
+  
   export const listarEstadoSeguimiento = async (req, res) => {
     const { id_seguimiento } = req.params;
     try {

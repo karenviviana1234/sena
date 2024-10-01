@@ -1,42 +1,66 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Modal, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import ActaSeguimiento from '../organismos/ActaSeguimiento.jsx';
-import Bitacoras from '../pages/Bitacoras.jsx';
 import SeguimientosContext from '../../Context/ContextSeguimiento.jsx';
-import axiosClient from '../../axiosClient'; 
+import axiosClient from '../../axiosClient';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import ModalBitacoras from './Modal_Bitacoras.jsx';
 
 const ModalSeguimiento = ({ visible, onClose }) => {
   const { getSeguimiento } = useContext(SeguimientosContext);
   const [idSeguimiento, setIdSeguimiento] = useState(null);
-  const [bitacoras, setBitacoras] = useState([]); 
-  const [error, setError] = useState(null); // Estado para manejar errores
+  const [bitacoras, setBitacoras] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchIdFromStorage = async () => {
-      const id = await AsyncStorage.getItem('idSeguimiento');
-      if (id) {
-        setIdSeguimiento(id);
-        try {
-          const response = await axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id}`);
-          setBitacoras(response.data);
-          setError(null); // Resetear el error si la solicitud es exitosa
-        } catch (err) {
-          // setError(`Error al obtener el seguimiento: ${err.message}`);
-          setBitacoras([]); // Limpiar las bitácoras en caso de error
-        }
+  const fetchBitacoras = useCallback(async (id) => {
+    if (id) {
+      try {
+        const response = await axiosClient.get(`/bitacoras/bitacorasSeguimiento/${id}`);
+        setBitacoras(response.data);
+        setError(null);
+      } catch (err) {
+        setBitacoras([]);
+        setError(`Error al obtener las bitácoras: ${err.message}`);
       }
-    };
-
-    if (visible) { // Solo cargar datos si el modal está visible
-      fetchIdFromStorage();
-    } else {
-      // Reiniciar el estado cuando el modal se cierra
-      setIdSeguimiento(null);
-      setBitacoras([]);
-      setError(null); // Reiniciar el error
     }
-  }, [visible]);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchIdFromStorage = async () => {
+        const id = await AsyncStorage.getItem('idSeguimiento');
+        if (id) {
+          setIdSeguimiento(id);
+          fetchBitacoras(id);
+        }
+      };
+
+      if (visible) {
+        fetchIdFromStorage();
+      }
+
+      return () => {
+        if (!visible) {
+          setIdSeguimiento(null);
+          setBitacoras([]);
+          setError(null);
+        }
+      };
+    }, [visible, fetchBitacoras])
+  );
+
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    // Refresh bitacoras list when modal is closed
+    fetchBitacoras(idSeguimiento);
+  };
 
   if (!visible) {
     return null;
@@ -60,9 +84,16 @@ const ModalSeguimiento = ({ visible, onClose }) => {
               <ActaSeguimiento id_seguimiento={idSeguimiento} />
             </View>
             <View style={styles.sectionContainer}>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button} onPress={handleOpenModal}>
+                  <Icon name="upload" size={20} color="#fff" style={styles.icon} />
+                  <Text style={styles.buttonText}>Subir Bitácora</Text>
+                </TouchableOpacity>
+              </View>
               <Text style={styles.subTitle}>Bitácoras</Text>
+
               {error ? (
-                <Text style={styles.errorText}>{error}</Text> // Mostrar el mensaje de error
+                <Text style={styles.errorText}>{error}</Text>
               ) : bitacoras.length > 0 ? (
                 bitacoras.map((bitacora) => (
                   <View key={bitacora.id_bitacora} style={styles.bitacoraItem}>
@@ -78,12 +109,14 @@ const ModalSeguimiento = ({ visible, onClose }) => {
                 <Text style={styles.noBitacorasText}>No hay bitácoras disponibles.</Text>
               )}
             </View>
-            <View style={styles.sectionContainer}>
-              <Bitacoras id_seguimiento={idSeguimiento} />
-            </View>
           </ScrollView>
         </View>
       </View>
+      <ModalBitacoras
+        visible={modalVisible}
+        onClose={handleCloseModal}
+        idSeguimiento={idSeguimiento}
+      />
     </Modal>
   );
 };
@@ -148,6 +181,30 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  buttonContainer: {
+    alignItems: 'flex-end',
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  buttonText: {
+    color: '#fff',
+    marginLeft: 10,
+  },
+  icon: {
+    marginRight: 5,
   },
 });
 
