@@ -187,7 +187,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
           </div>
         </div>
 
-        {/* Select para Fichas */}
+        {/* Select para Fichas de la base de datos*/}
         <div className="py-2">
           <select
             className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500"
