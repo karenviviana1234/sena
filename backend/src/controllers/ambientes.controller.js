@@ -28,11 +28,11 @@ export const registrarAmbientes = async (req, res) => {
 
         const [rows] = await pool.query(sql, [nombre_amb, municipio, sede])
 
-        if(rows.affectedRows>0){
+        if(rows.affectedRows > 0){
             res.status(200).json({
                 message: 'Ambiente registrado correctamente'
             })
-        }else{
+        } else {
             res.status(403).json({
                 message: 'Error al registrar el ambiente'
             })
@@ -43,6 +43,7 @@ export const registrarAmbientes = async (req, res) => {
         })
     }
 }
+
 
 export const actualizarAmbientes = async (req, res) => {
     try {
