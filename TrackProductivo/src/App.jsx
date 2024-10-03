@@ -153,9 +153,7 @@ export function WithSidebar({ children }) {
           <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Productivas" />
         )}
         <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimientos" />
-        {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
-          <SidebarItem nav="/estadisticas" icon={<BarChart3Icon size={20} />} text="Estadisticas" />
-        )}
+       
       </Sidebar>
       <div className="w-full bg-white h-screen overflow-auto">
         <Navbar2 />
