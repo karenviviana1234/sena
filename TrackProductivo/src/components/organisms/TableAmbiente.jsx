@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import GlobalTable from '../molecules/ComponentsGlobals/GlobalTable';
 import RegistroAmbiente from './FormAmbiente';
 import ActualizarAmbiente from './ActualizarAmbiente';
