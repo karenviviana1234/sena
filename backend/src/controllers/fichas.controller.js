@@ -14,7 +14,7 @@ export const listarFichas = async (req, res) => {
             INNER JOIN 
                 programas p ON f.programa = p.id_programa
             LEFT JOIN 
-                personas i ON f.instructor_lider = i.id_persona  -- Unir con la tabla personas
+                personas i ON f.lider = i.id_persona  -- Unir con la tabla personas
             WHERE 
                 f.estado IN (1, 2)  -- Filtrar solo las fichas con estado 1 o 2
         `;
@@ -67,12 +67,12 @@ export const actualizarFicha = async (req, res) => {
     console.log('Datos recibidos:', req.body);
 
     const { codigo } = req.params;
-    const { inicio_ficha, instructor_lider, fin_lectiva, fin_ficha, programa, sede, estado } = req.body;
+    const { inicio_ficha, lider, fin_lectiva, fin_ficha, programa, sede, estado } = req.body;
 
     const sql = `
         UPDATE fichas SET 
         inicio_ficha = ?,
-        instructor_lider = ?,
+        lider = ?,
         fin_lectiva = ?, 
         fin_ficha = ?, 
         programa = ?, 
@@ -81,7 +81,7 @@ export const actualizarFicha = async (req, res) => {
         WHERE codigo = ?
     `;
     try {
-        const [result] = await pool.query(sql, [inicio_ficha, instructor_lider, fin_lectiva, fin_ficha, programa, sede, estado, codigo]);
+        const [result] = await pool.query(sql, [inicio_ficha, lider, fin_lectiva, fin_ficha, programa, sede, estado, codigo]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'No se encontró la ficha para actualizar' });
@@ -94,13 +94,13 @@ export const actualizarFicha = async (req, res) => {
 };
 export const registrarFichas = async (req, res) => {
     try {
-        const { codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, instructor_lider } = req.body; // Agregamos instructor_lider
+        const { codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, lider } = req.body; // Agregamos lider
 
-        // Modificamos la consulta SQL para incluir instructor_lider
-        let sql = `INSERT INTO fichas (codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, instructor_lider, estado) VALUES (?, ?, ?, ?, ?, ?, ?, 1)`;
+        // Modificamos la consulta SQL para incluir lider
+        let sql = `INSERT INTO fichas (codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, lider, estado) VALUES (?, ?, ?, ?, ?, ?, ?, 1)`;
 
-        // Incluimos instructor_lider en el arreglo de parámetros de la consulta
-        const [rows] = await pool.query(sql, [codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, instructor_lider]);
+        // Incluimos lider en el arreglo de parámetros de la consulta
+        const [rows] = await pool.query(sql, [codigo, inicio_ficha, fin_lectiva, fin_ficha, programa, sede, lider]);
 
         if(rows.affectedRows > 0) {
             res.status(200).json({
@@ -175,7 +175,7 @@ export const listarCodigo = async (req, res) => {
         if (rol === 'Lider') {
             // Si es un líder, listar solo las fichas donde es instructor líder
             console.log('Instructor líder logueado:', userId);
-            sql = `SELECT codigo FROM fichas WHERE instructor_lider = ?`;
+            sql = `SELECT codigo FROM fichas WHERE lider = ?`;
             params = [userId]; // Filtrar por el ID del instructor líder
         } else {
             // Si es otro rol, listar todos los códigos de las fichas
