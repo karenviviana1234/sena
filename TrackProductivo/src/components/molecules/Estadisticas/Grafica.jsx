@@ -36,7 +36,7 @@ function Grafica() {
         },
         title: {
           align: 'left',
-          text: 'Resumen del Estado de las Etapas Productivas: Iniciadas, Terminadas y Renunciadas',
+          text: 'Etapas Productivas',
         },
         accessibility: {
           announceNewData: {
@@ -100,7 +100,7 @@ function Grafica() {
     }
   }, [data, total]);
 
-  return <div id="container" style={{ width: '100%', height: '400px' }}></div>;
+  return <div id="container" style={{ width: '400px', height: '400px' }}></div>;
 }
 
 export default Grafica;

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button, User } from "@nextui-org/react";
+import { Button, User, Checkbox } from "@nextui-org/react";
 import Swal from 'sweetalert2';
 import axiosClient from "../../../configs/axiosClient";
 
 function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
     const [aprendices, setAprendices] = useState([]);
     const [estado, setEstado] = useState("");
-    const [aprendizSeleccionado, setAprendizSeleccionado] = useState("");
+    const [aprendizSeleccionado, setAprendizSeleccionado] = useState(null);
     const [idMatricula, setMatriculaId] = useState(null);
     const [pendientesTecnicos, setPendientesTecnicos] = useState(0);
     const [pendientesTransversales, setPendientesTransversales] = useState(0);
@@ -31,7 +31,7 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
         if (initialData) {
             setMatriculaId(initialData.id_matricula);
             setEstado(initialData.estado || "Selecciona");
-            setAprendizSeleccionado(initialData.id_persona || "");
+            setAprendizSeleccionado(initialData.id_persona || null);
             setPendientesTecnicos(initialData.pendientes_tecnicos ?? 0);
             setPendientesTransversales(initialData.pendientes_transversales ?? 0);
             setPendienteIngles(initialData.pendiente_ingles ?? 0);
@@ -41,14 +41,12 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
         }
     }, [initialData]);
 
-    const handleAprendizClick = (id_persona) => {
-        setAprendizSeleccionado(id_persona); // Establece el ID del aprendiz seleccionado
-
+    const handleCheckboxChange = (id_persona) => {
+        setAprendizSeleccionado(id_persona === aprendizSeleccionado ? null : id_persona);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         setErrors({});
 
         if (estado === 'Selecciona') {
@@ -120,24 +118,32 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                     <option value="Certificado">Certificado</option>
                 </select>
 
+                {/* Mostrar la lista de aprendices solo al registrar */}
                 {!isEditing && (
-                    <h2 className="text-lg font-semibold">Selecciona un Aprendiz</h2>
+                    <>
+                        <h2 className="text-lg font-semibold mb-5">Selecciona un Aprendiz</h2>
+                        {aprendices.map((aprendiz) => (
+                            <Checkbox
+                                key={aprendiz.id_persona}
+                                isSelected={aprendizSeleccionado === aprendiz.id_persona}
+                                onValueChange={() => handleCheckboxChange(aprendiz.id_persona)}
+                                aria-label={aprendiz.nombres}
+                                classNames={{
+                                    base: "inline-flex  h-14 mr-1 ml-1 max-w-md bg-content1 hover:bg-content2 items-center justify-start cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent data-[selected=true]:border-[#0d324c]",
+                                    label: "w-full",
+                                }}
+                            >
+                                <div className="w-full flex justify-between gap-2">
+                                    <User
+                                        avatarProps={{ radius: "full" }}
+                                        description={aprendiz.correo}
+                                        name={aprendiz.nombres}
+                                    />
+                                </div>
+                            </Checkbox>
+                        ))}
+                    </>
                 )}
-                {aprendices.map((aprendiz) => (
-                    <div
-                        key={aprendiz.id_persona}
-                        className={`flex items-center mt-2 p-2 rounded-lg cursor-pointer hover:bg-gray-200 
-                                ${aprendizSeleccionado === aprendiz.id_persona ? 'border-2 border-green-500' : ''}`}
-                        onClick={() => handleAprendizClick(aprendiz.id_persona, aprendiz.nombres)}
-                    >
-                        <User
-                            avatarProps={{ radius: "lg" }}
-                            description={aprendiz.correo}
-                            name={aprendiz.nombres}
-                        />
-                    </div>
-                ))}
-
 
                 {isEditing && (
                     <>
