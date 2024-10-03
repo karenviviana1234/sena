@@ -11,3 +11,5 @@ rutaAmbientes.put("/activar/:id", validarToken, activarAmbiente);
 rutaAmbientes.put("/inactivar/:id", validarToken, inactivarAmbiente);
 
 export default rutaAmbientes;
+
+//comentario random borrenlo

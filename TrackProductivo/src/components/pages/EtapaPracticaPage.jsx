@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import TableEmpresas from "../organisms/TableEmpresa";
-import TableEtapaPractica from "../organisms/TablePractica";
-import AsignacionPage from "../pages/AsignacionPage";
+import TableProductiva from "../organisms/TablePractica";
 
 function EtapaPracticaPage() {
     const [userRole, setUserRole] = useState(null);
@@ -29,13 +28,8 @@ function EtapaPracticaPage() {
                         <TableEmpresas />
                     </Tab>
                     <Tab key= "instrutor" title="Etapa Practica">
-                        <TableEtapaPractica />
+                        <TableProductiva />
                     </Tab>
-                    {(userRol !== 'Lider') && (
-                    <Tab title="Asignaciones">
-                        <AsignacionPage />
-                    </Tab>
-                    )}
                 </Tabs>
             </div>
         </>

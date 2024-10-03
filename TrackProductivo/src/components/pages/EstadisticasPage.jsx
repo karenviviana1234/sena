@@ -3,7 +3,7 @@ import Grafica from '../molecules/Estadisticas/Grafica'
 
 function HomePage() {
   return (
-    <div className='bg-slate-200 m-20 h-96 rounded-2xl'>
+    <div className='bg-slate-200 m-20 h-96'>
       <Grafica/>
     </div>
   )
