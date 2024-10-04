@@ -316,3 +316,35 @@ export const descargarPdfBitacora = async (req, res) => {
         });
     }
 };
+export const contarEstadosBitacoras = async (req, res) => {
+    try {
+        // Consulta SQL para contar bitácoras agrupadas por estado
+        let sql = `
+            SELECT estado, COUNT(*) AS total
+            FROM bitacoras
+            GROUP BY estado
+        `;
+
+        const [result] = await pool.query(sql);
+
+        // Modificar el estado "no aprobado" a "noaprobado"
+        const modifiedResult = result.map(item => {
+            if (item.estado === 'no aprobado') {
+                return { ...item, estado: 'noaprobado' };
+            }
+            return item;
+        });
+
+        if (modifiedResult.length > 0) {
+            res.status(200).json(modifiedResult);
+        } else {
+            res.status(404).json({
+                message: 'No hay bitácoras registradas'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error.message
+        });
+    }
+};

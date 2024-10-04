@@ -2,23 +2,29 @@ import { pool } from "../database/conexion.js";
 
 export const listarAmbientes = async (req, res) => {
     try {
-        let sql = `SELECT * FROM ambientes`
+        // Aquí se une la tabla ambientes con la tabla municipios usando la clave foránea
+        let sql = `
+            SELECT ambientes.*, municipios.nombre_mpio 
+            FROM ambientes 
+            LEFT JOIN municipios ON ambientes.municipio = municipios.id_municipio
+        `;
 
-        const [results] = await pool.query(sql)
+        const [results] = await pool.query(sql);
         
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
                 message: 'No hay ambientes registrados'
-            })
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
 }
+
 
 export const registrarAmbientes = async (req, res) => {
     try {

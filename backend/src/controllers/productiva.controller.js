@@ -42,7 +42,6 @@ export const listarProductiva = async (req, res) => {
 };
 
 
-
 export const contarProductivasPorEstado = async (req, res) => {
     try {
         // Consulta SQL para contar la cantidad de registros por estado

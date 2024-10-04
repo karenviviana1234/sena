@@ -28,6 +28,70 @@ export const listarAprendices = async (req, res) => {
     }
 };
 
+export const contarMatriculasPorEstado = async (req, res) => {
+    try {
+        // Consulta SQL para contar la cantidad de matrículas por estado
+        const sql = `
+            SELECT 
+                estado, 
+                COUNT(*) AS total
+            FROM 
+                matriculas
+            GROUP BY 
+                estado
+        `;
+
+        const [results] = await pool.query(sql);
+
+        // Mapeo de los resultados a un formato más legible
+        const conteoPorEstado = {
+            Induccion: 0,
+            Formacion: 0,
+            Condicionado: 0,
+            Cancelado: 0,
+            RetiroVoluntario: 0,
+            PorCertificar: 0,
+            Certificado: 0
+        };
+
+        // Asignar los resultados de la consulta al conteo correspondiente
+        results.forEach(row => {
+            switch (row.estado) {
+                case 'Inducción':
+                    conteoPorEstado.Induccion = row.total;
+                    break;
+                case 'Formación':
+                    conteoPorEstado.Formacion = row.total;
+                    break;
+                case 'Condicionado':
+                    conteoPorEstado.Condicionado = row.total;
+                    break;
+                case 'Cancelado':
+                    conteoPorEstado.Cancelado = row.total;
+                    break;
+                case 'Retiro Voluntario':
+                    conteoPorEstado.RetiroVoluntario = row.total;
+                    break;
+                case 'Por Certificar':
+                    conteoPorEstado.PorCertificar = row.total;
+                    break;
+                case 'Certificado':
+                    conteoPorEstado.Certificado = row.total;
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        res.status(200).json(conteoPorEstado);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor: ' + error.message
+        });
+    }
+};
+
+
 export const listarMatriculas = async (req, res) => {
     const { codigo } = req.params; // Obtener el parámetro id_ficha de la URL
 
