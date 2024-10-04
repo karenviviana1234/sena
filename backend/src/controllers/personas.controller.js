@@ -3,22 +3,30 @@ import bcrypt from 'bcrypt'
 
 export const listarPersonas = async (req, res) => {
   try {
-    let sql = `SELECT * FROM personas`
-    const [results] = await pool.query(sql)
+    // Realizamos la consulta para obtener todas las personas
+    let sql = `SELECT * FROM personas`;
+    const [results] = await pool.query(sql);
 
-    if (results.length > 0) {
-      res.status(200).json(results)
+    // Contamos el total de personas
+    const total = results.length;
+
+    if (total > 0) {
+      res.status(200).json({
+        total: total, // Devolvemos el total de personas
+        personas: results // Devolvemos la lista de personas
+      });
     } else {
       res.status(404).json({
         message: 'No hay personas registradas'
-      })
+      });
     }
   } catch (error) {
     res.status(500).json({
-      message: 'Error del servidor' + error
-    })
+      message: 'Error del servidor: ' + error.message // Agregamos un mensaje más claro
+    });
   }
-}
+};
+
 
 
 

@@ -14,7 +14,6 @@ import NominaPage from './components/pages/NominaPage.jsx';
 import MatriculasPage from './components/pages/MatriculasPage.jsx';
 
 import SeguimientoPage from './components/pages/SeguimientoPage.jsx';
-import EstadisticasPage from './components/pages/EstadisticasPage.jsx';
 import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
@@ -93,13 +92,7 @@ export const App = () => {
             </ProtectedRoute>
           } />
 
-          <Route path="/estadisticas" element={
-            <ProtectedRoute>
-              <WithSidebar>
-                <EstadisticasPage />
-              </WithSidebar>
-            </ProtectedRoute>
-          } />
+        
 
           <Route path="/reportes" element={
             <ProtectedRoute>
