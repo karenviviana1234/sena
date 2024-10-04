@@ -6,9 +6,9 @@ const rutaAmbientes = Router();
 
 rutaAmbientes.get("/listar", validarToken, listarAmbientes);
 rutaAmbientes.post("/registrar", validarToken, registrarAmbientes);
-rutaAmbientes.put("/actualizar/:id", validarToken, actualizarAmbientes);
-rutaAmbientes.put("/activar/:id", validarToken, activarAmbiente);
-rutaAmbientes.put("/inactivar/:id", validarToken, inactivarAmbiente);
+rutaAmbientes.put("/actualizar/:id_ambiente", validarToken, actualizarAmbientes);
+rutaAmbientes.put("/activar/:id_ambiente", validarToken, activarAmbiente);
+rutaAmbientes.put("/inactivar/:id_ambiente", validarToken, inactivarAmbiente);
 
 export default rutaAmbientes;
 

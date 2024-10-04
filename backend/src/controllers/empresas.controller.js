@@ -46,33 +46,34 @@ export const listarEmpresas = async (req, res) => {
   /* listar por el municipio */
   // controllers/empresaController.js
 
-export const listarEmpresasPorMunicipio = async (req, res) => {
-  const { municipioId } = req.params; // Recibimos el ID del municipio como parámetro
-
-  try {
-    // Consulta SQL para obtener empresas del municipio especificado
-    const sql = `
-      SELECT e.*, m.*
-      FROM empresas e
-      INNER JOIN municipios m ON e.municipio = m.id_municipio
-      WHERE e.municipio = ? AND e.estado = 1
-    `;
-    
-    const [results] = await pool.query(sql, [municipioId]);
-
-    if (results.length > 0) {
-      res.status(200).json(results);
-    } else {
-      res.status(404).json({
-        message: 'No se encontraron empresas registradas en este municipio.'
+  export const listarEmpresasPorMunicipio = async (req, res) => {
+    const { municipioId } = req.params;
+    console.log("Municipio ID recibido:", municipioId); // Depuración
+  
+    try {
+      const sql = `
+        SELECT e.*, m.*
+        FROM empresas e
+        INNER JOIN municipios m ON e.municipio = m.id_municipio
+        WHERE e.municipio = ? AND e.estado = 1
+      `;
+      
+      const [results] = await pool.query(sql, [municipioId]);
+  
+      if (results.length > 0) {
+        res.status(200).json(results);
+      } else {
+        res.status(404).json({
+          message: 'No se encontraron empresas registradas en este municipio.'
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error del servidor: ' + error.message
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      message: 'Error del servidor: ' + error.message
-    });
-  }
-};
+  };
+  
 
 
 

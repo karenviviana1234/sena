@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, ModalContent, ModalHeader, ModalFooter, Button } from '@nextui-org/react';
-import FormEtapaPractica from './FormEtapaPractica';
+import FormProductiva from '../molecules/Productivas/FormEtapaPractica';
 
 function ModalEtapaPractica({ isOpen, onClose, etapa, onSave }) {
     return (
@@ -9,7 +9,7 @@ function ModalEtapaPractica({ isOpen, onClose, etapa, onSave }) {
                 <ModalHeader>
                     {etapa ? 'Editar Etapa Práctica' : 'Agregar Etapa Práctica'}
                 </ModalHeader>
-                <FormEtapaPractica etapa={etapa} onSave={onSave} />
+                <FormProductiva etapa={etapa} onSave={onSave} />
                 <ModalFooter>
                     <div className="flex justify-between items-center">
                         <Button onClick={onClose}>Cancelar</Button>

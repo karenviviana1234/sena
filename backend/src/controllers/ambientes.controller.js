@@ -2,28 +2,38 @@ import { pool } from "../database/conexion.js";
 
 export const listarAmbientes = async (req, res) => {
     try {
-        // Aquí se une la tabla ambientes con la tabla municipios usando la clave foránea
         let sql = `
-            SELECT ambientes.*, municipios.nombre_mpio 
-            FROM ambientes 
-            LEFT JOIN municipios ON ambientes.municipio = municipios.id_municipio
+          SELECT 
+    a.id_ambiente,
+    a.nombre_amb, 
+    m.nombre_mpio as municipio,  
+    a.sede,
+    a.estado
+FROM 
+    ambientes a
+LEFT JOIN 
+    municipios m ON a.municipio = m.id_municipio
+
         `;
 
         const [results] = await pool.query(sql);
-        
+
         if (results.length > 0) {
             res.status(200).json(results);
         } else {
             res.status(404).json({
                 message: 'No hay ambientes registrados'
             });
+            });
         }
     } catch (error) {
         res.status(500).json({
             message: 'Error del servidor: ' + error
         });
+            message: 'Error del servidor: ' + error
+        });
     }
-}
+};
 
 
 export const registrarAmbientes = async (req, res) => {
@@ -34,10 +44,11 @@ export const registrarAmbientes = async (req, res) => {
 
         const [rows] = await pool.query(sql, [nombre_amb, municipio, sede])
 
-        if(rows.affectedRows > 0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Ambiente registrado correctamente'
             })
+        } else {
         } else {
             res.status(403).json({
                 message: 'Error al registrar el ambiente'
@@ -53,7 +64,7 @@ export const registrarAmbientes = async (req, res) => {
 
 export const actualizarAmbientes = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id_ambiente } = req.params
         const { nombre_amb, municipio, sede } = req.body
 
         let sql = `UPDATE ambientes SET
@@ -63,13 +74,13 @@ export const actualizarAmbientes = async (req, res) => {
                     
                     WHERE id_ambiente = ?`
 
-        const [rows] = await pool.query(sql, [nombre_amb, municipio, sede, id])
+        const [rows] = await pool.query(sql, [nombre_amb, municipio, sede, id_ambiente])
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Ambiente actualizado correctamente'
             })
-        }else{
+        } else {
             res.status(403).json({
                 message: 'Error al actualizar el ambiente'
             })
@@ -83,17 +94,17 @@ export const actualizarAmbientes = async (req, res) => {
 
 export const activarAmbiente = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id_ambiente } = req.params
 
         let sql = `UPDATE ambientes SET estado = 1 WHERE id_ambiente = ?`
 
-        const [rows] = await pool.query(sql, [id])
+        const [rows] = await pool.query(sql, [id_ambiente])
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Ambiente activado correctamente'
             })
-        }else{
+        } else {
             res.status(403).json({
                 message: 'Error al activar el ambiente'
             })
@@ -107,17 +118,17 @@ export const activarAmbiente = async (req, res) => {
 
 export const inactivarAmbiente = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id_ambiente } = req.params
 
         let sql = `UPDATE ambientes SET estado = 2 WHERE id_ambiente = ?`
 
-        const [rows] = await pool.query(sql, [id])
+        const [rows] = await pool.query(sql, [id_ambiente])
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Ambiente inactivo correctamente'
             })
-        }else{
+        } else {
             res.status(403).json({
                 message: 'Error al inactivar el ambiente'
             })
