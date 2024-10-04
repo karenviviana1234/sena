@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs, Tab } from "@nextui-org/react";
 import TableFichas from "../organisms/TableFichas";
 import TableHorarios from "../organisms/TableHorario";
+import TableAmbiente from '../organisms/TableAmbiente';
 
 function FichasPage() {
   return ( 
@@ -13,6 +14,9 @@ function FichasPage() {
             </Tab>
             <Tab key="horarios" title="Horarios">
               <TableHorarios />
+            </Tab>
+            <Tab key="ambientes" title="Ambientes">
+              <TableAmbiente />
             </Tab>
         </Tabs>
     </div>

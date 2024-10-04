@@ -59,6 +59,25 @@ export const listarMatriculas = async (req, res) => {
     }
 };
 
+export const listar = async (req, res) => {
+    try {
+        let sql = `SELECT * FROM matriculas`
+
+        const [results] = await pool.query(sql)
+
+        if(results.length>0){
+            res.status(200).json(results)
+        }else{
+            res.status(404).json({
+                message: 'No hay matriculas registradas'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor' + error
+        })
+    }
+}
 
 
 export const registrarMatriculas = async (req, res) => {

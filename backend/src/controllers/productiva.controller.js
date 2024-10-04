@@ -136,7 +136,7 @@ export const registrarProductiva = async (req, res) => {
             });
         }
 
-        // Registrar etapa productiva, ahora incluyendo el ID del aprendiz
+        // Registrar etapa productiva, incluyendo el ID del aprendiz
         const sqlProductiva = `
             INSERT INTO productivas
             (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
@@ -235,6 +235,7 @@ export const registrarProductiva = async (req, res) => {
         });
     }
 };
+
 
 
 
