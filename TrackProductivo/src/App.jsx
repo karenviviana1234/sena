@@ -14,7 +14,6 @@ import NominaPage from './components/pages/NominaPage.jsx';
 import MatriculasPage from './components/pages/MatriculasPage.jsx';
 
 import SeguimientoPage from './components/pages/SeguimientoPage.jsx';
-import EstadisticasPage from './components/pages/EstadisticasPage.jsx';
 import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
@@ -93,13 +92,7 @@ export const App = () => {
             </ProtectedRoute>
           } />
 
-          <Route path="/estadisticas" element={
-            <ProtectedRoute>
-              <WithSidebar>
-                <EstadisticasPage />
-              </WithSidebar>
-            </ProtectedRoute>
-          } />
+        
 
           <Route path="/reportes" element={
             <ProtectedRoute>
@@ -153,9 +146,7 @@ export function WithSidebar({ children }) {
           <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Productivas" />
         )}
         <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimientos" />
-        {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
-          <SidebarItem nav="/estadisticas" icon={<BarChart3Icon size={20} />} text="Estadisticas" />
-        )}
+       
       </Sidebar>
       <div className="w-full bg-white h-screen overflow-auto">
         <Navbar2 />

@@ -12,8 +12,8 @@ function TableFichasPage() {
 
   const columns = [
     { key: 'codigo', label: 'Código' },
-    { key: 'nombre_programa', label: 'Nombre del Programa' },
-    { key: 'nombre_instructor', label: 'Nombre del Instructor' },
+    { key: 'nombre_programa', label: 'Programa' },
+    { key: 'nombre_instructor', label: 'Instructor' },
     { key: 'estado', label: 'Estado' },
     { key: 'inicio_ficha', label: 'Inicio de Ficha' },
     { key: 'fin_lectiva', label: 'Fin de Lectiva' },

@@ -53,12 +53,12 @@ export const listarasignaciones = async (req, res) => {
 export const registrarasignacion = async (req, res) => {
     const connection = await pool.getConnection(); // Obtener conexión manualmente para usar transacciones
     try {
-        const { productiva, actividad } = req.body;
+        const { id_productiva, actividad } = req.body; // Cambié 'productiva' por 'id_productiva'
 
-        if (!actividad || !productiva) {
+        if (!actividad || !id_productiva) { // Cambié 'productiva' por 'id_productiva'
             return res.status(400).json({
                 status: 400,
-                message: "Datos incompletos. Por favor, envíe actividad y productiva."
+                message: "Datos incompletos. Por favor, envíe actividad y id_productiva."
             });
         }
 
@@ -99,7 +99,7 @@ export const registrarasignacion = async (req, res) => {
         // Verificar si la etapa productiva existe
         const [productivaExist] = await connection.query(
             "SELECT * FROM productivas WHERE id_productiva = ?",
-            [productiva]
+            [id_productiva] // Cambié 'productiva' por 'id_productiva'
         );
 
         if (productivaExist.length === 0) {
@@ -112,7 +112,7 @@ export const registrarasignacion = async (req, res) => {
         // Registrar la asignación en la tabla asignaciones
         const [result] = await connection.query(
             "INSERT INTO asignaciones (productiva, actividad) VALUES (?, ?)",
-            [productiva, actividad]
+            [id_productiva, actividad] // Cambié 'productiva' por 'id_productiva'
         );
 
         if (result.affectedRows > 0) {
@@ -122,7 +122,7 @@ export const registrarasignacion = async (req, res) => {
                 SET instructor = ? 
                 WHERE productiva = ?
             `;
-            await connection.query(seguimientoUpdateQuery, [nombreInstructor, productiva]);
+            await connection.query(seguimientoUpdateQuery, [nombreInstructor, id_productiva]); // Cambié 'productiva' por 'id_productiva'
 
             // Actualizar las bitácoras para agregar el nombre del instructor
             const bitacoraUpdateQuery = `
@@ -132,14 +132,14 @@ export const registrarasignacion = async (req, res) => {
                     SELECT id_seguimiento FROM seguimientos WHERE productiva = ?
                 )
             `;
-            await connection.query(bitacoraUpdateQuery, [nombreInstructor, productiva]);
+            await connection.query(bitacoraUpdateQuery, [nombreInstructor, id_productiva]); // Cambié 'productiva' por 'id_productiva'
 
             // Confirmar la transacción
             await connection.commit();
 
             return res.status(200).json({
                 status: 200,
-                message: "Asignación registrada con éxito, incluyendo la actualización de seguimientos y bitacoras."
+                message: "Asignación registrada con éxito, incluyendo la actualización de seguimientos y bitácoras."
             });
         } else {
             return res.status(403).json({
@@ -157,6 +157,7 @@ export const registrarasignacion = async (req, res) => {
         connection.release(); // Liberar la conexión al final
     }
 };
+
 
 
 
@@ -217,7 +218,7 @@ export const actualizarasignacion = async (req, res) => {
         } else {
             return res.status(404).json({
                 status: 404,
-                message: "No se encontró la programación para actualizar o no está autorizado para realizar la actualización."
+                message: "No se encontró la productiva para actualizar o no está autorizado para realizar la actualización."
             });
         }
     } catch (error) {

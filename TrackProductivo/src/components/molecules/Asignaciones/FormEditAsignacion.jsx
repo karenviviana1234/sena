@@ -3,9 +3,10 @@ import { Button } from "@nextui-org/react";
 import Swal from 'sweetalert2';
 import axiosClient from "../../../configs/axiosClient";
 
-function FormRegistroAsignacion({ initialData, onSuccess, id_productiva  }) {
+function FormActualizarAsignacion({ initialData, onSuccess }) {
     const [SelectActividad, setSelectedActividad] = useState("");
     const [actividad, setActividad] = useState([]);
+    const [idAsignacion, setAsignacionId] = useState(initialData?.id_asignacion || null);
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -22,24 +23,26 @@ function FormRegistroAsignacion({ initialData, onSuccess, id_productiva  }) {
     }, []);
 
     useEffect(() => {
-      if (initialData) {
-          setSelectedActividad(initialData.id_actividad || "");
-      }
-  }, [initialData]);
+        if (initialData) {
+            setAsignacionId(initialData.id_asignacion);
+            setSelectedActividad(initialData.id_actividad || "");
+        }
+    }, [initialData]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors({});
 
         const formData = {
-            id_productiva: id_productiva || "DEFAULT_PRODUCTIVA",
+            productiva: initialData?.id_productiva || "DEFAULT_PRODUCTIVA",
             actividad: SelectActividad,
         };
+        
 
         try {
-            await axiosClient.post('/registrar', formData);
-            Swal.fire('Éxito', 'Asignación registrada correctamente', 'success');
-            setSelectedActividad(""); 
+            await axiosClient.put(`/actualizar/${idAsignacion}`, formData);
+            Swal.fire('Éxito', 'Asignación actualizada correctamente', 'success');
+            setSelectedActividad("");
 
             if (onSuccess) onSuccess();
         } catch (error) {
@@ -82,7 +85,7 @@ function FormRegistroAsignacion({ initialData, onSuccess, id_productiva  }) {
 
                 <div className="flex justify-end gap-5 mt-5">
                     <Button className="bg-[#0d324c] text-white" type="submit" color="success">
-                        Registrar
+                        Actualizar
                     </Button>
                 </div>
             </form>
@@ -90,4 +93,4 @@ function FormRegistroAsignacion({ initialData, onSuccess, id_productiva  }) {
     );
 }
 
-export default FormRegistroAsignacion;
+export default FormActualizarAsignacion;

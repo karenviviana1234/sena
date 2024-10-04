@@ -24,9 +24,12 @@ LEFT JOIN
             res.status(404).json({
                 message: 'No hay ambientes registrados'
             });
+            });
         }
     } catch (error) {
         res.status(500).json({
+            message: 'Error del servidor: ' + error
+        });
             message: 'Error del servidor: ' + error
         });
     }
@@ -46,6 +49,7 @@ export const registrarAmbientes = async (req, res) => {
                 message: 'Ambiente registrado correctamente'
             })
         } else {
+        } else {
             res.status(403).json({
                 message: 'Error al registrar el ambiente'
             })
@@ -56,6 +60,7 @@ export const registrarAmbientes = async (req, res) => {
         })
     }
 }
+
 
 export const actualizarAmbientes = async (req, res) => {
     try {
@@ -134,3 +139,5 @@ export const inactivarAmbiente = async (req, res) => {
         })
     }
 }
+
+//comentario random borrenlo

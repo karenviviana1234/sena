@@ -70,7 +70,7 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!fichaData.codigo ||  !fichaData.instructor_lider || !fichaData.inicio_ficha || !fichaData.fin_lectiva || !fichaData.fin_ficha || !fichaData.programa || !fichaData.sede) {
+    if (!fichaData.codigo ||  !fichaData.lider || !fichaData.inicio_ficha || !fichaData.fin_lectiva || !fichaData.fin_ficha || !fichaData.programa || !fichaData.sede) {
       setError("Todos los campos son obligatorios");
       return;
     }
@@ -84,7 +84,7 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
         inicio_ficha: "",
         fin_lectiva: "",
         fin_ficha: "",
-        instructor_lider: "",
+        lider: "",
         programa: "",
         sede: ""
       });
@@ -147,14 +147,14 @@ export const RegistroFicha = ({ onRegisterSuccess }) => {
             <Select
               label="Instructor"
               placeholder="Seleccione un Instructor Lider"
-              name="instructor_lider"
-              value={fichaData.instructor_lider}
+              name="lider"
+              value={fichaData.lider}
               onChange={handleInputChange}
               required
             >
-              {personas.map((instructor_lider) => (
-                <SelectItem key={instructor_lider.id_persona} value={instructor_lider.id_persona}>
-                  {instructor_lider.nombres}
+              {personas.map((lider) => (
+                <SelectItem key={lider.id_persona} value={lider.id_persona}>
+                  {lider.nombres}
                 </SelectItem>
               ))}
             </Select>
