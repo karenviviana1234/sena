@@ -4,17 +4,15 @@ export const listarAmbientes = async (req, res) => {
     try {
         let sql = `
           SELECT 
-    a.id_ambiente,
-    a.nombre_amb, 
-    m.nombre_mpio as municipio,  
-    a.sede,
-    a.estado
-FROM 
-    ambientes a
-LEFT JOIN 
-    municipios m ON a.municipio = m.id_municipio
-
-        `;
+            a.id_ambiente,
+            a.nombre_amb, 
+            m.nombre_mpio as municipio,  
+            a.sede,
+            a.estado
+          FROM 
+            ambientes a
+          LEFT JOIN 
+            municipios m ON a.municipio = m.id_municipio`;
 
         const [results] = await pool.query(sql);
 
@@ -24,12 +22,9 @@ LEFT JOIN
             res.status(404).json({
                 message: 'No hay ambientes registrados'
             });
-            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor: ' + error
-        });
             message: 'Error del servidor: ' + error
         });
     }
@@ -48,7 +43,6 @@ export const registrarAmbientes = async (req, res) => {
             res.status(200).json({
                 message: 'Ambiente registrado correctamente'
             })
-        } else {
         } else {
             res.status(403).json({
                 message: 'Error al registrar el ambiente'

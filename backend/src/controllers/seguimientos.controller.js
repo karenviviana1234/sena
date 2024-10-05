@@ -278,7 +278,7 @@ export const registrarSeguimiento = async (req, res) => {
     }
 };
 
-/* Cargar PDF */
+/* Cargar PDF y validar el nombre */
 export const uploadPdfToSeguimiento = async (req, res) => {
     try {
         const { id_seguimiento } = req.params;  // Obtener el ID del seguimiento desde los parámetros de la URL
@@ -290,29 +290,66 @@ export const uploadPdfToSeguimiento = async (req, res) => {
             });
         }
 
-        // Actualizar el campo 'pdf' en la tabla 'seguimientos' con la ruta o el nombre del archivo
-        const sqlUpdateSeguimiento = `
-            UPDATE seguimientos 
-            SET pdf = ? 
-            WHERE id_seguimiento = ?
-        `;
-        const [result] = await pool.query(sqlUpdateSeguimiento, [pdf, id_seguimiento]);
+        // Donde se almacena el nombre
+        const uploadDirectory = 'public/seguimientos';
 
-        if (result.affectedRows > 0) {
-            res.status(200).json({
-                message: 'PDF cargado exitosamente en el seguimiento'
-            });
-        } else {
-            res.status(404).json({
-                message: 'Seguimiento no encontrado'
-            });
-        }
+        /* Función para generar un nombre único */
+        const getUniqueFileName = (directory, originalFileName) => {
+            const extension = path.extname(originalFileName);  // Obtener la extensión del archivo (.pdf)
+            const baseName = path.basename(originalFileName, extension);  // Nombre base sin la extensión
+            let fileName = originalFileName;
+            let counter = 1;
+
+            /* Comprobar si el archivo existe */
+            while (fs.existsSync(path.join(directory, fileName))) {
+                // Renombrar el archivo agregando un número secuencial
+                fileName = `${baseName}-${counter}${extension}`;
+                counter++;
+            }
+
+            return fileName;  // Devolver el nombre único
+        };
+
+        // Generar un nombre único para el archivo PDF
+        const uniquePdfName = getUniqueFileName(uploadDirectory, pdf);
+
+        // Ruta completa donde se guardará el archivo
+        const pdfPath = path.join(uploadDirectory, uniquePdfName);
+
+        /* Mover el archivo a la carpeta de destino */
+        fs.rename(req.file.path, pdfPath, async (err) => {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error al guardar el archivo: ' + err.message
+                });
+            }
+
+            // Actualizar el campo 'pdf' en la tabla 'seguimientos' con el nombre del archivo único
+            const sqlUpdateSeguimiento = `
+                UPDATE seguimientos 
+                SET pdf = ? 
+                WHERE id_seguimiento = ?
+            `;
+            const [result] = await pool.query(sqlUpdateSeguimiento, [uniquePdfName, id_seguimiento]);
+
+            if (result.affectedRows > 0) {
+                res.status(200).json({
+                    message: 'PDF cargado exitosamente en el seguimiento'
+                });
+            } else {
+                res.status(404).json({
+                    message: 'Seguimiento no encontrado'
+                });
+            }
+        });
+
     } catch (error) {
         res.status(500).json({
             message: 'Error del servidor: ' + error.message
         });
     }
 };
+
 
 // Función para actualizar seguimientos
 export const actualizarSeguimiento = async (req, res) => {

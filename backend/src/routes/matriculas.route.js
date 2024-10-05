@@ -1,5 +1,5 @@
 import Router from 'express'
-import { listarMatriculas, registrarMatriculas, actualizarMatriculas, formacionMatricula,  condicionadaMatricula, canceladaMatricula, retiroMatricula, porCertificarMatricula, certificadaMatricula, listarAprendices, listar } from '../controllers/matriculas.controller.js'
+import { listarMatriculas, registrarMatriculas, actualizarMatriculas, formacionMatricula,  condicionadaMatricula, canceladaMatricula, retiroMatricula, porCertificarMatricula, certificadaMatricula, listarAprendices, listar, contarMatriculasPorEstado } from '../controllers/matriculas.controller.js'
 import { validarToken } from '../controllers/seguridad.controller.js'
 
 const rutaMatriculas = Router()
