@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import Swal from 'sweetalert2';
 import axiosClient from "../../../configs/axiosClient";
 import PersonasContext from "../../../context/PersonasContext";
@@ -166,23 +166,24 @@ function FormAprendices({ initialData }) {
             status={errors.telefono ? 'error' : 'default'}
           />
         </div>
-        <select
-          className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+        <Select
           id="municipios"
           name="Municipio"
           value={selectedMunicipio}
           onChange={(e) => setSelectMunicipio(e.target.value)}
+          placeholder="Seleccione un Municipio"
           required
+          className="max-w-2xl py-2"
         >
-          <option value="">Selecciona un Municipio</option>
+          <SelectItem value="">Selecciona un Municipio</SelectItem>
           {municipio.map((municipio) => (
-            <option key={municipio.id_municipio} value={municipio.id_municipio}>
+            <SelectItem key={municipio.id_municipio} value={municipio.id_municipio}>
               {municipio.nombre_mpio}
-            </option>
+            </SelectItem>
           ))}
-        </select>
+        </Select>
         <div className="flex justify-end gap-5 mt-5">
-          <Button className="bg-[#92d22e] text-white" type="submit" color="success">
+          <Button className="bg-[#0d324c] text-white" type="submit" color="success">
             {isEditing ? "Actualizar" : "Registrar"}
           </Button>
         </div>

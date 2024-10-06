@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 import ButtonAprobado from '../../atoms/ButtonAprobado.jsx';
 import ButtonNoAprobado from '../../atoms/ButtonNoAprobado.jsx';
 
-function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
+function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend, onSuccess, buttonState, setButtonState, onReject }) {
   const [seguimiento, setSeguimiento] = useState([]);
   const [estadoActaVisible, setEstadoActaVisible] = useState(false);
   const [fecha, setFecha] = useState("");
@@ -18,6 +18,7 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
   const [userRole, setUserRole] = useState(null);
   const [estado, setEstado] = useState(null);
   const [pdfName, setPdfName] = useState(null);
+
 
   const seguimientoNumeros = {
     1: 1,
@@ -166,115 +167,75 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
     }
   };
 
-  const handleAprobar = async (id_seguimiento) => {
+  const updateEstado = (nuevoEstado) => {
+    setEstado(nuevoEstado); // Actualiza el estado local con el nuevo valor
+  };
+
+
+  const handleAprobar = async () => {
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Quieres aprobar esta Acta?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Aprobar",
+      cancelButtonText: "No, cancelar",
+      customClass: {
+        confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
+        cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
+      },
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
-      const result = await Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¿Quieres aprobar esta Acta?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, Aprobar",
-        cancelButtonText: "No, cancelar",
-        reverseButtons: true,
-        customClass: {
-          confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
-          cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
-        },
-      });
-  
-      if (!result.isConfirmed) {
-        return;
-      }
-  
-      if (!id_seguimiento) {
-        console.error("ID de seguimiento no proporcionado");
-        await Swal.fire({
-          title: "Error",
-          text: "El ID de seguimiento no está definido.",
-          icon: "error",
-          confirmButtonText: "Entendido",
-        });
-        return;
-      }
-  
-      const response = await axiosClient.put(`/seguimientos/aprobar/${id_seguimiento}`); // Usa PUT si es una actualización
-  
+      const response = await axiosClient.put(`/seguimientos/aprobar/${id_seguimiento}`);
       if (response.status === 200) {
         Swal.fire("Aprobado", "El acta ha sido aprobada correctamente", "success");
-  
-        // Actualización del estado después de la aprobación
-        setSeguimiento((prevSeguimiento) =>
-          prevSeguimiento.filter((seguimiento) => seguimiento.id_seguimiento !== id_seguimiento)
-        );
+        updateEstado("aprobado");
+        setButtonState("aprobado");
+        onSuccess();
       } else {
         throw new Error("Error inesperado durante la aprobación.");
       }
     } catch (error) {
       console.error("Error al aprobar el acta:", error);
-      Swal.fire({
-        title: "Error",
-        text: "No se pudo aprobar el acta. Intenta nuevamente.",
-        icon: "error",
-        confirmButtonText: "Entendido",
-      });
+      Swal.fire("Error", "No se pudo aprobar el acta.", "error");
     }
   };
 
+  const handleNoAprobar = async () => {
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Quieres rechazar esta Acta?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Rechazar",
+      cancelButtonText: "No, cancelar",
+      customClass: {
+        confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
+        cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
+      },
+    });
 
-  const handleNoAprobar = async (id_seguimiento) => {
+    if (!result.isConfirmed) return;
+
     try {
-      const result = await Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¿Quieres rechazar esta Acta?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, Rechazar",
-        cancelButtonText: "No, cancelar",
-        reverseButtons: true,
-        customClass: {
-          confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
-          cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
-        },
-      });
-  
-      if (!result.isConfirmed) {
-        return;
-      }
-  
-      if (!id_seguimiento) {
-        console.error("ID de seguimiento no proporcionado");
-        await Swal.fire({
-          title: "Error",
-          text: "El ID de seguimiento no está definido.",
-          icon: "error",
-          confirmButtonText: "Entendido",
-        });
-        return;
-      }
-  
-      const response = await axiosClient.put(`/seguimientos/rechazar/${id_seguimiento}`); // Usa PUT si es una actualización
-  
+      const response = await axiosClient.put(`/seguimientos/rechazar/${id_seguimiento}`);
       if (response.status === 200) {
         Swal.fire("Rechazada", "El acta ha sido rechazada correctamente", "success");
-  
-        // Actualización del estado después de la aprobación
-        setSeguimiento((prevSeguimiento) =>
-          prevSeguimiento.filter((seguimiento) => seguimiento.id_seguimiento !== id_seguimiento)
-        );
+        updateEstado("no aprobado");  // Cambiar 'no aprobado' a 'noAprobado'
+        setButtonState("no aprobado");
+        onReject();
       } else {
         throw new Error("Error inesperado durante la aprobación.");
       }
     } catch (error) {
-      console.error("Error al aprobar el acta:", error);
-      Swal.fire({
-        title: "Error",
-        text: "No se pudo aprobar el acta. Intenta nuevamente.",
-        icon: "error",
-        confirmButtonText: "Entendido",
-      });
+      console.error("Error al rechazar el acta:", error);
+      Swal.fire("Error", "No se pudo rechazar el acta.", "error");
     }
   };
-  
+
 
   const downloadFile = async (id_seguimiento) => {
     console.log("ID de seguimiento:", id_seguimiento); // Verifica el valor aquí
@@ -331,10 +292,14 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
 
   const { color, icon } = estadoConfig[estado] || {};
 
+  const DimensionsActa = (userRole === 'Administrativo' || userRole === 'Coordinador')
+    ? { width: 'w-[690px]', height: 'h-28' }
+    : { width: 'w-[750px]', height: 'h-40' };
+
   return (
     <>
       <h1 className="font-semibold text-xl mb-4">Acta:</h1>
-      <div className="border shadow-medium rounded-2xl p-4 flex flex-col relative h-40">
+      <div className={`border shadow-medium rounded-2xl p-4 flex flex-col relative ${DimensionsActa.height}  ${DimensionsActa.width}`}>
         <h2 className="font-semibold text-lg mb-2">
           Acta N° {seguimientoNumeros[id_seguimiento] || 1}:
         </h2>
@@ -347,16 +312,30 @@ function ActaSeguimiento({ handleSubmit, id_seguimiento, onIdSend }) {
           )}
 
           <div className="flex items-center">
-          {estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
+            {estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
               <PDFUploader onFileSelect={handleActaPdfSubmit} />
             )}
-            <ButtonDescargar onClick={() => downloadFile(id_seguimiento)} />
-            {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
-              <ButtonAprobado onClick={() => handleAprobar(id_seguimiento)}/>
-            )}
-            {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
-              <ButtonNoAprobado onClick={() => handleNoAprobar(id_seguimiento)} />
-            )}
+
+            <div>
+              {pdfName ? (
+                // Si hay un PDF cargado, muestra el botón de descarga
+                <ButtonDescargar onClick={() => downloadFile(id_seguimiento)} />
+              ) : (
+                // Si no hay PDF cargado, muestra el mensaje
+                <p className=" text-gray-500 text-lg">
+                  No se a cargado un archivo aún
+                </p>
+              )}
+            </div>
+            <div className='flex justify-between'>
+              {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
+                <ButtonAprobado onClick={() => handleAprobar(id_seguimiento)} />
+              )}
+              {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
+                <ButtonNoAprobado onClick={() => handleNoAprobar(id_seguimiento)} />
+              )}
+            </div>
+
             {estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Aprendiz' && userRole !== 'Coordinador') && (
               <ButtonEnviar onClick={handleSubmitActa} />
             )}

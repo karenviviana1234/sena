@@ -123,24 +123,25 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                     <>
                         <h2 className="text-lg font-semibold mb-5">Selecciona un Aprendiz</h2>
                         {aprendices.map((aprendiz) => (
-                            <Checkbox
-                                key={aprendiz.id_persona}
-                                isSelected={aprendizSeleccionado === aprendiz.id_persona}
-                                onValueChange={() => handleCheckboxChange(aprendiz.id_persona)}
-                                aria-label={aprendiz.nombres}
-                                classNames={{
-                                    base: "inline-flex  h-14 mr-1 ml-1 max-w-md bg-content1 hover:bg-content2 items-center justify-start cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent data-[selected=true]:border-[#0d324c]",
-                                    label: "w-full",
-                                }}
-                            >
-                                <div className="w-full flex justify-between gap-2">
-                                    <User
-                                        avatarProps={{ radius: "full" }}
-                                        description={aprendiz.correo}
-                                        name={aprendiz.nombres}
-                                    />
-                                </div>
-                            </Checkbox>
+                            <div key={aprendiz.id_persona} className="mb-5"> {/* Añade un margen inferior para separación */}
+                                <Checkbox
+                                    isSelected={aprendizSeleccionado === aprendiz.id_persona}
+                                    onValueChange={() => handleCheckboxChange(aprendiz.id_persona)}
+                                    aria-label={aprendiz.nombres}
+                                    classNames={{
+                                        base: "flex h-14 mr-1 ml-1 max-w-md bg-content1 hover:bg-content2 items-center justify-start cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent data-[selected=true]:border-[#0d324c]",
+                                        label: "w-full",
+                                    }}
+                                >
+                                    <div className="w-full flex justify-between gap-2">
+                                        <User
+                                            avatarProps={{ radius: "full" }}
+                                            description={aprendiz.correo}
+                                            name={aprendiz.nombres}
+                                        />
+                                    </div>
+                                </Checkbox>
+                            </div>
                         ))}
                     </>
                 )}
@@ -180,7 +181,7 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                 )}
 
                 <div className="flex justify-end gap-5 mt-5">
-                    <Button className="bg-[#92d22e] text-white" type="submit" color="success">
+                    <Button className="bg-[#0d324c] text-white" type="submit" color="success">
                         {isEditing ? "Actualizar" : "Registrar"}
                     </Button>
                 </div>

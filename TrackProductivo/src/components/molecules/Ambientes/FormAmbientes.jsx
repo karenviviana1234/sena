@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import axiosClient from '../../../configs/axiosClient';
+import Swal from 'sweetalert2';
 
 const FormAmbientes = ({ onSubmit, onClose, actionLabel, mode, initialData }) => {
     const [formData, setFormData] = useState({
@@ -51,10 +52,23 @@ const FormAmbientes = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
         });
     };
 
+    // Maneja los cambios en los select de manera específica
+    const handleSelectChange = (name, value) => {
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await onSubmit(formData);
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: 'Ambiente registrado correctamente',
+              });
         } catch (error) {
             console.error("Error al enviar formulario:", error);
         }
@@ -63,20 +77,11 @@ const FormAmbientes = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
     return (
         <form onSubmit={handleSubmit}>
             <div>
-                {mode === 'update' && (
-                    <div className="py-2">
-                        <Input
-                            label="ID Ambiente"
-                            name="id_ambiente"
-                            type="text"
-                            value={formData.id_ambiente}
-                            disabled
-                        />
-                    </div>
-                )}
+
                 <div className="py-2">
                     <Input
                         label="Nombre del Ambiente"
+                        className='w-96'
                         placeholder="Nombre"
                         name="nombre_amb"
                         type="text"
@@ -86,42 +91,42 @@ const FormAmbientes = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
                     />
                 </div>
                 <div className="py-2">
-                    <label>Municipio</label>
-                    <select
+                    <Select
                         name="municipio"
                         value={formData.municipio}
-                        onChange={handleInputChange}
+                        onChange={(e) => handleSelectChange('municipio', e.target.value)}
                         required
-                        className="pl-2 pr-4 py-2 w-full h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                        <option value="">Seleccionar Municipio</option>
+                        className="w-96"
+                        placeholder='Selecciona un Municipio'
+                    >
+                        <SelectItem value="">Seleccionar Municipio</SelectItem>
                         {municipios.map((municipio) => (
-                            <option key={municipio.id_municipio} value={municipio.id_municipio}>
+                            <SelectItem key={municipio.id_municipio} value={municipio.id_municipio}>
                                 {municipio.nombre_mpio}
-                            </option>
+                            </SelectItem>
                         ))}
-                    </select>
+                    </Select>
                 </div>
                 <div className="py-2">
-                    <label>Sede</label>
-                    <select
+                    <Select
                         name="sede"
                         value={formData.sede}
-                        onChange={handleInputChange}
-                        className="pl-2 pr-4 py-2 w-full h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                        <option value="">Seleccionar Sede</option>
+                        onChange={(e) => handleSelectChange('sede', e.target.value)}
+                        className="w-96"
+                        placeholder='Selecciona una Sede'
+                    >
+                        <SelectItem value="">Seleccionar Sede</SelectItem>
                         {optionsSede.map((option) => (
-                            <option key={option.value} value={option.value}>
+                            <SelectItem key={option.value} value={option.value}>
                                 {option.label}
-                            </option>
+                            </SelectItem>
                         ))}
-                    </select>
+                    </Select>
                 </div>
 
                 <div className="mt-4 flex justify-end gap-2">
-                
-                    <Button color="primary" type="submit">
+
+                    <Button className="bg-[#0d324c] text-white" type="submit">
                         {actionLabel}
                     </Button>
                 </div>

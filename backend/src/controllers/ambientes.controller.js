@@ -1,18 +1,19 @@
 import { pool } from "../database/conexion.js";
-
 export const listarAmbientes = async (req, res) => {
     try {
         let sql = `
           SELECT 
-            a.id_ambiente,
-            a.nombre_amb, 
-            m.nombre_mpio as municipio,  
-            a.sede,
-            a.estado
-          FROM 
-            ambientes a
-          LEFT JOIN 
-            municipios m ON a.municipio = m.id_municipio`;
+    a.id_ambiente,
+    a.nombre_amb, 
+    m.nombre_mpio as municipio,  
+    a.sede,
+    a.estado
+FROM 
+    ambientes a
+LEFT JOIN 
+    municipios m ON a.municipio = m.id_municipio
+
+        `;
 
         const [results] = await pool.query(sql);
 
@@ -22,11 +23,13 @@ export const listarAmbientes = async (req, res) => {
             res.status(404).json({
                 message: 'No hay ambientes registrados'
             });
+           
         }
     } catch (error) {
         res.status(500).json({
             message: 'Error del servidor: ' + error
         });
+            message: 'Error del servidor: ' + error
     }
 };
 
@@ -133,5 +136,3 @@ export const inactivarAmbiente = async (req, res) => {
         })
     }
 }
-
-//comentario random borrenlo

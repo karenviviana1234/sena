@@ -39,6 +39,13 @@ function TableSeguimientos() {
     });
     const [page, setPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [buttonStates, setButtonStates] = useState(() => {
+        // Recuperar el estado de los botones desde localStorage
+        const storedStates = localStorage.getItem('buttonStates');
+        return storedStates ? JSON.parse(storedStates) : {};
+    });
+    const [buttonState, setButtonState] = useState("solicitud");
+
 
 
     const seguimientosIds = [1, 2, 3];
@@ -70,16 +77,41 @@ function TableSeguimientos() {
         if (type === 'formNovedades') {
             setBodyContent(<Novedades id_seguimiento={id_seguimiento} />);
         } else if (type === 'componentSeguimiento') {
-            setBodyContent(<ComponentSeguimiento
-                id_seguimiento={id_seguimiento} // Asegúrate de que este prop está bien pasado
-                mode="create"
-                handleSubmit={() => console.log("Submit")}
-                onClose={() => console.log("Close")}
-                actionLabel="Enviar"
-                onSuccess={handleUpdateData}
-                onIdSend={(id) => console.log("ID de seguimiento enviado:", id)} />);
+            setBodyContent(
+                <ComponentSeguimiento
+                    id_seguimiento={id_seguimiento}
+                    setButtonState={setButtonState}
+                    mode="create"
+                    handleSubmit={() => console.log("Submit")}
+                    onClose={() => console.log("Close")}
+                    actionLabel="Enviar"
+                    onSuccess={() => {
+                        handleUpdateData();
+                        setButtonStates(prevStates => {
+                            const updatedStates = {
+                                ...prevStates,
+                                [id_seguimiento]: "aprobado",  // Aquí 'id_seguimiento' debería ser el ID del seguimiento actual
+                            };
+                            localStorage.setItem('buttonStates', JSON.stringify(updatedStates)); // Guardar en localStorage
+                            return updatedStates;
+                        });
+                    }}
+                    onReject={() => {
+                        handleUpdateData();
+                        setButtonStates(prevStates => {
+                            const updatedStates = {
+                                ...prevStates,
+                                [id_seguimiento]: "no aprobado",  // Igualmente aquí
+                            };
+                            localStorage.setItem('buttonStates', JSON.stringify(updatedStates)); // Guardar en localStorage
+                            return updatedStates;
+                        });
+                    }}
+                    onIdSend={(id) => console.log("ID de seguimiento enviado:", id)}
+                />
+            );
         }
-        console.log("datos enviados", id_seguimiento)
+
         setSelectedSeguimientoId(id_seguimiento);
         setIsModalOpen(true);
     };
@@ -157,60 +189,65 @@ function TableSeguimientos() {
         const hash = hashCode(fichaNumber.toString());
         return intToColor(hash);
     };
-    
+
 
     // Render cell based on column key
+
     const renderCell = useCallback((item, columnKey) => {
         const cellValue = item[columnKey];
-
-
 
         switch (columnKey) {
             case "acciones":
                 return (
                     <div className="flex justify-around items-center">
-                        <ButtonRegistrarNovedad
-                            onClick={() => handleOpenModal(null, 'formNovedades')}
-                        />
+                        <ButtonRegistrarNovedad onClick={() => handleOpenModal(null, 'formNovedades')} />
                     </div>
-
                 );
 
             case "seguimiento1":
             case "seguimiento2":
             case "seguimiento3":
-                const formattedDate = format(new Date(cellValue), 'dd-MM-yyyy');
+                // Asegúrate de que cellValue es una fecha válida
+                const formattedDate = cellValue ? format(new Date(cellValue), 'dd-MM-yyyy') : 'Fecha no válida';
                 const seguimientoIdKey = `id_${columnKey}`;
-                const estadoKey = `estado${columnKey.charAt(columnKey.length - 1)}`; // Obtener el estado correspondiente
-                const estado = item[estadoKey]; // Obtener el estado
+                const estadoKey = `estado${columnKey.charAt(columnKey.length - 1)}`;
+                const estado = item[estadoKey];
+
+                const buttonState = buttonStates[item[seguimientoIdKey]] || "solicitud";
 
                 return (
                     <div className="flex flex-col items-center">
                         <Button
-                            className=" text-white h-8 w-10 text-xs"
+                            className="text-white h-8 w-10 text-xs"
                             style={{
                                 backgroundColor:
-                                    estado === "no aprobado" ? "red" :
-                                        estado === "solicitud" ? "orange" :
-                                            estado === "aprobado" ? "green" : null
+                                    buttonState === "no aprobado" ? "red" :
+                                        buttonState === "solicitud" ? "orange" :
+                                            buttonState === "aprobado" ? "green" :
+                                                "gray",
                             }}
-
                             onClick={() => handleOpenModal(item[seguimientoIdKey], 'componentSeguimiento')}
                         >
                             {formattedDate}
                         </Button>
                     </div>
                 );
+
             case "codigo":
                 return (
                     <Chip
                         className="text-[#3c3c3c]"
                         variant="flat"
-                        style={{ backgroundColor: getColorForFicha(cellValue) || "rgba(240, 240, 240, 0.8)" }} // Color claro por defecto
+                        style={{ backgroundColor: getColorForFicha(cellValue) || "rgba(240, 240, 240, 0.8)" }}
                     >
                         {cellValue}
                     </Chip>
                 );
+
+            case "porcentaje":
+                // Formatear el porcentaje y añadir el símbolo "%"
+                return `${cellValue}%`;
+
             case "actions":
                 return (
                     <div className="relative flex justify-end items-center gap-2">
@@ -226,13 +263,11 @@ function TableSeguimientos() {
                         </Dropdown>
                     </div>
                 );
-                
-                  
 
             default:
                 return cellValue;
         }
-    }, [handleOpenModal]);
+    }, [buttonStates, handleOpenModal]);
 
     // Pagination handlers
     const onNextPage = useCallback(() => {
@@ -294,10 +329,10 @@ function TableSeguimientos() {
     // Columns definition
     const columns = [
         { key: "identificacion", label: "Identificación" },
-        { key: "nombres", label: "Nombres" },
-        { key: "correo", label: "Correo" },
+        { key: "nombres", label: "Aprendiz" },
         { key: "codigo", label: "Ficha" },
         { key: "razon_social", label: "Empresa" },
+        { key: "nombre_instructor", label: "Instructor Asignado" },
         { key: "seguimiento1", label: "Seguimiento 1" },
         { key: "seguimiento2", label: "Seguimiento 2" },
         { key: "seguimiento3", label: "Seguimiento 3" },
