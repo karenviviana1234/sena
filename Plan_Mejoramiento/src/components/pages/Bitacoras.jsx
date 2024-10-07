@@ -97,6 +97,7 @@ const Bitacoras = () => {
         ) : (
           <SectionList
             sections={bitacoras}
+            style={styles.title}
             keyExtractor={(item, index) => item.id_bitacora.toString()}
             renderItem={renderBitacora}
             renderSectionHeader={renderSectionHeader}
@@ -124,6 +125,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: 'black'
   },
   button: {
     backgroundColor: '#28a745',
@@ -164,11 +166,12 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: 18,
+    color: 'black',
     fontWeight: 'bold',
   },
   itemSubtitle: {
     fontSize: 16,
-    color: 'grey',
+    color: 'black',
   },
   itemLink: {
     fontSize: 16,

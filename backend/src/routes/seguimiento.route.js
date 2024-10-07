@@ -1,6 +1,6 @@
 import Router from 'express'
-import { listarSeguimiento, registrarSeguimiento, actualizarSeguimiento, cargarSeguimiento, aprobarSeguimiento, rechazarSeguimiento, listarSeguimientoAprendices, uploadPdfToSeguimiento, descargarPdf, listarEstadoSeguimiento } from '../controllers/seguimientos.controller.js'
 import { validarToken } from './../controllers/seguridad.controller.js'
+import { actualizarSeguimiento, aprobarSeguimiento, cargarSeguimiento, descargarPdf, listarEstadoSeguimiento, listarSeguimiento, listarSeguimientoAprendices, rechazarSeguimiento, registrarSeguimiento, uploadPdfToSeguimiento } from '../controllers/seguimientos.controller.js'
 
 const rutaSeguimiento = Router()
 
@@ -11,7 +11,7 @@ rutaSeguimiento.post('/cargarPdf/:id_seguimiento', validarToken, cargarSeguimien
 rutaSeguimiento.put('/actualizar/:id', validarToken, cargarSeguimiento, actualizarSeguimiento)
 rutaSeguimiento.put('/aprobar/:id_seguimiento', validarToken, aprobarSeguimiento)
 rutaSeguimiento.put('/rechazar/:id_seguimiento', validarToken, rechazarSeguimiento)
-rutaSeguimiento.get('/descargarPdf/:id_seguimiento', validarToken, descargarPdf)
+rutaSeguimiento.get('/descargarPdf/:id_seguimiento',/*  validarToken, */ descargarPdf)
 rutaSeguimiento.get('/listarEstado/:id_seguimiento', validarToken, listarEstadoSeguimiento)
 
 

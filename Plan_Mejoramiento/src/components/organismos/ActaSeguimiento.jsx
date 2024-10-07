@@ -5,6 +5,7 @@ import axiosClient from '../../axiosClient';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFS from 'react-native-fs';
+import ButtonDescargar from '../atomos/BotonDescargar';
 
 const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
   const [seguimientoPdf, setSeguimientoPdf] = useState(null);
@@ -140,17 +141,15 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
       const response = await axiosClient.get(`/seguimientos/descargarPdf/${id_seguimiento}`, {
         responseType: 'blob',
       });
+      
+      console.log('Response', response); // Verifica si la respuesta tiene el formato correcto
   
       if (response.status === 200) {
-        const pdfFileName = `archivo-${id_seguimiento}.pdf`; // O usa el nombre que necesites
+        const pdfFileName = `archivo-${id_seguimiento}.pdf`;
         const path = `${RNFS.DocumentDirectoryPath}/${pdfFileName}`;
         
-        // Guardar el archivo
-        await RNFS.writeFile(path, response.data, 'base64'); // Asegúrate de que la respuesta sea base64
+        await RNFS.writeFile(path, response.data, 'base64'); // Verifica si response.data es base64
         Alert.alert("Éxito", "Archivo descargado correctamente.");
-        
-        // O puedes usar Linking para abrir el archivo
-        // Linking.openURL(path); // Si quieres abrir el archivo después de descargarlo
       } else {
         Alert.alert("Error", "No se pudo descargar el archivo.");
       }
@@ -159,6 +158,7 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
       Alert.alert("Error", `No se pudo descargar el archivo: ${error.message}`);
     }
   };
+  
   
 
   const estadoConfig = {
@@ -201,11 +201,10 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
               <Text style={styles.buttonText}>Enviar</Text>
             </TouchableOpacity>
           )}
-          {estado !== 'aprobado' && (userRole === 'Aprendiz') && (
-            <TouchableOpacity style={styles.button} onPress={() => downloadFile(id_seguimiento)}>
-              <Text style={styles.buttonText}>Descargar</Text>
-            </TouchableOpacity>
-          )}
+{/* {estado !== 'aprobado' && (userRole === 'Aprendiz') && (
+)} */}
+<ButtonDescargar onPress={() => downloadFile(id_seguimiento)} />
+
         </View>
 
         {estado && (
@@ -240,10 +239,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 8,
+    color: 'black'
   },
   pdfName: {
     fontSize: 14,
     marginBottom: 8,
+    color: 'black'
   },
   buttonContainer: {
     flexDirection: "row",

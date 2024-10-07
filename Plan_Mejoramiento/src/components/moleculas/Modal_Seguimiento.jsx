@@ -97,12 +97,12 @@ const ModalSeguimiento = ({ visible, onClose }) => {
               ) : bitacoras.length > 0 ? (
                 bitacoras.map((bitacora) => (
                   <View key={bitacora.id_bitacora} style={styles.bitacoraItem}>
-                    <Text>Bitácora: {bitacora.bitacora}</Text>
-                    <Text>Estado: {bitacora.estado}</Text>
-                    <Text>Fecha: {new Date(bitacora.fecha).toLocaleDateString()}</Text>
-                    <Text>Instructor: {bitacora.instructor}</Text>
-                    <Text>PDF: {bitacora.pdf}</Text>
-                    <Text>Seguimiento: {bitacora.seguimiento}</Text>
+                    <Text style={styles.TextTitle}>Bitácora: {bitacora.bitacora}</Text>
+                    <Text style={styles.Text}>Estado: {bitacora.estado}</Text>
+                    <Text style={styles.Text}>Fecha: {new Date(bitacora.fecha).toLocaleDateString()}</Text>
+                    <Text style={styles.Text}>Instructor: {bitacora.instructor}</Text>
+                    <Text style={styles.Text}>PDF: {bitacora.pdf}</Text>
+                    <Text style={styles.Text}>Seguimiento: {bitacora.seguimiento}</Text>
                   </View>
                 ))
               ) : (
@@ -155,6 +155,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 24,
     textAlign: 'center',
+  },
+  TextTitle: {
+    color: 'black',
+    fontWeight: 'bold'
+  },
+  Text: {
+    color: 'black'
   },
   sectionContainer: {
     marginBottom: 32,

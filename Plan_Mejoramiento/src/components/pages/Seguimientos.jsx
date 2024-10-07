@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
     itemText: {
         fontSize: 16,
         marginBottom: 4,
+        color: 'black'
     },
     buttonContainer: {
         flexDirection: 'row',
