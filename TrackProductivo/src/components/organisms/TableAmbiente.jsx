@@ -67,6 +67,11 @@ export default function TableAmbiente() {
         try {
             if (formData.id_ambiente) {
                 const response = await axiosClient.put(`/ambientes/actualizar/${formData.id_ambiente}`, formData);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Ambiente actualizado correctamente',
+                  });
                 console.log('Respuesta del servidor:', response.data);
             } else {
                 const response = await axiosClient.post('/ambientes/registrar', formData);
@@ -141,7 +146,11 @@ export default function TableAmbiente() {
                 const response = await axiosClient.put(`/ambientes/inactivar/${id_ambiente}`, {
                     activo: 0, // Desactivar el ambiente
                 });
-                Swal.fire("Desactivada", response.data.message, "success");
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Ambiente desactivado',
+                  });
     
                 // Actualizar el estado eliminando el ambiente desactivado de la lista
                 setAmbientes((prevAmbientes) =>

@@ -34,14 +34,14 @@ function Bitacoras({
 
   useEffect(() => {
     const currentDate = new Date();
-    
+
     // Obtener la fecha local en el formato YYYY-MM-DD
     const localDate = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000)
       .toISOString()
       .slice(0, 10);
-    
+
     setFecha(localDate);
-    
+
     const userJson = localStorage.getItem('user');
     if (userJson) {
       try {
@@ -51,12 +51,12 @@ function Bitacoras({
         console.error('Error al parsear el JSON del usuario:', error);
       }
     }
-  
+
     if (onIdSend && id_seguimiento) {
       onIdSend(id_seguimiento);
     }
   }, [id_seguimiento, onIdSend]);
-  
+
 
   useEffect(() => {
     if (id_seguimiento) {
@@ -170,11 +170,11 @@ function Bitacoras({
           cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
         },
       });
-  
+
       if (!result.isConfirmed) {
         return;
       }
-  
+
       if (!id_bitacora) {
         console.error("ID de seguimiento no proporcionado");
         await Swal.fire({
@@ -185,12 +185,12 @@ function Bitacoras({
         });
         return;
       }
-  
+
       const response = await axiosClient.put(`/bitacoras/aprobar/${id_bitacora}`); // Usa PUT si es una actualización
-  
+
       if (response.status === 200) {
         Swal.fire("Aprobado", "La bitacora ha sido aprobada correctamente", "success");
-  
+
         // Actualización del estado después de la aprobación
         setBitacora((prevBitacora) =>
           prevBitacora.filter((bitacora) => bitacora.id_bitacora !== id_bitacora)
@@ -225,11 +225,11 @@ function Bitacoras({
           cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
         },
       });
-  
+
       if (!result.isConfirmed) {
         return;
       }
-  
+
       if (!id_bitacora) {
         console.error("ID de bitacora no proporcionado");
         await Swal.fire({
@@ -240,15 +240,15 @@ function Bitacoras({
         });
         return;
       }
-  
+
       const response = await axiosClient.put(`/bitacoras/rechazar/${id_bitacora}`); // Usa PUT si es una actualización
-  
+
       if (response.status === 200) {
         Swal.fire("Rechazada", "La Bitacora ha sido rechazada correctamente", "success");
-  
+
         // Actualización del estado después de la aprobación
         setBitacora((prevBitacora) =>
-        prevBitacora.filter((bitacora) => bitacora.id_bitacora !== id_bitacora)
+          prevBitacora.filter((bitacora) => bitacora.id_bitacora !== id_bitacora)
         );
       } else {
         throw new Error("Error inesperado durante la aprobación.");
@@ -263,7 +263,7 @@ function Bitacoras({
       });
     }
   };
-  
+
 
 
   const downloadFile = async (id_bitacora) => {
@@ -342,7 +342,7 @@ function Bitacoras({
                       <div className="flex items-center justify-between">
                         <h2 className="font-semibold text-lg">Bitácora {bitacora.bitacora}</h2>
                         {bitacora.pdf && (
-                            <Chip
+                          <Chip
                             endContent={icon && React.createElement(icon, { size: 20 })}
                             variant="flat"
                             color={color}
@@ -357,33 +357,45 @@ function Bitacoras({
                       )}
                     </div>
                     <div className="flex flex-col">
-                      <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-                      {bitacora.estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Coordinador') && (
+                      <div className="flex flex-wrap justify-between items-center gap-4 mb-6 mt-5">
+                        {bitacora.estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Coordinador') && (
                           <PDFUploader onFileSelect={(file) => handleBitacoraPdfSubmit(file, bitacora.id_bitacora)} />
                         )}
                         <div className="flex gap-2">
-                          {bitacora.pdf || selectedPdf[bitacora.id_bitacora] ? (
-                            <ButtonDescargar
-                              onClick={() => {
-                                const fileToDownload = bitacora.pdf || selectedPdf[bitacora.id_bitacora]?.name;
-                                if (fileToDownload) {
-                                  downloadFile(bitacora.id_bitacora);
-                                } else {
-                                  Swal.fire({
-                                    title: "Error",
-                                    text: "No hay archivo para descargar.",
-                                    icon: "error",
-                                  });
-                                }
-                              }}
-                            />
-                          ) : null}
-                          {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
-                            <ButtonAprobado onClick={() => handleAprobar(bitacora.id_bitacora)} />
-                          )}
-                          {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
-                            <ButtonNoAprobado onClick={() => handleNoAprobar(bitacora.id_bitacora)} />
-                          )}
+                          <div>
+                            {bitacora.pdf || selectedPdf[bitacora.id_bitacora] ? (
+                              <ButtonDescargar 
+                                onClick={() => {
+                                  const fileToDownload = bitacora.pdf || selectedPdf[bitacora.id_bitacora]?.name;
+                                  if (fileToDownload) {
+                                    downloadFile(bitacora.id_bitacora);
+                                  } else {
+                                    Swal.fire({
+                                      title: "Error",
+                                      text: "No hay archivo para descargar.",
+                                      icon: "error",
+                                    });
+                                  }
+                                }}
+                              />
+                            ) : (
+                              // Si no hay PDF cargado, muestra el mensaje
+                              <p className="text-gray-500 text-base absolute top-12 left-5">
+                                No se ha cargado un archivo aún
+                              </p>
+                            )}
+
+                          </div>
+
+                          <div className='flex justify-normal'>
+                            {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
+                              <ButtonAprobado onClick={() => handleAprobar(bitacora.id_bitacora)} />
+                            )}
+                            {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
+                              <ButtonNoAprobado onClick={() => handleNoAprobar(bitacora.id_bitacora)} />
+                            )}
+                          </div>
+
                           {bitacora.estado !== 'aprobado' && (userRole !== 'Administrativo' && userRole !== 'Coordinador') && (
                             <ButtonEnviar onClick={() => handleSubmitBitacoras(bitacora.id_bitacora)} />
                           )}

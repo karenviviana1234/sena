@@ -49,11 +49,26 @@ export const registrarNovedad = async (req, res) => {
 
 export const listar = async (req, res) => {
     try {
-        // Consulta que obtiene las novedades relacionadas con los seguimientos 1, 2 y 3
+        // Consulta que obtiene todas las novedades relacionadas con los seguimientos de las productivas
         let sql = `
-            SELECT id_novedad, fecha, instructor, descripcion, foto 
-            FROM novedades 
-            WHERE seguimiento IN (1, 2, 3)`; // Filtrar por los seguimientos 1, 2 y 3
+            SELECT 
+                p.id_productiva,
+                s.id_seguimiento,
+                n.id_novedad, 
+                n.seguimiento,
+                n.fecha, 
+                n.instructor, 
+                n.descripcion, 
+                n.foto,
+                s.seguimiento AS numero_seguimiento -- Añadir el número de seguimiento
+            FROM 
+                productivas p
+            JOIN 
+                seguimientos s ON p.id_productiva = s.productiva
+            JOIN 
+                novedades n ON s.id_seguimiento = n.seguimiento
+            WHERE 
+                s.seguimiento IN ('1', '2', '3')`; // Filtrar por los seguimientos 1, 2 y 3
 
         const [results] = await pool.query(sql);
 
@@ -66,7 +81,7 @@ export const listar = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor: ' + error
+            message: 'Error del servidor: ' + error.message
         });
     }
 };
@@ -75,7 +90,7 @@ export const listar = async (req, res) => {
 export const listarnovedades = async (req, res) => {
     try {
         const { id_seguimiento } = req.params; // Obtén el ID del seguimiento desde los parámetros de la solicitud
-        let sql = `SELECT id_novedad, fecha, instructor, descripcion, foto FROM novedades WHERE seguimiento = ?`; // Asegúrate de incluir la columna de imagen
+        let sql = `SELECT id_novedad, seguimiento, fecha, instructor, descripcion, foto FROM novedades WHERE seguimiento = ?`; // Asegúrate de incluir la columna de imagen
 
         const [results] = await pool.query(sql, [id_seguimiento]);
         if (results.length > 0) {

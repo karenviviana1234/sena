@@ -5,6 +5,7 @@ import FormNovedades from './FormNovedades';
 import ButtonRegistrarActividad from '../../atoms/ButtonRegistrarActividad';
 import ButtonDesactivar from '../../atoms/ButtonDesactivar';
 import Swal from 'sweetalert2';
+import { Select, SelectItem } from '@nextui-org/react';
 
 const Novedades = () => {
     const [novedades, setNovedades] = useState([]);
@@ -15,6 +16,7 @@ const Novedades = () => {
     const [selectedSeguimientos, setSelectedSeguimientos] = useState('');
     const [seguimientos, setSeguimientos] = useState([]);
     const [userRole, setUserRole] = useState(null);
+    const [noNovedadesMessage, setNoNovedadesMessage] = useState('');
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -41,10 +43,18 @@ const Novedades = () => {
     };
 
     const fetchData = async () => {
+        if (!selectedSeguimientos) return; // No hacer nada si no hay seguimiento seleccionado
         setIsLoading(true);
         try {
             const response = await axiosClient.get(`/novedades/listar/${selectedSeguimientos}`);
-            setNovedades(response.data || []);
+            if (response.data && response.data.length > 0) {
+                setNovedades(response.data);
+                setNoNovedadesMessage('');
+            } else {
+                setNovedades([]); // Limpia el estado si no hay novedades
+                setNoNovedadesMessage('No hay novedades registradas para este seguimiento.');
+                console.log('No hay novedades registradas.'); // Log para ver si se ejecuta
+            }            
         } catch (error) {
             console.error('Error al obtener las novedades:', error);
         } finally {
@@ -57,6 +67,12 @@ const Novedades = () => {
         fetchSeguimientos(); // Obtener seguimientos al inicio
     }, []);
 
+    useEffect(() => {
+        if (selectedSeguimientos) {
+            fetchData(); // Solo llamarlo si hay un seguimiento seleccionado
+        }
+    }, [selectedSeguimientos]);
+
     const fetchSeguimientos = async () => {
         try {
             const response = await axiosClient.get("/seguimientos/listar");
@@ -66,14 +82,6 @@ const Novedades = () => {
         }
     };
 
-    useEffect(() => {
-        if (selectedSeguimientos) {
-            fetchData(); // Cargar novedades según el seguimiento seleccionado
-        } else {
-            listarN(); // Si no hay seguimiento seleccionado, cargar todas las novedades
-        }
-    }, [selectedSeguimientos]);
-
     const handleOpenModal = (formType, novedad = null) => {
         if (formType === 'formNovedades') {
             setBodyContent(
@@ -82,8 +90,8 @@ const Novedades = () => {
                     id_seguimiento={selectedSeguimientos}
                     onClose={handleCloseModal}
                     onSubmit={handleSubmit}
-                    mode={'create'}
-                    actionLabel={'Registrar Novedad'}
+                    mode={novedad ? 'edit' : 'create'} // Cambia el modo si editas
+                    actionLabel={novedad ? 'Actualizar Novedad' : 'Registrar Novedad'}
                 />
             );
         }
@@ -93,17 +101,30 @@ const Novedades = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedNovedad(null);
+        listarN(); // Refrescar las novedades después de cerrar el modal
     };
 
-    const handleSubmit = async () => {
-        console.log('Novedad guardada:', selectedNovedad);
-        listarN(); // Refrescar las novedades después de la acción
-        handleCloseModal();
+    const handleSubmit = async (novedadData) => {
+        try {
+            if (selectedNovedad) {
+                // Lógica para editar la novedad
+                await axiosClient.put(`/novedades/actualizar/${selectedNovedad.id_novedad}`, novedadData);
+            } else {
+                // Lógica para registrar nueva novedad
+                await axiosClient.post(`/novedades/crear`, { ...novedadData, id_seguimiento: selectedSeguimientos });
+            }
+            listarN(); // Refrescar las novedades después de la acción
+            handleCloseModal();
+        } catch (error) {
+            console.error('Error al guardar la novedad:', error);
+        }
     };
 
     const handleSeguimientoChange = (event) => {
         setSelectedSeguimientos(event.target.value);
+        console.log(event.target.value); // Agrega este log para verificar el valor
     };
+    
 
     const desactivarNovedad = async (id_novedad) => {
         try {
@@ -120,6 +141,8 @@ const Novedades = () => {
         }
     };
 
+    
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex justify-between items-center">
@@ -127,22 +150,23 @@ const Novedades = () => {
             </div>
 
             {/* Filtro por seguimiento */}
-            <div className="mb-6">
-                <select
-                    className="mt-4 h-10 w-60 rounded-lg bg-[#f4f4f5] p-2 mr-20"
+            <div className="mb-6 flex justify-between">
+                <Select
+                    className="w-60 mt-5"
                     id="seguimientos"
                     name="Seguimiento"
                     value={selectedSeguimientos}
+                    placeholder='Selecciona un Seguimiento'
                     onChange={handleSeguimientoChange}
                     required
                 >
-                    <option value="">Selecciona un Seguimiento</option>
+                    <SelectItem value="">Selecciona un Seguimiento</SelectItem>
                     {seguimientos.map((seguimiento, index) => (
-                        <option key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
-                            {index + 1} {/* Mostrar el número 1, 2, 3, pero enviando el id_seguimiento */}
-                        </option>
+                        <SelectItem key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
+                            {`${index + 1} `}
+                        </SelectItem>
                     ))}
-                </select>
+                </Select>
 
                 {(userRole !== 'Aprendiz') && (
                     <ButtonRegistrarActividad
@@ -153,34 +177,38 @@ const Novedades = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {novedades.map((novedad) => (
-                    <div key={novedad.id_novedad} className="bg-white shadow-md rounded-lg p-4 relative">
-                        <h4 className="text-xl font-semibold mb-2">{novedad.instructor}</h4>
-                        <p className="text-sm text-gray-600">Descripción: {novedad.descripcion}</p>
-                        <p className="text-sm text-gray-600">Seguimiento: {novedad.seguimiento}</p>
+                {novedades.length > 0 ? (
+                    novedades.map((novedad) => (
+                        <div key={novedad.id_novedad} className="bg-white shadow-md rounded-lg p-4 w-60 relative">
+                            <h4 className="text-xl font-semibold mb-2">{novedad.instructor}</h4>
+                            <p className="text-sm text-gray-600">Descripción: {novedad.descripcion}</p>
+                            <p className="text-sm text-gray-600">Seguimiento: {novedad.numero_seguimiento}</p>
 
-                        {novedad.foto && (
-                            <img
-                                src={`${axiosClient.defaults.baseURL}/novedad/${novedad.foto}`}
-                                alt={`Foto de ${novedad.instructor}`}
-                                className="my-6 rounded-xl w-full max-h-40 object-cover"
-                            />
-                        )}
-                        <p className="text-sm text-gray-600 absolute bottom-4 right-4 ">
-                            {new Date(novedad.fecha).toLocaleDateString('es-CO', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                            }).replace(/\//g, '-')}
-                        </p>
-
-                        <div className="absolute top-2 right-2">
-                            {(userRole !== 'Aprendiz') && (
-                                <ButtonDesactivar onClick={() => desactivarNovedad(novedad.id_novedad)} />
+                            {novedad.foto && (
+                                <img
+                                    src={`${axiosClient.defaults.baseURL}/novedad/${novedad.foto}`}
+                                    alt={`Foto de ${novedad.instructor}`}
+                                    className="my-6 rounded-xl w-full max-h-40 object-cover"
+                                />
                             )}
+                            <p className="text-sm text-gray-600 absolute bottom-4 right-4 ">
+                                {new Date(novedad.fecha).toLocaleDateString('es-CO', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                }).replace(/\//g, '-')}
+                            </p>
+
+                            <div className="absolute top-2 right-2">
+                                {(userRole !== 'Aprendiz') && (
+                                    <ButtonDesactivar onClick={() => desactivarNovedad(novedad.id_novedad)} />
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    <p className="text-red-500">{noNovedadesMessage}</p> // Mensaje cuando no hay novedades
+                )}
             </div>
 
 
