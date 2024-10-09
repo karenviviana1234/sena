@@ -95,6 +95,7 @@ const storage = multer.diskStorage(
 )
 
 const upload = multer({storage: storage})
+
 export const productivaFiles = upload.fields([
     {name: 'acuerdo', maxCount: 1},
     {name: 'arl', maxCount: 1},
@@ -237,13 +238,13 @@ export const registrarProductiva = async (req, res) => {
 
 export const actualizarProductiva = async (req, res) => {
     try {
-        const {id} = req.params
+        const {id_productiva} = req.params
         const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, aprendiz } = req.body
         let acuerdo = req.files && req.files.acuerdo ? req.files.acuerdo[0].originalname : null
         let arl = req.files && req.files.arl ? req.files.arl[0].originalname : null
         let consulta = req.files && req.files.consulta ? req.files.consulta[0].originalname : null
 
-        const [anterior] = await pool.query('SELECT * FROM productiva WHERE id_productiva = ?', [id])
+        const [anterior] = await pool.query('SELECT * FROM productiva WHERE id_productiva = ?', [id_productiva])
 
         let sql = `UPDATE productiva SET
                     matricula = ?,

@@ -122,26 +122,30 @@ export const listarMatriculas = async (req, res) => {
         });
     }
 };
-
 export const listar = async (req, res) => {
     try {
-        let sql = `SELECT * FROM matriculas`
+        // Consulta para listar las matriculas junto con los nombres de los aprendices
+        let sql = `
+            SELECT matriculas.*, personas.nombres AS nombre_aprendiz 
+            FROM matriculas 
+            JOIN personas ON matriculas.aprendiz = personas.id_persona
+        `;
 
-        const [results] = await pool.query(sql)
+        const [results] = await pool.query(sql);
 
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
-                message: 'No hay matriculas registradas'
-            })
+                message: 'No hay matrículas registradas'
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error.message
+        });
     }
-}
+};
 
 
 export const registrarMatriculas = async (req, res) => {

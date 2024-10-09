@@ -24,6 +24,7 @@ import FormActualizarAsignacion from "../molecules/Asignaciones/FormEditAsignaci
 import { format } from 'date-fns';
 import ButtonDescargar from "../atoms/ButtonDescargar.jsx";
 import ButtonDescargarProductiva from "../atoms/ButtonDescargarProductiva.jsx";
+import FormProductiva from "../molecules/Productivas/FormEtapaPractica.jsx";
 
 function TableProductiva() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -39,6 +40,7 @@ function TableProductiva() {
     });
 
     const fetchData = async () => {
+        console.log("Fetching data...");
         try {
             const response = await axiosClient.get("/productiva/listar");
             setProductivas(response.data);
@@ -61,27 +63,49 @@ function TableProductiva() {
         setModalOpen(true);
         setInitialData(data);
 
-        // Si es para registrar una nueva asignación
-        if (formType === 'asignacion') {
-            setModalContent(
-                <FormAsignacion
-                    initialData={null}  // Sin datos iniciales para registrar
-                    onSuccess={handleUpdateData}
-                    id_productiva={id_productiva}  // Solo enviar id_productiva para registro
-                />
-            );
-        }
+        switch (formType) {
+            case 'productiva':
+                setModalContent(
+                    <FormProductiva
+                        initialData={null}  // Sin datos iniciales para registrar
+                        onSuccess={handleUpdateData}
+                    />
+                );
+                break;
 
-        // Si es para actualizar una asignación existente
-        if (formType === 'actualizar_asignacion') {
-            setModalContent(
-                <FormActualizarAsignacion
-                    initialData={data}  // Pasamos los datos existentes para actualizar
-                    onSuccess={handleUpdateData}
-                    id_productiva={id_productiva}  // Enviar tanto id_productiva como id_asignacion
-                    id_asignacion={data.id_asignacion}
-                />
-            );
+            case 'actualizar_productiva':
+                setModalContent(
+                    <FormProductiva
+                        initialData={data}  // Asegúrate de que `data` tenga los valores correctos
+                        onSuccess={handleUpdateData}
+                        id_productiva={id_productiva}
+                    />
+                );
+                break;
+
+            case 'asignacion':
+                setModalContent(
+                    <FormAsignacion
+                        initialData={null}  // Sin datos iniciales para registrar
+                        onSuccess={handleUpdateData}
+                        id_productiva={id_productiva}  // Solo enviar id_productiva para registro
+                    />
+                );
+                break;
+
+            case 'actualizar_asignacion':
+                setModalContent(
+                    <FormActualizarAsignacion
+                        initialData={data}  // Pasamos los datos existentes para actualizar
+                        onSuccess={handleUpdateData}
+                        id_productiva={id_productiva}  // Enviar tanto id_productiva como id_asignacion
+                        id_asignacion={data.id_asignacion}
+                    />
+                );
+                break;
+
+            default:
+                break;
         }
     };
 
@@ -89,30 +113,19 @@ function TableProductiva() {
         fetchData();
     }, [fetchData]);
 
-    const handleFormSubmit = async (formData) => {
-        try {
-            if (formData.id_asignacion) {
-                // Si tiene id_asignacion, actualizamos
-                const response = await axiosClient.put(`/actualizar/${formData.id_asignacion}`, formData);
-                console.log('Updated successfully:', response.data);
-            } else {
-                // Si no tiene id_asignacion, registramos
-                const response = await axiosClient.post('/registrar', { ...formData, id_productiva: formData.id_productiva });
-                console.log('Created successfully:', response.data);
-            }
-            handleCloseModal();
-        } catch (error) {
-            console.error("Error submitting form:", error);
-        }
-    };
-
     const handleEditAsignacion = (data) => {
         handleOpenModal('actualizar_asignacion', {
             ...data,
             id_asignacion: data.id_asignacion,
-        }, data.id_productiva);  // Pasamos también el id_productiva
-    };
+        }, data.id_productiva);
+        };
 
+    const handleEditProductiva = (data) => {
+            handleOpenModal('actualizar_productiva', {
+                ...data,
+                id_productiva: data.id_productiva,
+            }, data.id_productiva);
+            };
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -160,13 +173,15 @@ function TableProductiva() {
         }
     };
 
-    const renderCell = (productiva, columnKey) => {
-        const cellValue = productiva[columnKey];
+    const renderCell = (productiva, columnKey, item) => {
+        const cellValue = productiva[item, columnKey];
         switch (columnKey) {
             case "acciones":
                 return (
                     <div className="flex justify-around items-center">
-                        <ButtonActualizar />
+                        <ButtonActualizar 
+                            onClick={() => handleEditProductiva("actualizar_productiva", item)}
+                        />
                         <ButtonDesactivar
                             onClick={() => handleDesactivar(productiva.id_asignacion)}
                         />
@@ -214,7 +229,6 @@ function TableProductiva() {
                     </Chip>
                 );
 
-
             default:
                 return cellValue;
         }
@@ -256,6 +270,7 @@ function TableProductiva() {
         setPage(1);
     }, []);
 
+
     const onSearchChange = useCallback((value) => {
         setFilterValue(value || "");
         setPage(1);
@@ -282,6 +297,7 @@ function TableProductiva() {
                         />
                         <div>
                             <Button
+                                onClick={() => handleOpenModal("productiva")}
                                 className="bg-[#0d324c] text-white"
                             >
                                 Registrar Etapa Productiva
@@ -350,7 +366,7 @@ function TableProductiva() {
                     </TableHeader>
                     <TableBody>
                         {sortedItems.map((item) => (
-                            <TableRow key={item.id_asignacion}>
+                            <TableRow>
                                 {columns.map((column) => (
                                     <TableCell key={column.key} style={{ width: '250px' }}>
                                         {renderCell(item, column.key)}
@@ -374,7 +390,6 @@ function TableProductiva() {
             <ModalAcciones
                 isOpen={modalOpen}
                 onClose={handleCloseModal}
-                title={initialData ? "Actualizar Asignación" : "Registrar Asignación"}
                 bodyContent={modalContent}
             />
         </div>
