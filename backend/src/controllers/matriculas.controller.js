@@ -90,16 +90,14 @@ export const contarMatriculasPorEstado = async (req, res) => {
         });
     }
 };
-
-
 export const listarMatriculas = async (req, res) => {
     const { codigo } = req.params; // Obtener el parámetro id_ficha de la URL
 
     try {
-        // Realizar un JOIN entre matriculas y personas para obtener el nombre del aprendiz,
+        // Realizar un JOIN entre matriculas y personas para obtener el nombre y la identificación del aprendiz,
         // y filtrar por id_ficha recibido en la ruta
         let sql = `
-            SELECT m.id_matricula, p.nombres AS nombre_aprendiz, m.ficha, m.estado, 
+            SELECT m.id_matricula, p.identificacion, p.nombres AS nombre_aprendiz, m.ficha, m.estado, 
                    m.pendiente_tecnicos, m.pendiente_transversales, m.pendiente_ingles
             FROM matriculas m
             JOIN personas p ON m.aprendiz = p.id_persona
@@ -122,30 +120,26 @@ export const listarMatriculas = async (req, res) => {
         });
     }
 };
+
 export const listar = async (req, res) => {
     try {
-        // Consulta para listar las matriculas junto con los nombres de los aprendices
-        let sql = `
-            SELECT matriculas.*, personas.nombres AS nombre_aprendiz 
-            FROM matriculas 
-            JOIN personas ON matriculas.aprendiz = personas.id_persona
-        `;
+        let sql = `SELECT * FROM matriculas`
 
-        const [results] = await pool.query(sql);
+        const [results] = await pool.query(sql)
 
-        if (results.length > 0) {
-            res.status(200).json(results);
-        } else {
+        if(results.length>0){
+            res.status(200).json(results)
+        }else{
             res.status(404).json({
-                message: 'No hay matrículas registradas'
-            });
+                message: 'No hay matriculas registradas'
+            })
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor: ' + error.message
-        });
+            message: 'Error del servidor' + error
+        })
     }
-};
+}
 
 
 export const registrarMatriculas = async (req, res) => {
