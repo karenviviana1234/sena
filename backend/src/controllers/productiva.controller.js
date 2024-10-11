@@ -1,6 +1,18 @@
 import { pool } from "../database/conexion.js";
 import multer from "multer";
 import { addMonths, format, isValid } from 'date-fns';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import archiver from 'archiver';
+
+
+
+// Obtener el directorio actual del archivo
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 export const listarProductiva = async (req, res) => {
     try {
         // Consulta para listar todas las productivas con los nombres de los aprendices, instructores, razón social de la empresa y el id_asignacion
@@ -85,21 +97,21 @@ export const contarProductivasPorEstado = async (req, res) => {
 
 const storage = multer.diskStorage(
     {
-        destination: function(req,file,cb){
+        destination: function (req, file, cb) {
             cb(null, "public/productiva")
         },
-        filename: function(req,file,cb){
+        filename: function (req, file, cb) {
             cb(null, file.originalname)
         }
     }
 )
 
-const upload = multer({storage: storage})
+const upload = multer({ storage: storage })
 
 export const productivaFiles = upload.fields([
-    {name: 'acuerdo', maxCount: 1},
-    {name: 'arl', maxCount: 1},
-    {name: 'consulta', maxCount: 1}
+    { name: 'acuerdo', maxCount: 1 },
+    { name: 'arl', maxCount: 1 },
+    { name: 'consulta', maxCount: 1 }
 ])
 
 
@@ -107,9 +119,11 @@ export const productivaFiles = upload.fields([
 export const registrarProductiva = async (req, res) => {
     try {
         const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, instructor } = req.body;
-        const acuerdo = req.files?.acuerdo?.[0]?.originalname || null;
-        const arl = req.files?.arl?.[0]?.originalname || null;
-        const consulta = req.files?.consulta?.[0]?.originalname || null;
+        const acuerdo = req.files?.acuerdo?.[0]?.filename || null;
+        const arl = req.files?.arl?.[0]?.filename || null;
+        const consulta = req.files?.consulta?.[0]?.filename || null;
+
+        console.log("Nombres de archivos a insertar:", { acuerdo, arl, consulta });
 
         // Verificar que la matrícula existe en la tabla matriculas y obtener el aprendiz
         const sqlCheckMatricula = 'SELECT id_matricula, aprendiz FROM matriculas WHERE id_matricula = ?';
@@ -136,13 +150,17 @@ export const registrarProductiva = async (req, res) => {
 
         // Registrar etapa productiva, incluyendo el ID del aprendiz
         const sqlProductiva = `
-            INSERT INTO productivas
-            (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
-            VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
-        `;
+        INSERT INTO productivas
+        (matricula, empresa, fecha_inicio, fecha_fin, alternativa, estado, acuerdo, arl, consulta, aprendiz) 
+        VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
+    `;
         const [resultProductiva] = await pool.query(sqlProductiva, [
             matricula, empresa, fecha_inicio, fecha_fin, alternativa, acuerdo, arl, consulta, aprendiz
         ]);
+
+        console.log("Resultado de la inserción:", resultProductiva);
+
+        
 
         if (resultProductiva.affectedRows > 0) {
             const productivaId = resultProductiva.insertId;
@@ -238,7 +256,7 @@ export const registrarProductiva = async (req, res) => {
 
 export const actualizarProductiva = async (req, res) => {
     try {
-        const {id_productiva} = req.params
+        const { id_productiva } = req.params
         const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, aprendiz } = req.body
         let acuerdo = req.files && req.files.acuerdo ? req.files.acuerdo[0].originalname : null
         let arl = req.files && req.files.arl ? req.files.arl[0].originalname : null
@@ -276,11 +294,11 @@ export const actualizarProductiva = async (req, res) => {
 
         const [rows] = await pool.query(sql, param)
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Etapa productiva actualizada correctamente'
             })
-        }else{
+        } else {
             res.status(403).json({
                 message: 'Error al actualizar la etapa productiva'
             })
@@ -288,22 +306,22 @@ export const actualizarProductiva = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             message: 'Error del servidor' + error
-        })   
+        })
     }
 }
 
 export const renunciarProductiva = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         let sql = `UPDATE productiva SET estado = 2 WHERE id_productiva =?`
 
         const [rows] = await pool.query(sql, [id])
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Etapa productiva renunciada correctamente'
             })
-        }else{
+        } else {
             res.status(403).json({
                 message: 'Error al renunciar la etapa productiva'
             })
@@ -315,18 +333,18 @@ export const renunciarProductiva = async (req, res) => {
     }
 }
 
-export const terminarProductiva = async(req, res) => {
+export const terminarProductiva = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         let sql = `UPDATE productiva SET estado = 3 WHERE id_productiva =?`
 
         const [rows] = await pool.query(sql, [id])
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'Etapa productiva finalizada correctamente'
             })
-        }else{
+        } else {
             res.status(403).json({
                 message: 'Error al finalizar la etapa productiva'
             })
@@ -338,3 +356,61 @@ export const terminarProductiva = async(req, res) => {
     }
 }
 
+
+export const descargarPdf = async (req, res) => {
+    try {
+        const id_productiva = decodeURIComponent(req.params.id_productiva);
+        const [result] = await pool.query('SELECT arl, consulta, acuerdo FROM productivas WHERE id_productiva = ?', [id_productiva]);
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Producto no encontrado.' });
+        }
+
+        const { arl, consulta, acuerdo } = result[0];
+
+        // Verifica si alguno de los nombres de archivo es nulo o una cadena vacía
+        if (!arl || !consulta || !acuerdo) {
+            return res.status(404).json({ message: 'Uno o más archivos PDF no están disponibles.' });
+        }
+
+        // Ruta de los archivos PDF
+        const files = [
+            { name: arl, path: path.resolve(__dirname, '../../public/productiva', arl) },
+            { name: consulta, path: path.resolve(__dirname, '../../public/productiva', consulta) },
+            { name: acuerdo, path: path.resolve(__dirname, '../../public/productiva', acuerdo) },
+        ];
+
+        // Verifica si los archivos existen
+        for (const file of files) {
+            if (!fs.existsSync(file.path)) {
+                return res.status(404).json({ message: `Archivo no encontrado: ${file.name}` });
+            }
+        }
+
+        // Configura la respuesta para el archivo ZIP
+        res.zip = (files) => {
+            const archive = archiver('zip', {
+                zlib: { level: 9 } // Establece la compresión
+            });
+
+            res.attachment('documentos.zip');
+
+            // Pipe la salida del archivo ZIP a la respuesta
+            archive.pipe(res);
+
+            // Agrega los archivos al archivo ZIP
+            files.forEach(file => {
+                archive.file(file.path, { name: file.name });
+            });
+
+            archive.finalize();
+        };
+
+        // Envía el archivo ZIP al cliente
+        res.zip(files);
+
+    } catch (error) {
+        console.error('Error en el servidor:', error);
+        res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    }
+};

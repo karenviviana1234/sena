@@ -23,13 +23,12 @@ LEFT JOIN
             res.status(404).json({
                 message: 'No hay ambientes registrados'
             });
-           
+
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor: ' + error
-        });
-            message: 'Error del servidor: ' + error
+            message: 'Error del servidor' + error
+        })
     }
 };
 

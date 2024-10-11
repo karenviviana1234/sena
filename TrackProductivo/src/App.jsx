@@ -136,13 +136,13 @@ export function WithSidebar({ children }) {
         {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
           <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
         )}
-        {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
+        {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
           <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
         )}
         {/*  {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
         <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
         )} */}
-        {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
+        {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
           <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Productivas" />
         )}
         <SidebarItem nav="/seguimiento" icon={<FolderSearch2 size={20} />} text="Seguimientos" />

@@ -16,11 +16,11 @@ function FichasPage() {
           <Tab key="fichas" title="Fichas">
             <TableFichas />
           </Tab>
-          <Tab key="horarios" title="Horarios">
-            <TableHorarios />
-          </Tab>
           <Tab key="ambientes" title="Ambientes">
             <TableAmbiente />
+          </Tab>
+          <Tab key="horarios" title="Horarios">
+            <TableHorarios />
           </Tab>
         </Tabs>
       </div>

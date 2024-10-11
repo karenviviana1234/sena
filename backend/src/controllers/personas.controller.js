@@ -234,8 +234,6 @@ export const actualizarPersona = async (req, res) => {
     const { id_persona } = req.params;
     const { identificacion, nombres, correo, telefono, rol, cargo, municipio } = req.body;
 
-  
-
     if (!identificacion || !nombres || !correo || !telefono || !rol) {
       return res.status(400).json({
         status: 400,
@@ -252,6 +250,9 @@ export const actualizarPersona = async (req, res) => {
       });
     }
 
+    // Generar la nueva contraseña hasheada
+    const newPassword = await bcrypt.hash(identificacion.toString(), 10);
+
     const updatedUsuario = {
       identificacion: identificacion || oldPersona[0].identificacion,
       nombres: nombres || oldPersona[0].nombres,
@@ -260,6 +261,7 @@ export const actualizarPersona = async (req, res) => {
       rol: rol || oldPersona[0].rol,
       cargo: cargo || oldPersona[0].cargo,
       municipio: municipio || oldPersona[0].municipio,
+      password: newPassword 
     };
 
     const [result] = await pool.query(
@@ -270,7 +272,8 @@ export const actualizarPersona = async (req, res) => {
           telefono = ?, 
           rol = ?, 
           cargo = ?, 
-          municipio = ? 
+          municipio = ?, 
+          password = ?  
          WHERE id_persona = ?`,
       [
         updatedUsuario.identificacion,
@@ -280,6 +283,7 @@ export const actualizarPersona = async (req, res) => {
         updatedUsuario.rol,
         updatedUsuario.cargo,
         updatedUsuario.municipio,
+        updatedUsuario.password, 
         id_persona
       ]
     );
