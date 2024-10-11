@@ -5,7 +5,7 @@ import axiosClient from "../../../configs/axiosClient";
 
 function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
     const [aprendices, setAprendices] = useState([]);
-    const [estado, setEstado] = useState("");
+    const [estado, setEstado] = useState("Selecciona");
     const [aprendizSeleccionado, setAprendizSeleccionado] = useState(null);
     const [idMatricula, setMatriculaId] = useState(null);
     const [pendientesTecnicos, setPendientesTecnicos] = useState(0);
@@ -46,13 +46,13 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setErrors({});
+    e.preventDefault();
+    setErrors({});
 
-        if (estado === 'Selecciona') {
-            setErrors({ estado: 'Por favor, selecciona un estado válido.' });
-            return;
-        }
+    if (estado === 'Selecciona') {
+        setErrors({ estado: 'Por favor, selecciona un estado válido.' });
+        return;
+    }
 
         const formData = {
             estado,
@@ -117,6 +117,7 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                     <option value="Por Certificar">Por Certificar</option>
                     <option value="Certificado">Certificado</option>
                 </select>
+                {errors.estado && <p className="text-red-500">{errors.estado}</p>}
 
                 {/* Mostrar la lista de aprendices solo al registrar */}
                 {!isEditing && (

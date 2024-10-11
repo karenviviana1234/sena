@@ -90,22 +90,24 @@ function TableSeguimientos() {
                         setButtonStates(prevStates => {
                             const updatedStates = {
                                 ...prevStates,
-                                [id_seguimiento]: "aprobado",  // Aquí 'id_seguimiento' debería ser el ID del seguimiento actual
+                                [id_seguimiento]: "aprobado",
                             };
-                            localStorage.setItem('buttonStates', JSON.stringify(updatedStates)); // Guardar en localStorage
+                            localStorage.setItem('buttonStates', JSON.stringify(updatedStates));
                             return updatedStates;
                         });
                     }}
+                    
                     onReject={() => {
                         handleUpdateData();
                         setButtonStates(prevStates => {
                             const updatedStates = {
                                 ...prevStates,
-                                [id_seguimiento]: "no aprobado",  // Igualmente aquí
+                                [id_seguimiento]: "no aprobado",
                             };
-                            localStorage.setItem('buttonStates', JSON.stringify(updatedStates)); // Guardar en localStorage
+                            localStorage.setItem('buttonStates', JSON.stringify(updatedStates));
                             return updatedStates;
                         });
+                    
                     }}
                     onIdSend={(id) => console.log("ID de seguimiento enviado:", id)}
                 />
@@ -195,36 +197,26 @@ function TableSeguimientos() {
 
     const renderCell = useCallback((item, columnKey) => {
         const cellValue = item[columnKey];
-
+    
         switch (columnKey) {
-            case "acciones":
-                return (
-                    <div className="flex justify-around items-center">
-                        <ButtonRegistrarNovedad onClick={() => handleOpenModal(null, 'formNovedades')} />
-                    </div>
-                );
-
             case "seguimiento1":
             case "seguimiento2":
             case "seguimiento3":
-                // Asegúrate de que cellValue es una fecha válida
                 const formattedDate = cellValue ? format(new Date(cellValue), 'dd-MM-yyyy') : 'Fecha no válida';
                 const seguimientoIdKey = `id_${columnKey}`;
                 const estadoKey = `estado${columnKey.charAt(columnKey.length - 1)}`;
-                const estado = item[estadoKey];
-
-                const buttonState = buttonStates[item[seguimientoIdKey]] || "solicitud";
-
+                const estado = item[estadoKey]; // Obtenemos el estado directamente de la BD
+    
                 return (
                     <div className="flex flex-col items-center">
                         <Button
                             className="text-white h-8 w-10 text-xs"
                             style={{
                                 backgroundColor:
-                                    buttonState === "no aprobado" ? "red" :
-                                        buttonState === "solicitud" ? "orange" :
-                                            buttonState === "aprobado" ? "green" :
-                                                "gray",
+                                    estado === "no aprobado" ? "red" :
+                                    estado === "solicitud" ? "orange" :
+                                    estado === "aprobado" ? "green" :
+                                    "gray",  // Color por defecto si no hay estado
                             }}
                             onClick={() => handleOpenModal(item[seguimientoIdKey], 'componentSeguimiento')}
                         >
@@ -337,7 +329,6 @@ function TableSeguimientos() {
         { key: "seguimiento2", label: "Seguimiento 2" },
         { key: "seguimiento3", label: "Seguimiento 3" },
         { key: "porcentaje", label: "Porcentaje" },
-        { key: "acciones", label: "Acciones" },
     ];
 
     return (

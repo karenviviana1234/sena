@@ -283,7 +283,7 @@ export default function TableAmbiente() {
                         <TableColumn key={column.key}>{column.label}</TableColumn>
                     ))}
                 </TableHeader>
-                <TableBody emptyContent={"No hay ambientes registrados"} items={sortedItems}>
+                <TableBody  items={sortedItems}>
                     {(item) => (
                         <TableRow key={item.id_ambiente}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

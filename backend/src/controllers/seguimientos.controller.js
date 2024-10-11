@@ -3,10 +3,25 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { format } from 'date-fns';
 
 // Obtener el directorio actual del archivo
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+/* Multer para cargar el PDF */
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "public/seguimientos");
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+export const cargarSeguimiento = upload.single('seguimientoPdf');
 
 // Función para listar seguimientos
 export const listarSeguimiento = async (req, res) => {
@@ -23,19 +38,9 @@ export const listarSeguimiento = async (req, res) => {
     }
 };
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "public/seguimientos");
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname);
-    }
-});
 
-const upload = multer({ storage: storage });
-export const cargarSeguimiento = upload.single('seguimientoPdf');
 export const listarSeguimientoAprendices = async (req, res) => {
-    const { identificacion, rol } = req.user; // Obtiene la información del usuario
+    const { identificacion, rol, cargo } = req.user; // Obtiene la información del usuario
     try {
         let sql;
         let params = [];
@@ -76,7 +81,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
                 ORDER BY
                     p.identificacion, s.seguimiento;
             `;
-        } else if (rol === 'Instructor') {
+        } else if (cargo === 'Instructor') {
             // Si es instructor, filtrar los seguimientos donde es el instructor asignado
             sql = `
                 SELECT
@@ -241,10 +246,7 @@ export const registrarSeguimiento = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error del servidor: ' + error });
     }
-};
-
-/* Cargar PDF */
-export const uploadPdfToSeguimiento = async (req, res) => {
+};export const uploadPdfToSeguimiento = async (req, res) => {
     try {
         const { id_seguimiento } = req.params;  // Obtener el ID del seguimiento desde los parámetros de la URL
         const pdf = req.file?.originalname || null;  // Obtener el nombre del archivo PDF cargado
@@ -255,30 +257,68 @@ export const uploadPdfToSeguimiento = async (req, res) => {
             });
         }
 
-        // Actualizar el campo 'pdf' en la tabla 'seguimientos' con la ruta o el nombre del archivo
-        const sqlUpdateSeguimiento = `
-            UPDATE seguimientos 
-            SET pdf = ? 
-            WHERE id_seguimiento = ?
-        `;
-        const [result] = await pool.query(sqlUpdateSeguimiento, [pdf, id_seguimiento]);
+        // Directorio donde se guardan los archivos
+        const uploadDirectory = 'public/seguimientos';
 
-        if (result.affectedRows > 0) {
-            res.status(200).json({
-                message: 'PDF cargado exitosamente en el seguimiento'
-            });
-        } else {
-            res.status(404).json({
-                message: 'Seguimiento no encontrado'
-            });
-        }
+        // Nombre base para el archivo
+        const baseFileName = 'ActaSeguimiento';
+
+        // Función para generar un nombre de archivo único
+        const getUniqueFileName = (directory, baseFileName) => {
+            const extension = path.extname(pdf); // Obtener extensión del PDF cargado
+            let fileName = `${baseFileName}${extension}`; // Nombre base con extensión
+            let counter = 1;
+
+            // Comprobar si el archivo existe y renombrar con un número secuencial
+            while (fs.existsSync(path.join(directory, fileName))) {
+                fileName = `${baseFileName}-${counter}${extension}`; // Agregar número al archivo
+                counter++;
+            }
+
+            return fileName; // Devolver nombre único
+        };
+
+        // Generar el nombre de archivo único
+        const uniquePdfName = getUniqueFileName(uploadDirectory, baseFileName);
+
+        // Ruta completa donde se guardará el archivo
+        const pdfPath = path.join(uploadDirectory, uniquePdfName);
+
+        // Mover el archivo a la carpeta de destino con el nombre único
+        fs.rename(req.file.path, pdfPath, async (err) => {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error al guardar el archivo: ' + err.message
+                });
+            }
+
+            // Obtener la fecha actual en formato local YYYY-MM-DD
+            const fechaActual = format(new Date(), 'yyyy-MM-dd');
+
+            // Actualizar el campo 'pdf' en la tabla 'seguimientos' con la ruta o el nombre del archivo
+            const sqlUpdateSeguimiento = `
+                UPDATE seguimientos 
+                SET pdf = ?, fecha = ?
+                WHERE id_seguimiento = ?
+            `;
+            const [result] = await pool.query(sqlUpdateSeguimiento, [uniquePdfName, fechaActual, id_seguimiento]);
+
+            if (result.affectedRows > 0) {
+                res.status(200).json({
+                    message: 'PDF cargado exitosamente en el seguimiento'
+                });
+            } else {
+                res.status(404).json({
+                    message: 'Seguimiento no encontrado'
+                });
+            }
+        });
     } catch (error) {
         res.status(500).json({
             message: 'Error del servidor: ' + error.message
         });
     }
 };
-
 // Función para actualizar seguimientos
 export const actualizarSeguimiento = async (req, res) => {
     try {

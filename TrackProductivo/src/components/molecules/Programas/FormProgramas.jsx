@@ -65,7 +65,7 @@ function FormProgramas({ initialData, onSuccess }) {
                 onChange={(e) => setNivel(e.target.value)}
                 required
             >
-                <option value="Selecciona">Selecciona</option>
+                <option value="Selecciona">Selecciona un Nivel</option>
                 <option value="Tecnico">Tecnico</option>
                 <option value="Tecnólogo">Tecnólogo</option>
             </select>
