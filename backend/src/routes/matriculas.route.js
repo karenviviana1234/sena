@@ -5,7 +5,6 @@ import { validarToken } from '../controllers/seguridad.controller.js'
 const rutaMatriculas = Router()
 
 rutaMatriculas.get('/listar/:codigo', validarToken, listarMatriculas)
-rutaMatriculas.get("/listarEstados", validarToken, contarMatriculasPorEstado);
 rutaMatriculas.get('/listarA', validarToken, listarAprendices)
 rutaMatriculas.get('/lista', validarToken, listar)
 rutaMatriculas.post('/registrar', validarToken, registrarMatriculas)
