@@ -41,7 +41,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
   useEffect(() => {
     const loadFichas = async () => {
       try {
-        const response = await axiosClient.get("/fichas/listar");
+        const response = await axiosClient.get("/fichas/listarN");
         setFichas(response.data);
       } catch (error) {
         console.error("Error al cargar las fichas:", error);
@@ -188,6 +188,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
         </div>
 
         {/* Select para Fichas de la base de datos*/}
+
         <div className="py-2">
           <select
             className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500"
@@ -197,7 +198,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
           >
             <option value="">Seleccionar Ficha</option>
             {fichas.map((ficha) => (
-              <option key={ficha.id_ficha} value={ficha.id_ficha}>
+              <option key={ficha.codigo} value={ficha.codigo}>
                 {ficha.codigo}
               </option>
             ))}

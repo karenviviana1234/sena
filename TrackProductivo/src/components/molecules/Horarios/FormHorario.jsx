@@ -6,8 +6,8 @@ import GlobalModal from "../ComponentsGlobals/GlobalModal";
 import { useDisclosure } from "@nextui-org/react";
 import { Clock } from 'lucide-react';
 
-export const RegistroHorario = ({ onRegisterSuccess }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export const RegistroHorario = ({ refreshData, onClose }) => {
+  const { isOpen, onOpen } = useDisclosure();
   const [horarioData, setHorarioData] = useState({
     hora_inicio: "",
     hora_fin: "",
@@ -27,7 +27,6 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
         setFichas(response.data);
       } catch (error) {
         console.error("Error al obtener las fichas:", error);
-        GlobalAlert.error("Hubo un error al obtener las fichas.");
       }
     };
 
@@ -37,7 +36,6 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
         setAmbientes(response.data);
       } catch (error) {
         console.error("Error al obtener los ambientes:", error);
-        GlobalAlert.error("Hubo un error al obtener los ambientes.");
       }
     };
 
@@ -68,7 +66,6 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
     try {
       const response = await axiosClient.post("/horarios/registrar", horarioData);
       console.log("Respuesta del servidor:", response.data);
-      GlobalAlert.success("Horario registrado correctamente.");
       setHorarioData({
         hora_inicio: "",
         hora_fin: "",
@@ -78,10 +75,9 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
         ambiente: "",
       });
       onClose();
-      if (onRegisterSuccess) onRegisterSuccess();
+      refreshData();
     } catch (error) {
       console.error("Error al registrar el horario:", error.response?.data || error);
-      GlobalAlert.error("Hubo un error al registrar el horario.");
     }
   };
 
@@ -109,31 +105,21 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
 
   return (
     <div className="flex flex-col gap-2">
-    <div className="relative z-20 flex items-center justify-end gap-3">
-      <Button
-        onPress={onOpen}
-        className="bg-[#0d324c] text-white absolute top-0 z-30" 
-      >
-        Registrar Horario
-      </Button>
-    </div>
-      <GlobalModal
-        isOpen={isOpen}
-        onOpenChange={onClose}
-        title="Registro de Horarios"
-        children={
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <TimeInput
               label="Hora de Inicio"
               name="hora_inicio"
               value={horarioData.hora_inicio}
               onChange={handleTimeChange}
+              className="w-96"
             />
             <TimeInput
               label="Hora de Fin"
               name="hora_fin"
               value={horarioData.hora_fin}
               onChange={handleTimeChange}
+              className="w-96"
+
             />
             <Select
               label="Día"
@@ -142,6 +128,8 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
               selectedKeys={horarioData.dia ? [horarioData.dia] : []}
               onChange={handleSelectChange("dia")}
               required
+              className="w-96"
+
             >
               {['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabados', 'domingo'].map((dia) => (
                 <SelectItem key={dia} value={dia}>
@@ -157,6 +145,8 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
               value={horarioData.horas}
               onChange={handleInputChange}
               required
+              className="w-96"
+
             />
             <Select
               label="Ficha"
@@ -165,6 +155,8 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
               selectedKeys={horarioData.ficha ? [horarioData.ficha] : []}
               onChange={handleSelectChange("ficha")}
               required
+              className="w-96"
+
             >
               {fichas.map((ficha) => (
                 <SelectItem key={ficha.codigo.toString()} textValue={ficha.codigo.toString()}>
@@ -179,6 +171,8 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
               selectedKeys={horarioData.ambiente ? [horarioData.ambiente] : []}
               onChange={handleSelectChange("ambiente")}
               required
+              className="w-96"
+
             >
               {ambientes.map((ambiente) => (
                 <SelectItem key={ambiente.id_ambiente.toString()} textValue={ambiente.nombre_amb}>
@@ -193,8 +187,7 @@ export const RegistroHorario = ({ onRegisterSuccess }) => {
               </Button>
             </div>
           </form>
-        }
-      />
+
     </div>
   );
 };

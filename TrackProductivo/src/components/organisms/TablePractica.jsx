@@ -15,15 +15,14 @@ import {
     Chip,
 } from "@nextui-org/react";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
-import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import FormAsignacion from "../molecules/Asignaciones/FormAsignacion.jsx";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonEditarAsignacionI from "../atoms/ButtonEditarAsignacionI.jsx";
 import ButtonAsignarI from "../atoms/ButtonAsignarInstructor.jsx";
 import FormActualizarAsignacion from "../molecules/Asignaciones/FormEditAsignacion.jsx";
 import { format } from 'date-fns';
-import ButtonDescargar from "../atoms/ButtonDescargar.jsx";
 import ButtonDescargarProductiva from "../atoms/ButtonDescargarProductiva.jsx";
+import FormProductiva from "../molecules/Productivas/FormEtapaPractica.jsx";
 
 function TableProductiva() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -38,18 +37,25 @@ function TableProductiva() {
         direction: "ascending",
     });
 
-    const fetchData = async () => {
+    // Fetch data from API
+    const fetchData = useCallback(async () => {
+        console.log("Fetching data...");
         try {
             const response = await axiosClient.get("/productiva/listar");
             setProductivas(response.data);
         } catch (error) {
             console.error("Error fetching data:", error);
+            Swal.fire({
+                title: "Error",
+                text: "No se pudo obtener los datos.",
+                icon: "error",
+            });
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchData]);
 
     const handleCloseModal = () => {
         setModalOpen(false);
@@ -61,27 +67,68 @@ function TableProductiva() {
         setModalOpen(true);
         setInitialData(data);
 
-        // Si es para registrar una nueva asignación
-        if (formType === 'asignacion') {
-            setModalContent(
-                <FormAsignacion
-                    initialData={null}  // Sin datos iniciales para registrar
-                    onSuccess={handleUpdateData}
-                    id_productiva={id_productiva}  // Solo enviar id_productiva para registro
-                />
-            );
-        }
+        switch (formType) {
+            case 'productiva':
+                setModalContent(
+                    <FormProductiva
+                        initialData={null}
+                        onSuccess={handleSubmit} // Aquí se pasa la función handleSubmit
+                    />
+                );
+                break;
 
-        // Si es para actualizar una asignación existente
-        if (formType === 'actualizar_asignacion') {
-            setModalContent(
-                <FormActualizarAsignacion
-                    initialData={data}  // Pasamos los datos existentes para actualizar
-                    onSuccess={handleUpdateData}
-                    id_productiva={id_productiva}  // Enviar tanto id_productiva como id_asignacion
-                    id_asignacion={data.id_asignacion}
-                />
-            );
+            case 'actualizar_productiva':
+                setModalContent(
+                    <FormProductiva
+                        initialData={data}
+                        onSuccess={handleSubmit} // Aquí se pasa la función handleSubmit
+                        id_productiva={id_productiva}
+                    />
+                );
+                break;
+
+            case 'asignacion':
+                setModalContent(
+                    <FormAsignacion
+                        initialData={null}
+                        onSuccess={handleUpdateData}
+                        id_productiva={id_productiva}
+                    />
+                );
+                break;
+
+            case 'actualizar_asignacion':
+                setModalContent(
+                    <FormActualizarAsignacion
+                        initialData={data}
+                        onSuccess={handleUpdateData}
+                        id_productiva={id_productiva}
+                        id_asignacion={data.id_asignacion}
+                    />
+                );
+                break;
+
+            default:
+                break;
+        }
+    };
+
+    const handleSubmit = async (data, id_productiva) => {
+        try {
+            if (id_productiva) {
+                await axiosClient.put(`/productiva/actualizar/${id_productiva}`, data);
+            } else {
+                await axiosClient.post(`/productiva/registrar`, data);
+            }
+            handleUpdateData(); // Actualiza los datos en la tabla
+            handleCloseModal(); // Cierra el modal
+        } catch (error) {
+            console.error("Error al guardar datos:", error);
+            Swal.fire({
+                title: "Error",
+                text: "No se pudo guardar los datos.",
+                icon: "error",
+            });
         }
     };
 
@@ -89,55 +136,67 @@ function TableProductiva() {
         fetchData();
     }, [fetchData]);
 
-    const handleFormSubmit = async (formData) => {
+    const handleEditAsignacion = (data) => {
+        handleOpenModal('actualizar_asignacion', data, data.id_productiva);
+    };
+
+    const handleEditProductiva = (data) => {
+        handleOpenModal('actualizar_productiva', data, data.id_productiva);
+    };
+
+    const downloadFile = async (id_productiva) => {
         try {
-            if (formData.id_asignacion) {
-                // Si tiene id_asignacion, actualizamos
-                const response = await axiosClient.put(`/actualizar/${formData.id_asignacion}`, formData);
-                console.log('Updated successfully:', response.data);
-            } else {
-                // Si no tiene id_asignacion, registramos
-                const response = await axiosClient.post('/registrar', { ...formData, id_productiva: formData.id_productiva });
-                console.log('Created successfully:', response.data);
+            const response = await axiosClient.get(`/productiva/descargarPdf/${id_productiva}`, {
+                responseType: 'blob',
+            });
+
+            // Verifica si el servidor está respondiendo con un archivo JSON, lo que indica un error
+            if (response.headers['content-type'] === 'application/json') {
+                const errorData = await response.data.text();
+                console.error('Error del servidor:', errorData);
+                Swal.fire({
+                    title: "Error",
+                    text: "No se pudo descargar el archivo.",
+                    icon: "error",
+                });
+                return;
             }
-            handleCloseModal();
+
+            const fileURL = URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = fileURL;
+            link.setAttribute('download', `Archivo_${id_productiva}.zip`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
         } catch (error) {
-            console.error("Error submitting form:", error);
+            console.error('Error al descargar el archivo:', error);
+            Swal.fire({
+                title: "Error",
+                text: "No se pudo descargar el archivo.",
+                icon: "error",
+            });
         }
     };
-
-    const handleEditAsignacion = (data) => {
-        handleOpenModal('actualizar_asignacion', {
-            ...data,
-            id_asignacion: data.id_asignacion,
-        }, data.id_productiva);  // Pasamos también el id_productiva
-    };
-
 
     const hasSearchFilter = Boolean(filterValue);
 
     const filteredItems = useMemo(() => {
-        let filteredproductivas = productivas;
-
         if (hasSearchFilter) {
-            filteredproductivas = filteredproductivas.filter((seg) =>
+            return productivas.filter((seg) =>
                 seg.aprendiz_nombre.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
-
-        return filteredproductivas;
+        return productivas;
     }, [productivas, filterValue]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
-    // Get paginated items
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        return filteredItems.slice(start, end);
+        return filteredItems.slice(start, start + rowsPerPage);
     }, [page, filteredItems, rowsPerPage]);
 
-    // Sort items based on the sort descriptor
     const sortedItems = useMemo(() => {
         return [...items].sort((a, b) => {
             const first = a[sortDescriptor.column];
@@ -156,7 +215,7 @@ function TableProductiva() {
             case "Terminado":
                 return "rgba(144, 238, 144, 0.8)"; // Verde claro
             default:
-                return null; // Color por defecto si no coincide
+                return "rgba(240, 240, 240, 0.8)"; // Color por defecto
         }
     };
 
@@ -166,10 +225,8 @@ function TableProductiva() {
             case "acciones":
                 return (
                     <div className="flex justify-around items-center">
-                        <ButtonActualizar />
-                        <ButtonDesactivar
-                            onClick={() => handleDesactivar(productiva.id_asignacion)}
-                        />
+                        <ButtonActualizar onClick={() => handleEditProductiva(productiva)} />
+                        <ButtonDescargarProductiva onClick={() => downloadFile(productiva.id_productiva)} />
                     </div>
                 );
             case "instructor_nombre":
@@ -177,77 +234,27 @@ function TableProductiva() {
                     <div className="flex items-center">
                         <span>{cellValue}</span>
                         {cellValue ? (
-                            <ButtonEditarAsignacionI
-                                onClick={() => handleEditAsignacion(productiva)}
-                            />
+                            <ButtonEditarAsignacionI onClick={() => handleEditAsignacion(productiva)} />
                         ) : (
-                            <ButtonAsignarI
-                                onClick={() =>
-                                    handleOpenModal("asignacion", null, productiva.id_productiva)
-                                }
-                            />
+                            <ButtonAsignarI onClick={() => handleOpenModal("asignacion", null, productiva.id_productiva)} />
                         )}
                     </div>
                 );
-
             case "fecha_inicio":
             case "fecha_fin":
                 return cellValue ? format(new Date(cellValue), 'dd-MM-yyyy') : 'N/A'; // Formatea la fecha
-
-            case "acuerdo":
-            case "arl":
-            case "consulta":
-                return (
-                    <div className="flex justify-center items-center">
-                        <ButtonDescargarProductiva />
-                    </div>
-                );
-
-            case "estado": // Caso para la columna "estado"
+            case "estado":
                 return (
                     <Chip
                         className="text-[#3c3c3c]"
                         variant="flat"
-                        style={{ backgroundColor: getColorForEstado(cellValue) || "rgba(240, 240, 240, 0.8)" }} // Color claro por defecto
+                        style={{ backgroundColor: getColorForEstado(cellValue) }} // Color claro por defecto
                     >
                         {cellValue}
                     </Chip>
                 );
-
-
             default:
                 return cellValue;
-        }
-    };
-
-    const handleDesactivar = async (id_asignacion) => {
-        const result = await Swal.fire({
-            title: "¿Estás seguro?",
-            text: "¿Quieres eliminar esta asignación?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "No, cancelar",
-            reverseButtons: true,
-            customClass: {
-                confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
-                cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
-            },
-        });
-
-        if (result.isConfirmed) {
-            try {
-                const response = await axiosClient.delete(`/eliminar/${id_asignacion}`);
-                Swal.fire("Eliminada", response.data.message, "success");
-
-                // Remove deleted asignación from the state
-                setProductivas((prevProductivas) =>
-                    prevProductivas.filter((productiva) => productiva.id_asignacion !== id_asignacion)
-                );
-            } catch (error) {
-                console.error("Error deleting asignación:", error);
-                Swal.fire("Error", "No se pudo eliminar la asignación", "error");
-            }
         }
     };
 
@@ -263,7 +270,6 @@ function TableProductiva() {
 
     const onClear = useCallback(() => {
         setFilterValue("");
-        setPage(1);
     }, []);
 
     const topContent = useMemo(() => {
@@ -282,6 +288,7 @@ function TableProductiva() {
                         />
                         <div>
                             <Button
+                                onClick={() => handleOpenModal("productiva")}
                                 className="bg-[#0d324c] text-white"
                             >
                                 Registrar Etapa Productiva
@@ -326,9 +333,6 @@ function TableProductiva() {
         { key: "fecha_fin", label: "Fecha de Fin" },
         { key: "alternativa", label: "Alternativa" },
         { key: "estado", label: "Estado" },
-        { key: "acuerdo", label: "Acuerdo" },
-        { key: "arl", label: "ARL" },
-        { key: "consulta", label: "Consulta" },
         { key: "acciones", label: "Acciones" },
     ];
 
@@ -350,7 +354,7 @@ function TableProductiva() {
                     </TableHeader>
                     <TableBody>
                         {sortedItems.map((item) => (
-                            <TableRow key={item.id_asignacion}>
+                            <TableRow>
                                 {columns.map((column) => (
                                     <TableCell key={column.key} style={{ width: '250px' }}>
                                         {renderCell(item, column.key)}
@@ -374,7 +378,6 @@ function TableProductiva() {
             <ModalAcciones
                 isOpen={modalOpen}
                 onClose={handleCloseModal}
-                title={initialData ? "Actualizar Asignación" : "Registrar Asignación"}
                 bodyContent={modalContent}
             />
         </div>

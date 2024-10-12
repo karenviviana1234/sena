@@ -38,9 +38,10 @@ export const listarHorariosPorFicha = async (req, res) => {
     try {
       // Consulta SQL para obtener los horarios asociados a la ficha especificada
       const sql = `
-        SELECT h.*, f.*
+        SELECT h.*, f.*, a.nombre_amb
         FROM horarios h
         INNER JOIN fichas f ON h.ficha = f.codigo
+        INNER JOIN ambientes a ON h.ambiente = a.id_ambiente  -- Aquí usamos h.ambiente
         WHERE h.ficha = ? AND h.estado = 1
       `;
       

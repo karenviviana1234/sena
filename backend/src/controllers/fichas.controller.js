@@ -1,4 +1,25 @@
 import { pool } from '../database/conexion.js'
+
+export const listarFichasNormal = async (req, res) => {
+    try {
+        let sql = `SELECT * FROM fichas`
+
+        const [results] = await pool.query(sql)
+        
+        if(results.length>0){
+            res.status(200).json(results)
+        }else{
+            res.status(404).json({
+                message: 'No hay fichas registradas'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error del servidor' + error
+        })
+    }
+}
+
 export const listarFichas = async (req, res) => {
     try {
         let sql = `

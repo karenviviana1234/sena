@@ -82,32 +82,67 @@ export const uploadPdfToBitacoras = async (req, res) => {
             });
         }
 
-        // Obtener la fecha actual en formato local YYYY-MM-DD
-        const fechaActual = format(new Date(), 'yyyy-MM-dd');
+        // Directorio donde se guardan los archivos
+        const uploadDirectory = 'public/bitacoras';
 
-        // Actualizar el campo 'pdf' y 'fecha' en la tabla 'bitacoras'
-        const sqlUpdateBitacora = `
-            UPDATE bitacoras
-            SET pdf = ?, fecha = ?
-            WHERE id_bitacora = ?
-        `;
-        const [result] = await pool.query(sqlUpdateBitacora, [pdf, fechaActual, id_bitacora]);
+        // Función para generar un nombre de archivo único
+        const getUniqueFileName = (directory, originalFileName) => {
+            const extension = path.extname(originalFileName); // Obtener extensión (.pdf)
+            const baseName = path.basename(originalFileName, extension); // Nombre sin extensión
+            let fileName = originalFileName;
+            let counter = 1;
 
-        if (result.affectedRows > 0) {
-            res.status(200).json({
-                message: 'PDF cargado exitosamente en la bitacora'
-            });
-        } else {
-            res.status(404).json({
-                message: 'Bitacora no encontrada'
-            });
-        }
+            // Comprobar si el archivo existe y renombrar con un número secuencial
+            while (fs.existsSync(path.join(directory, fileName))) {
+                fileName = `${baseName}-${counter}${extension}`; // Agregar número al archivo
+                counter++;
+            }
+
+            return fileName; // Devolver nombre único
+        };
+
+        // Generar el nombre de archivo único
+        const uniquePdfName = getUniqueFileName(uploadDirectory, pdf);
+
+        // Ruta completa donde se guardará el archivo
+        const pdfPath = path.join(uploadDirectory, uniquePdfName);
+
+        // Mover el archivo a la carpeta de destino con el nombre único
+        fs.rename(req.file.path, pdfPath, async (err) => {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error al guardar el archivo: ' + err.message
+                });
+            }
+
+            // Obtener la fecha actual en formato local YYYY-MM-DD
+            const fechaActual = format(new Date(), 'yyyy-MM-dd');
+
+            // Actualizar el campo 'pdf' y 'fecha' en la tabla 'bitacoras'
+            const sqlUpdateBitacora = `
+                UPDATE bitacoras
+                SET pdf = ?, fecha = ?
+                WHERE id_bitacora = ?
+            `;
+            const [result] = await pool.query(sqlUpdateBitacora, [uniquePdfName, fechaActual, id_bitacora]);
+
+            if (result.affectedRows > 0) {
+                res.status(200).json({
+                    message: 'PDF cargado exitosamente en la bitacora'
+                });
+            } else {
+                res.status(404).json({
+                    message: 'Bitacora no encontrada'
+                });
+            }
+        });
     } catch (error) {
         res.status(500).json({
             message: 'Error del servidor: ' + error.message
         });
     }
 };
+
 
 export const actualizarBitacora = async (req, res) => {
     try {

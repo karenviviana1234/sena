@@ -58,7 +58,9 @@ const ListActividad = ({ selectedInstructor, item }) => {
       const response = await axiosClient.put(`/actividades/desactivar/${id_actividad}`);
       if (response.status === 200) {
         alert('La actividad ha sido desactivada exitosamente.');
-        fetchData(instructor);
+  
+        // Filtrar la actividad desactivada de la lista de actividades en el estado
+        setActividades((prevActividades) => prevActividades.filter((actividad) => actividad.id_actividad !== id_actividad));
       } else {
         alert('Hubo un problema al desactivar la actividad.');
       }
@@ -67,6 +69,7 @@ const ListActividad = ({ selectedInstructor, item }) => {
       console.log(error);
     }
   };
+  
 
   const formatFecha = (fecha) => {
     const date = new Date(fecha);

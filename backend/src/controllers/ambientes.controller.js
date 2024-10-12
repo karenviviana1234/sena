@@ -1,5 +1,4 @@
 import { pool } from "../database/conexion.js";
-
 export const listarAmbientes = async (req, res) => {
     try {
         let sql = `
@@ -28,9 +27,8 @@ LEFT JOIN
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor: ' + error
-        });
-        message: 'Error del servidor: ' + error
+            message: 'Error del servidor' + error
+        })
     }
 };
 
@@ -137,5 +135,3 @@ export const inactivarAmbiente = async (req, res) => {
         })
     }
 }
-
-//comentario random borrenlo

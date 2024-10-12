@@ -2,51 +2,50 @@ import { pool } from "../database/conexion.js";
 
 export const listarPrograma = async (req, res) => {
     try {
-        let sql = `SELECT * FROM programas`
+        let sql = `SELECT * FROM programas WHERE estado = 'activo'`;
 
-        const [results] = await pool.query(sql)
+        const [results] = await pool.query(sql);
 
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        if(results.length > 0){
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
-                message: 'No hay programas registradas'
-            })
+                message: 'No hay programas activos registrados'
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
-
+};
 export const registrarPrograma = async (req, res) => {
     try {
-        const { nombre_programa, sigla, nivel } = req.body
+        const { nombre_programa, sigla, nivel } = req.body;
 
-        let sql = `INSERT INTO programas (nombre_programa, sigla, nivel,estado) VALUES (?, ?, ?, 1)`
+        let sql = `INSERT INTO programas (nombre_programa, sigla, nivel, estado) VALUES (?, ?, ?, 1)`; // '1' indica que el estado es activo
 
-        const [rows] = await pool.query(sql, [nombre_programa, sigla, nivel])
+        const [rows] = await pool.query(sql, [nombre_programa, sigla, nivel]);
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
-                message: 'Programa registrada correctamente'
-            })
-        }else{
+                message: 'Programa registrado correctamente'
+            });
+        } else {
             res.status(403).json({
-                message: 'Error al registrar la Programa'
-            })
+                message: 'Error al registrar el programa'
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
+};
 
 export const actualizarPrograma = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id_programa } = req.params;
         const { nombre_programa, sigla, nivel } = req.body;
 
         let sql = `UPDATE programas SET
@@ -55,7 +54,7 @@ export const actualizarPrograma = async (req, res) => {
                     nivel = ?
                     WHERE id_programa = ?`;
 
-        const [rows] = await pool.query(sql, [nombre_programa, sigla, nivel, id]);
+        const [rows] = await pool.query(sql, [nombre_programa, sigla, nivel, id_programa]);
 
         if (rows.affectedRows > 0) {
             res.status(200).json({
@@ -76,10 +75,10 @@ export const actualizarPrograma = async (req, res) => {
 
 export const inactivarPrograma = async (req, res) => {
     try {
-        const {id} = req.params
+        const {id_programa} = req.params
         let sql = `UPDATE programas SET estado = 2 WHERE id_programa =?`
 
-        const [rows] = await pool.query(sql, [id])
+        const [rows] = await pool.query(sql, [id_programa])
 
         if(rows.affectedRows>0){
             res.status(200).json({

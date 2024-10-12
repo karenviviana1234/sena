@@ -37,7 +37,7 @@ function FormActualizarAsignacion({ initialData, onSuccess }) {
             productiva: initialData?.id_productiva || "DEFAULT_PRODUCTIVA",
             actividad: SelectActividad,
         };
-        
+
 
         try {
             await axiosClient.put(`/actualizar/${idAsignacion}`, formData);
@@ -53,6 +53,9 @@ function FormActualizarAsignacion({ initialData, onSuccess }) {
 
     return (
         <div>
+            <h1 className="text-xl font-bold mb-4">
+                Actualizar Asignacion e Instructor
+            </h1>
             <form onSubmit={handleSubmit} className="flex flex-col">
                 <select
                     className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.actividad ? 'border-red-500' : ''}`}
@@ -62,7 +65,7 @@ function FormActualizarAsignacion({ initialData, onSuccess }) {
                     onChange={(e) => setSelectedActividad(e.target.value)}
                     required
                 >
-                    <option value="">Selecciona una Actividad</option>
+                    <option value="">Selecciona un Instructor y una Actividad</option>
                     {actividad.map((actividad) => {
                         const formatearFecha = (fecha) => {
                             const dateObj = new Date(fecha);

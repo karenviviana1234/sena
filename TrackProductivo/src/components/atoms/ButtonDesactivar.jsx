@@ -17,7 +17,7 @@ const ButtonDesactivar = ({ estado, onClick }) => {
     tooltipColor = "danger";
     iconComponent = <Icons.aprobado className="text-success" />; // Ícono para desactivar
   } else {
-    tooltipContent = "Eliminar";
+    tooltipContent = "Desactivar";
     iconComponent = <Icons.noAprobado className="text-danger" />; // Ícono para activar
   }
 

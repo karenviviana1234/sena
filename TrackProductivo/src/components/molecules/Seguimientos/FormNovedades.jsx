@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, Button } from "@nextui-org/react";
+import { Input, Button, SelectItem, Select } from "@nextui-org/react";
 import axiosClient from "../../../configs/axiosClient";
 import Swal from 'sweetalert2'; // Importar SweetAlert2
 
@@ -7,10 +7,10 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
   const [descripcion, setDescripcion] = useState(initialData?.descripcion || "");
   const [fecha, setFecha] = useState(initialData?.fecha || "");
   const [foto, setFoto] = useState(null);
-  const [instructor, setInstructor] = useState(initialData?.instructor || "");
   const [seguimientos, setSeguimientos] = useState([]);
   const [selectedSeguimiento, setSelectedSeguimiento] = useState(initialData?.id_seguimiento || "");
   const [errorMessage, setErrorMessage] = useState("");
+  const [instructor, setInstructor] = useState(""); // Cambia aquí
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -36,7 +36,6 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
 
       setFecha(new Date(novedad.fecha));
       setDescripcion(novedad.descripcion);
-      setInstructor(novedad.instructor);
       setSelectedSeguimiento(novedad.id_seguimiento);
 
       if (novedad.foto) {
@@ -55,7 +54,7 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
     const formData = new FormData();
     formData.append("descripcion", descripcion);
     formData.append("fecha", fecha);
-    formData.append("instructor", instructor);
+    formData.append("instructor", instructor); // Cambia aquí para usar instructor
     formData.append("seguimiento", selectedSeguimiento);
 
     if (foto) {
@@ -106,6 +105,19 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
 
   const formattedFecha = typeof fecha === 'string' ? fecha : new Date(fecha).toISOString().split('T')[0];
 
+  // Obtén el instructor desde el localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        setInstructor(user.nombres); // Asume que el objeto de usuario tiene una propiedad 'nombre'
+      } catch (error) {
+        console.error("Error al parsear el JSON del usuario:", error);
+      }
+    }
+  }, []);
+
   return (
     <form method="post" onSubmit={handleSubmit}>
       <h1 className="text-xl font-bold mb-4">
@@ -134,10 +146,17 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
             className="w-96 mb-4"
             id="foto"
             name="foto"
+            accept="image/*" // Permitir solo imágenes
             onChange={(e) => {
               const file = e.target.files[0];
               if (file) {
-                setFoto(file);
+                const fileType = file.type.split('/')[0]; // Obtener el tipo de archivo (ej. image)
+                if (fileType === 'image') {
+                  setFoto(file);
+                } else {
+                  setErrorMessage("Por favor, selecciona un archivo de imagen.");
+                  setFoto(null); // Limpiar el estado de foto si no es una imagen
+                }
               }
             }}
           />
@@ -157,34 +176,22 @@ const FormNovedades = ({ onSubmit, onClose, actionLabel, mode, initialData }) =>
         </div>
 
         <div>
-          <select
-            className="my-4 h-14 rounded-xl bg-[#f4f4f5] p-2 w-96"
+          <Select
+            className="my-4 w-96"
             onChange={(e) => setSelectedSeguimiento(e.target.value)}
             value={selectedSeguimiento}
+            placeholder="Selecciona un Seguimiento"
             required
             id="id_seguimiento"
             name="id_seguimiento"
           >
-            <option value="">Selecciona un seguimiento</option>
-            {seguimientos.map((seguimiento) => (
-              <option key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
-                {seguimiento.descripcion || seguimiento.id_seguimiento}
-              </option>
+            <SelectItem value="">Selecciona un seguimiento</SelectItem>
+            {seguimientos.map((seguimiento, index) => (
+              <SelectItem key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
+                {`${index + 1} `}
+              </SelectItem>
             ))}
-          </select>
-        </div>
-
-        <div className="py-2">
-          <Input
-            type="text"
-            label="Instructor"
-            className="mb-4 w-96"
-            id="instructor"
-            name="instructor"
-            value={instructor}
-            onChange={(e) => setInstructor(e.target.value)}
-            required
-          />
+          </Select>
         </div>
 
         <div className="flex justify-end gap-5 mt-5">

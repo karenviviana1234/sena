@@ -103,11 +103,6 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
   };
 
   return (
-    <GlobalModal
-      isOpen={true}
-      onOpenChange={onClose}
-      title="Actualizar Horario"
-      children={
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       
           <Input
@@ -117,6 +112,7 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
             value={horarioData.hora_inicio}
             onChange={handleInputChange}
             required
+            className="w-96"
           />
           <Input
             label="Hora de Fin"
@@ -125,6 +121,7 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
             value={horarioData.hora_fin}
             onChange={handleInputChange}
             required
+            className="w-96"
           />
           <Select
             label="Día"
@@ -133,6 +130,7 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
             selectedKeys={horarioData.dia ? [horarioData.dia] : []}
             onChange={(e) => handleInputChange({ target: { name: 'dia', value: e.target.value } })}
             required
+            className="w-96"
           >
             {['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabados', 'domingo'].map((dia) => (
               <SelectItem key={dia} value={dia}>
@@ -148,6 +146,7 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
             value={horarioData.horas}
             onChange={handleInputChange}
             required
+            className="w-96"
           />
           <Select
             label="Ficha"
@@ -156,6 +155,7 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
             selectedKeys={horarioData.ficha ? [horarioData.ficha] : []}
             onChange={(e) => handleInputChange({ target: { name: 'ficha', value: e.target.value } })}
             required
+            className="w-96"
           >
             {fichas.map((ficha) => (
               <SelectItem key={ficha.codigo.toString()} textValue={ficha.codigo.toString()}>
@@ -170,6 +170,7 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
             selectedKeys={horarioData.ambiente ? [horarioData.ambiente] : []}
             onChange={(e) => handleInputChange({ target: { name: 'ambiente', value: e.target.value } })}
             required
+            className="w-96"
           >
             {ambientes.map((ambiente) => (
               <SelectItem key={ambiente.id_ambiente.toString()} textValue={ambiente.nombre_amb}>
@@ -184,8 +185,6 @@ const ActualizarHorario = ({ item, onClose, refreshData }) => {
               </Button>
             </div>
         </form>
-      }
-    />
   );
 };
 
