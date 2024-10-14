@@ -109,9 +109,9 @@ const storage = multer.diskStorage(
 const upload = multer({ storage: storage })
 
 export const productivaFiles = upload.fields([
-    { name: 'acuerdo', maxCount: 1 },
-    { name: 'arl', maxCount: 1 },
-    { name: 'consulta', maxCount: 1 }
+    { name: 'acuerdoFile', maxCount: 1 },
+    { name: 'arlFile', maxCount: 1 },
+    { name: 'consultaFile', maxCount: 1 }
 ])
 
 
@@ -119,10 +119,10 @@ export const productivaFiles = upload.fields([
 export const registrarProductiva = async (req, res) => {
     try {
         const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, instructor } = req.body;
-        const acuerdo = req.files?.acuerdo?.[0]?.filename || null;
-        const arl = req.files?.arl?.[0]?.filename || null;
-        const consulta = req.files?.consulta?.[0]?.filename || null;
-
+        const acuerdo = req.files?.acuerdoFile?.[0]?.filename || null;
+        const arl = req.files?.arlFile?.[0]?.filename || null;
+        const consulta = req.files?.consultaFile?.[0]?.filename || null;
+        
         console.log("Nombres de archivos a insertar:", { acuerdo, arl, consulta });
 
         // Verificar que la matrícula existe en la tabla matriculas y obtener el aprendiz
@@ -257,22 +257,23 @@ export const registrarProductiva = async (req, res) => {
 export const actualizarProductiva = async (req, res) => {
     try {
         const { id_productiva } = req.params
-        const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, aprendiz } = req.body
-        let acuerdo = req.files && req.files.acuerdo ? req.files.acuerdo[0].originalname : null
-        let arl = req.files && req.files.arl ? req.files.arl[0].originalname : null
-        let consulta = req.files && req.files.consulta ? req.files.consulta[0].originalname : null
+        const { matricula, empresa, fecha_inicio, fecha_fin, alternativa, aprendiz, estado } = req.body
+        const acuerdo = req.files?.acuerdoFile?.[0]?.filename || null;
+        const arl = req.files?.arlFile?.[0]?.filename || null;
+        const consulta = req.files?.consultaFile?.[0]?.filename || null;
 
-        const [anterior] = await pool.query('SELECT * FROM productiva WHERE id_productiva = ?', [id_productiva])
+        const [anterior] = await pool.query('SELECT * FROM productivas WHERE id_productiva = ?', [id_productiva])
 
-        let sql = `UPDATE productiva SET
+        let sql = `UPDATE productivas SET
                     matricula = ?,
                     empresa =?,
                     fecha_inicio =?,
                     fecha_fin =?,
                     alternativa =?,
-                    aprendiz =?`
+                    aprendiz =?,
+                    estado =?`
 
-        const param = [matricula || anterior[0].matricula, empresa || anterior[0].empresa, fecha_inicio || anterior[0].fecha_inicio, fecha_fin || anterior[0].fecha_fin, alternativa || anterior[0].alternativa, aprendiz || anterior[0].aprendiz]
+        const param = [matricula || anterior[0].matricula, empresa || anterior[0].empresa, fecha_inicio || anterior[0].fecha_inicio, fecha_fin || anterior[0].fecha_fin, alternativa || anterior[0].alternativa, aprendiz || anterior[0].aprendiz, estado || anterior[0].estado]
 
         if (acuerdo) {
             sql += `, acuerdo = ?`;
@@ -290,7 +291,7 @@ export const actualizarProductiva = async (req, res) => {
         }
 
         sql += ` WHERE id_productiva = ?`;
-        param.push(id);
+        param.push(id_productiva);
 
         const [rows] = await pool.query(sql, param)
 

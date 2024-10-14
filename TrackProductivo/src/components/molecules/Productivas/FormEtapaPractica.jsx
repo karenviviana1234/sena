@@ -10,12 +10,13 @@ function FormProductiva({ initialData, onSuccess }) {
         fecha_inicio: "",
         fecha_fin: "",
         alternativa: "Selecciona",
+        estado: "Selecciona",
         acuerdoFile: null,
         arlFile: null,
         consultaFile: null,
     });
     const [matriculas, setMatriculas] = useState([]);
-    const [empresas, setEmpresas] = useState([]);
+    const [empresas, setEmpresas] = useState([]);;
     const [isEditing, setIsEditing] = useState(false);
     const [idPractica, setIdPractica] = useState(null);
     const [errors, setErrors] = useState({});
@@ -51,6 +52,7 @@ function FormProductiva({ initialData, onSuccess }) {
                 fecha_inicio: initialData.fecha_inicio || "",
                 fecha_fin: initialData.fecha_fin || "",
                 alternativa: initialData.alternativa || "Selecciona",
+                estado: initialData.estado || "Selecciona",
                 acuerdoFile: null,
                 arlFile: null,
                 consultaFile: null,
@@ -65,6 +67,7 @@ function FormProductiva({ initialData, onSuccess }) {
                 fecha_inicio: "",
                 fecha_fin: "",
                 alternativa: "Selecciona",
+                estado: "Selecciona",
                 acuerdoFile: null,
                 arlFile: null,
                 consultaFile: null,
@@ -82,30 +85,52 @@ function FormProductiva({ initialData, onSuccess }) {
 
     const handleFileChange = (e) => {
         const { name, files } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: files[0],
-        }));
+        const file = files[0];
+        if (file && file.type === "application/pdf") {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: file,
+            }));
+        } else {
+            Swal.fire("Error", "Por favor, selecciona un archivo PDF válido", "error");
+        }
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         const formDataToSend = new FormData();
-        for (const key in formData) {
-            if (formData[key] !== null && formData[key] !== "") {
-                formDataToSend.append(key, formData[key]);
-            }
+        formDataToSend.append("matricula", formData.matricula);
+        formDataToSend.append("empresa", formData.empresa);
+        formDataToSend.append("fecha_inicio", formData.fecha_inicio);
+        formDataToSend.append("fecha_fin", formData.fecha_fin);
+        formDataToSend.append("alternativa", formData.alternativa);
+        formDataToSend.append("estado", formData.estado);
+
+        // Adjuntar los archivos con los nombres correctos
+        if (formData.acuerdoFile) {
+            formDataToSend.append("acuerdoFile", formData.acuerdoFile);
+        }
+        if (formData.arlFile) {
+            formDataToSend.append("arlFile", formData.arlFile);
+        }
+        if (formData.consultaFile) {
+            formDataToSend.append("consultaFile", formData.consultaFile);
+        }
+
+        // Log para verificar los datos que se envían
+        for (const pair of formDataToSend.entries()) {
+            console.log(`${pair[0]}:`, pair[1]);
         }
 
         try {
             const response = isEditing
                 ? await axiosClient.put(`/productiva/actualizar/${initialData.id_productiva}`, formDataToSend, {
-                      headers: { "Content-Type": "multipart/form-data" },
-                  })
+                    headers: { "Content-Type": "multipart/form-data" },
+                })
                 : await axiosClient.post("/productiva/registrar", formDataToSend, {
-                      headers: { "Content-Type": "multipart/form-data" },
-                  });
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
 
             Swal.fire("Éxito", `Etapa Productiva ${isEditing ? "actualizada" : "registrada"} correctamente`, "success");
             if (onSuccess) onSuccess();
@@ -115,49 +140,59 @@ function FormProductiva({ initialData, onSuccess }) {
         }
     };
 
+
+
     return (
         <div>
             <h1 className="text-xl font-bold mb-4">
                 {isEditing ? "Actualizar Etapa Productiva" : "Registro de Etapas Productivas"}
             </h1>
             <form onSubmit={handleSubmit} className="flex flex-col" encType="multipart/form-data">
-                <Select
-                    id="matricula"
-                    name="matricula"
-                    value={formData.matricula}
-                    onChange={(value) => setFormData((prevData) => ({ ...prevData, matricula: value }))}
-                    placeholder="Seleccione una Matricula de un Aprendiz"
-                    required
-                    className="w-96 mb-5"
-                    size="lg"
-                >
-                    <SelectItem value="">Selecciona un Aprendiz</SelectItem>
-                    {matriculas.map((matricula) => (
-                        <SelectItem key={matricula.id_matricula} value={matricula.id_matricula}>
-                            {matricula.nombre_aprendiz}
-                        </SelectItem>
-                    ))}
-                </Select>
+                {!isEditing && (
+                    <select
+                        id="matricula"
+                        name="matricula"
+                        value={formData.matricula}
+                        onChange={(event) =>
+                            setFormData((prevData) => ({ ...prevData, matricula: event.target.value }))
+                        }
+                        placeholder="Seleccione una Matricula de un Aprendiz"
+                        required
+                        className={`mb-4 h-[52px] rounded-xl bg-[#f4f4f5] p-2 ${errors.matricula ? "border-red-500" : ""
+                            }`}
+                        size="lg"
+                    >
+                        <option value="">Selecciona un Aprendiz</option>
+                        {matriculas.map((matricula) => (
+                            <option key={matricula.id_matricula} value={matricula.id_matricula}>
+                                {matricula.nombre_aprendiz}
+                            </option>
+                        ))}
+                    </select>
+                )}
 
-                <Select
+
+
+                <select
                     id="empresa"
                     name="empresa"
                     value={formData.empresa}
-                    onChange={(value) => setFormData((prevData) => ({ ...prevData, empresa: value }))}
+                    onChange={(event) => setFormData((prevData) => ({ ...prevData, empresa: event.target.value }))}
                     placeholder="Seleccione una Empresa"
                     required
-                    className="w-96 mb-5"
+                    className={`mb-4 h-[52px] rounded-xl bg-[#f4f4f5] p-2 ${errors.empresa ? "border-red-500" : ""}`}
                     size="lg"
                 >
-                    <SelectItem value="">Selecciona una Empresa</SelectItem>
+                    <option value="">Selecciona una Empresa</option>
                     {empresas.map((empresa) => (
-                        <SelectItem key={empresa.id_empresa} value={empresa.id_empresa}>
+                        <option key={empresa.id_empresa} value={empresa.id_empresa}>
                             {empresa.razon_social}
-                        </SelectItem>
+                        </option>
                     ))}
-                </Select>
+                </select>
 
                 <Input
+                    id="fecha_inicio"
                     type="date"
                     label="Fecha de Inicio"
                     name="fecha_inicio"
@@ -165,8 +200,10 @@ function FormProductiva({ initialData, onSuccess }) {
                     onChange={handleInputChange}
                     className="w-96 mb-5"
                     size="md"
+                    required
                 />
                 <Input
+                    id="fecha_fin"
                     type="date"
                     label="Fecha de Fin"
                     name="fecha_fin"
@@ -177,6 +214,7 @@ function FormProductiva({ initialData, onSuccess }) {
                     size="md"
                 />
                 <select
+                    id="alternativa"
                     className={`mb-4 h-[52px] rounded-xl bg-[#f4f4f5] p-2 ${errors.alternativa ? "border-red-500" : ""}`}
                     name="alternativa"
                     value={formData.alternativa}
@@ -190,10 +228,26 @@ function FormProductiva({ initialData, onSuccess }) {
                     <option value="Monitoria">Monitoria</option>
                 </select>
 
+                {isEditing && (
+                    <select
+                        id="estado"
+                        className={`mb-4 h-[52px] rounded-xl bg-[#f4f4f5] p-2 ${errors.estado ? "border-red-500" : ""}`}
+                        name="estado"
+                        value={formData.estado}
+                        onChange={handleInputChange}
+                        required
+                    >
+                        <option value="Selecciona">Selecciona un estado</option>
+                        <option value="Inicio">Inicio</option>
+                        <option value="Terminado">Terminado</option>
+                        <option value="Renuncia">Renuncia</option>
+                    </select>
+                )}
+
+
                 <Input
                     type="file"
                     label="Acuerdo"
-                    accept="application/pdf"
                     onChange={handleFileChange}
                     className="mb-5"
                     name="acuerdoFile"
@@ -201,7 +255,6 @@ function FormProductiva({ initialData, onSuccess }) {
                 <Input
                     type="file"
                     label="ARL"
-                    accept="application/pdf"
                     onChange={handleFileChange}
                     className="mb-5"
                     name="arlFile"
@@ -209,7 +262,6 @@ function FormProductiva({ initialData, onSuccess }) {
                 <Input
                     type="file"
                     label="Consulta"
-                    accept="application/pdf"
                     onChange={handleFileChange}
                     className="mb-5"
                     name="consultaFile"

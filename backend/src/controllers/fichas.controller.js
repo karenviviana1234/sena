@@ -1,24 +1,28 @@
 import { pool } from '../database/conexion.js'
-
 export const listarFichasNormal = async (req, res) => {
     try {
-        let sql = `SELECT * FROM fichas`
+        let sql = `
+            SELECT fichas.*, programas.sigla 
+            FROM fichas
+            JOIN programas ON fichas.programa = programas.id_programa
+        `;
 
-        const [results] = await pool.query(sql)
-        
-        if(results.length>0){
-            res.status(200).json(results)
-        }else{
+        const [results] = await pool.query(sql);
+
+        if (results.length > 0) {
+            res.status(200).json(results);
+        } else {
             res.status(404).json({
                 message: 'No hay fichas registradas'
-            })
+            });
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor' + error
-        })
+            message: 'Error del servidor: ' + error
+        });
     }
-}
+};
+
 
 export const listarFichas = async (req, res) => {
     try {
@@ -186,39 +190,6 @@ export const finFicha = async (req, res) => {
         })
     }
 }
-export const listarCodigo = async (req, res) => {
-    try {
-        const { rol, userId } = req.user; // Obtener el rol y el ID del usuario logueado
-
-        let sql;
-        let params = [];
-
-        if (rol === 'Lider') {
-            // Si es un líder, listar solo las fichas donde es instructor líder
-            console.log('Instructor líder logueado:', userId);
-            sql = `SELECT codigo FROM fichas WHERE lider = ?`;
-            params = [userId]; // Filtrar por el ID del instructor líder
-        } else {
-            // Si es otro rol, listar todos los códigos de las fichas
-            console.log('Usuario logueado:', userId, 'Rol:', rol);
-            sql = `SELECT codigo FROM fichas`;
-        }
-
-        const [results] = await pool.query(sql, params);
-
-        if (results.length > 0) {
-            res.status(200).json(results);
-        } else {
-            res.status(404).json({
-                message: 'No hay fichas registradas'
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: 'Error del servidor: ' + error.message
-        });
-    }
-};
 export const finalizarFicha = async (req, res) => {
     try {
         const { id } = req.params; // Obtenemos el id de la ficha a finalizar

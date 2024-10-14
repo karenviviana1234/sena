@@ -23,11 +23,13 @@ import FormActualizarAsignacion from "../molecules/Asignaciones/FormEditAsignaci
 import { format } from 'date-fns';
 import ButtonDescargarProductiva from "../atoms/ButtonDescargarProductiva.jsx";
 import FormProductiva from "../molecules/Productivas/FormEtapaPractica.jsx";
+import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 
 function TableProductiva() {
     const [modalOpen, setModalOpen] = useState(false);
     const [initialData, setInitialData] = useState(null);
     const [productivas, setProductivas] = useState([]);
+    const [asignaciones, setAsignaciones] = useState([]);
     const [modalContent, setModalContent] = useState(null);
     const [filterValue, setFilterValue] = useState("");
     const [page, setPage] = useState(1);
@@ -72,7 +74,7 @@ function TableProductiva() {
                 setModalContent(
                     <FormProductiva
                         initialData={null}
-                        onSuccess={handleSubmit} // Aquí se pasa la función handleSubmit
+                        onSuccess={handleUpdateData} // Aquí se pasa la función handleSubmit
                     />
                 );
                 break;
@@ -81,7 +83,7 @@ function TableProductiva() {
                 setModalContent(
                     <FormProductiva
                         initialData={data}
-                        onSuccess={handleSubmit} // Aquí se pasa la función handleSubmit
+                        onSuccess={handleUpdateData} // Aquí se pasa la función handleSubmit
                         id_productiva={id_productiva}
                     />
                 );
@@ -113,7 +115,7 @@ function TableProductiva() {
         }
     };
 
-    const handleSubmit = async (data, id_productiva) => {
+   /*  const handleSubmit = async (data, id_productiva) => {
         try {
             if (id_productiva) {
                 await axiosClient.put(`/productiva/actualizar/${id_productiva}`, data);
@@ -130,7 +132,8 @@ function TableProductiva() {
                 icon: "error",
             });
         }
-    };
+    }; */
+
 
     const handleUpdateData = useCallback(() => {
         fetchData();
@@ -142,6 +145,40 @@ function TableProductiva() {
 
     const handleEditProductiva = (data) => {
         handleOpenModal('actualizar_productiva', data, data.id_productiva);
+    };
+
+    const handleDesactivar = async (id_asignacion) => {
+        // Mostrar una alerta de confirmación
+        const result = await Swal.fire({
+            title: "¿Estás seguro?",
+            text: "¿Quieres eliminar esta asignacion? Si lo haces, se borrará la asignacion de la etapa productiva",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, Eliminar",
+            cancelButtonText: "No, cancelar",
+            reverseButtons: true,
+            customClass: {
+                confirmButton: "bg-[#90d12c] text-white hover:bg-green-600 border-green-500",
+                cancelButton: "bg-[#f31260] text-white hover:bg-red-600 border-red-500",
+            },
+        });
+
+        // Si el usuario confirma, proceder con la desactivación
+        if (result.isConfirmed) {
+            try {
+                const response = await axiosClient.delete(`/eliminar/${id_asignacion}`);
+                Swal.fire("Eliminada", response.data.message, "success");
+                // Actualizar el estado para eliminar el instructor desactivado
+
+                setAsignaciones((prevAsignacion) =>
+                    prevAsignacion.filter((asignacion) => asignacion.id_asignacion !== id_asignacion)
+                );
+                handleUpdateData();
+            } catch (error) {
+                console.error("Error Eliminando la Matricula:", error);
+                Swal.fire("Error", "No se pudo Eliminar la matricula", "error");
+            }
+        }
     };
 
     const downloadFile = async (id_productiva) => {
@@ -238,6 +275,7 @@ function TableProductiva() {
                         ) : (
                             <ButtonAsignarI onClick={() => handleOpenModal("asignacion", null, productiva.id_productiva)} />
                         )}
+                        <ButtonDesactivar onClick={() => handleDesactivar(productiva.id_asignacion)}/>
                     </div>
                 );
             case "fecha_inicio":

@@ -26,6 +26,8 @@ function FormProgramas({ initialData, onSuccess }) {
 
         const formData = { nombre_programa, sigla, nivel };
 
+        console.log("FormData:", formData);
+
         try {
             if (isEditing) {
                 await axiosClient.put(`/programa/actualizar/${idPrograma}`, formData);

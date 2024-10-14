@@ -1,4 +1,4 @@
-import { ChevronFirst, ChevronLast, Power, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronFirst, ChevronLast, LogOut, ChevronDown, ChevronUp } from "lucide-react";
 import logo from "../../../assets/img/LOGOTIC.png";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -40,7 +40,7 @@ export default function Sidebar({ children }) {
           </div>
         </div>
         <div className="flex p-3 bottom-5 w-full cursor-pointer border-t-[1px] border-opacity-45 border-gray-200">
-          <Power className="ml-1 text-gray-600" size={20} />
+          <LogOut className="ml-1 text-gray-600" size={20} />
           <div
             className={`flex justify-between items-center overflow-hidden transition-all ${
               expanded ? "w-48 ml-3" : "w-0"

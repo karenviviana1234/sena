@@ -124,11 +124,13 @@ export const listarMatriculas = async (req, res) => {
 };
 export const listar = async (req, res) => {
     try {
-        // Consulta para listar las matriculas junto con los nombres de los aprendices
+        // Consulta para listar las matriculas junto con los nombres de los aprendices que no tienen productivas registradas
         let sql = `
             SELECT matriculas.*, personas.nombres AS nombre_aprendiz 
             FROM matriculas 
             JOIN personas ON matriculas.aprendiz = personas.id_persona
+            LEFT JOIN productivas ON matriculas.id_matricula = productivas.matricula
+            WHERE productivas.matricula IS NULL
         `;
 
         const [results] = await pool.query(sql);
@@ -137,7 +139,7 @@ export const listar = async (req, res) => {
             res.status(200).json(results);
         } else {
             res.status(404).json({
-                message: 'No hay matrículas registradas'
+                message: 'No hay matrículas sin productivas registradas'
             });
         }
     } catch (error) {
@@ -201,13 +203,6 @@ export const actualizarMatriculas = async (req, res) => {
         const { id_matricula } = req.params;
         const { estado, pendiente_tecnicos, pendiente_transversales, pendiente_ingles } = req.body;
 
-        // Asegúrate de que el valor de estado sea una cadena y esté en el formato esperado
-        const estadoValido = ['Induccion', 'Formacion', 'Condicionado', 'Cancelado', 'Retiro Voluntario', 'Por Certificar', 'Certificado'];
-        if (estado && !estadoValido.includes(estado)) {
-            return res.status(400).json({
-                message: 'Estado no válido'
-            });
-        }
 
         // Crea un array para los valores de actualización
         const valoresActualizar = [];

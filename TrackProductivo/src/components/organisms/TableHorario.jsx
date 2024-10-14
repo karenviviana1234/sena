@@ -46,7 +46,7 @@ function TableHorario() {
   useEffect(() => {
     const fetchFichas = async () => {
       try {
-        const response = await axiosClient.get('/fichas/listarC');
+        const response = await axiosClient.get('/fichas/listarN');
         if (response.data.length > 0) {
           setFichas(response.data);
         } else {
@@ -261,7 +261,7 @@ function TableHorario() {
             <SelectItem value="">Seleccione una ficha</SelectItem> {/* Opción por defecto */}
             {fichas.map((ficha) => (
               <SelectItem key={ficha.codigo} value={ficha.codigo}>
-                {`${ficha.codigo} `}
+                {`${ficha.codigo} - ${ficha.sigla}`}
               </SelectItem>
             ))}
           </Select>
