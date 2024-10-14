@@ -76,7 +76,20 @@ export const importExcel = async (req, res) => {
             let idPersona;
             if (personaQuery.length > 0 && personaQuery[0].length > 0) {
                 idPersona = personaQuery[0][0].id_persona;
-            } else {
+
+                // Actualizar los datos de la persona existente
+                await pool.query(
+                    "UPDATE personas SET nombres = ?, correo = ?, telefono = ? WHERE id_persona = ?",
+                    [
+                        item.aprendiz,
+                        item.correo,
+                        item.telefono,
+                        idPersona
+                    ]
+                );
+
+                console.log("Persona existente actualizada");
+            } else {    
                 console.log("Persona no encontrada, creando nueva");
 
                 // Insertar nueva persona
@@ -106,8 +119,9 @@ export const importExcel = async (req, res) => {
                 idMatricula = matriculaQuery[0][0].id_matricula;
                 // Actualizar matrícula existente
                 await pool.query(
-                    "UPDATE matriculas SET estado = ?, pendiente_tecnicos = ?, pendiente_transversales = ?, pendiente_ingles = ? WHERE id_matricula = ?",
+                    "UPDATE matriculas SET aprendiz = ?, estado = ?, pendiente_tecnicos = ?, pendiente_transversales = ?, pendiente_ingles = ? WHERE id_matricula = ?",
                     [
+                        idPersona,
                         item.estado,
                         item.pendiente_tecnicos,
                         item.pendiente_transversales,
