@@ -285,7 +285,6 @@ function TableProgramas() {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     bodyContent={bodyContent}
-                    title={initialData ? "Actualizar Programa" : "Registrar Programa"}
                 />
             </div>
         </div>
