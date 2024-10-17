@@ -15,7 +15,6 @@ import {
     Input,
     Pagination,
 } from "@nextui-org/react";
-import { PlusIcon } from "../NextIU/atoms/plusicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import { SearchIcon } from '../NextIU/atoms/searchicons.jsx';
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
@@ -62,7 +61,6 @@ export default function TableAsignaciones() {
 
     const handleFormAsignacionSubmit = async (formData) => {
         try {
-            // Verifica que id_asignacion esté presente en formData antes de realizar la operación
             if (formData.id_asignacion) {
                 const response = await axiosClient.put(`/actualizar/${formData.id_asignacion}`, formData);
                 console.log('Respuesta del servidor:', response.data);

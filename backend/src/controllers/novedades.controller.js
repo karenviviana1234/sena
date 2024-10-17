@@ -49,40 +49,20 @@ export const registrarNovedad = async (req, res) => {
 
 export const listar = async (req, res) => {
     try {
-        // Consulta que obtiene todas las novedades relacionadas con los seguimientos de las productivas
-        let sql = `
-            SELECT 
-                p.id_productiva,
-                s.id_seguimiento,
-                n.id_novedad, 
-                n.seguimiento,
-                n.fecha, 
-                n.instructor, 
-                n.descripcion, 
-                n.foto,
-                s.seguimiento AS numero_seguimiento -- Añadir el número de seguimiento
-            FROM 
-                productivas p
-            JOIN 
-                seguimientos s ON p.id_productiva = s.productiva
-            JOIN 
-                novedades n ON s.id_seguimiento = n.seguimiento
-            WHERE 
-                s.seguimiento IN ('1', '2', '3')`; // Filtrar por los seguimientos 1, 2 y 3
+        let sql = "SELECT * FROM novedades"
 
-        const [results] = await pool.query(sql);
-
-        if (results.length > 0) {
-            res.status(200).json(results);
-        } else {
+        const [results] = await pool.query(sql)
+        if(results.length>0){
+            res.status(200).json(results)
+        }else{
             res.status(404).json({
-                message: 'No hay novedades registradas para los seguimientos 1, 2 o 3'
-            });
+                message: 'No hay novedades registradas'
+            })
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error del servidor: ' + error.message
-        });
+            message: 'Error del servidor' + error
+        })
     }
 };
 
@@ -165,17 +145,17 @@ const isValidDate = (dateString) => {
 
 export const eliminarNovedad = async (req, res) => {
     try {
-        const {id_novedad} = req.params
+        const { id_novedad } = req.params
 
         let sql = `DELETE FROM novedades WHERE id_novedad = ?`
 
         const [rows] = await pool.query(sql, [id_novedad])
 
-        if(rows.affectedRows>0){
+        if (rows.affectedRows > 0) {
             res.status(200).json({
                 message: 'novedad eliminada exitosamente'
             })
-        }else{
+        } else {
             res.status(403).json({
                 message: 'Error al eliminar la novedad'
             })

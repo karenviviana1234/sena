@@ -199,6 +199,13 @@ function TableSeguimientos() {
         const cellValue = item[columnKey];
     
         switch (columnKey) {
+            case "acciones":
+                return (
+                    <div className="flex justify-around items-center">
+                        <ButtonRegistrarNovedad onClick={() => handleOpenModal(null, 'formNovedades')} />
+                    </div>
+                );
+    
             case "seguimiento1":
             case "seguimiento2":
             case "seguimiento3":
@@ -224,7 +231,7 @@ function TableSeguimientos() {
                         </Button>
                     </div>
                 );
-
+    
             case "codigo":
                 return (
                     <Chip
@@ -235,12 +242,12 @@ function TableSeguimientos() {
                         {cellValue}
                     </Chip>
                 );
-
+    
             case "porcentaje":
                 // Formatear el porcentaje y añadir el símbolo "%"
                 return `${cellValue}%`;
-
-            case "actions":
+    
+            case "actions": // Cambié "acciones" a "actions" para que coincida
                 return (
                     <div className="relative flex justify-end items-center gap-2">
                         <Dropdown>
@@ -255,11 +262,12 @@ function TableSeguimientos() {
                         </Dropdown>
                     </div>
                 );
-
+    
             default:
                 return cellValue;
         }
     }, [buttonStates, handleOpenModal]);
+    
 
     // Pagination handlers
     const onNextPage = useCallback(() => {
@@ -329,6 +337,7 @@ function TableSeguimientos() {
         { key: "seguimiento2", label: "Seguimiento 2" },
         { key: "seguimiento3", label: "Seguimiento 3" },
         { key: "porcentaje", label: "Porcentaje" },
+        { key: "acciones", label: "Acciones" },
     ];
 
     return (

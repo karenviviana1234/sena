@@ -32,7 +32,7 @@ function TableFichasPage() {
             refreshTrigger={refreshTrigger}
             updateComponent={ActualizarFicha}
             contentName="fichas"
-            desactivarEndpoint="/fichas/fin/" // Cambiar aquí a minúscula
+            desactivarEndpoint="/fichas/fin/" 
             idField="codigo"
           />
 

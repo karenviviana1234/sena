@@ -15,6 +15,20 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
+        if (initialData) {
+            setMatriculaId(initialData.id_matricula);
+            setEstado(initialData.estado || "Selecciona");
+            setAprendizSeleccionado(initialData.id_persona || null);
+            setPendientesTecnicos(initialData.pendiente_tecnicos ?? 0);
+            setPendientesTransversales(initialData.pendiente_transversales ?? 0);
+            setPendienteIngles(initialData.pendiente_ingles ?? 0);
+            setIsEditing(true);
+        } else {
+            setIsEditing(false);
+        }
+    }, [initialData]);
+
+    useEffect(() => {
         const fetchAprendices = async () => {
             try {
                 const response = await axiosClient.get("/matriculas/listarA");
@@ -27,19 +41,7 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
         fetchAprendices();
     }, []);
 
-    useEffect(() => {
-        if (initialData) {
-            setMatriculaId(initialData.id_matricula);
-            setEstado(initialData.estado || "Selecciona");
-            setAprendizSeleccionado(initialData.id_persona || null);
-            setPendientesTecnicos(initialData.pendientes_tecnicos ?? 0);
-            setPendientesTransversales(initialData.pendientes_transversales ?? 0);
-            setPendienteIngles(initialData.pendiente_ingles ?? 0);
-            setIsEditing(true);
-        } else {
-            setIsEditing(false);
-        }
-    }, [initialData]);
+  
 
     const handleCheckboxChange = (id_persona) => {
         setAprendizSeleccionado(id_persona === aprendizSeleccionado ? null : id_persona);
@@ -49,17 +51,12 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
     e.preventDefault();
     setErrors({});
 
-    if (estado === 'Selecciona') {
-        setErrors({ estado: 'Por favor, selecciona un estado válido.' });
-        return;
-    }
-
         const formData = {
             estado,
             ficha: fichaSeleccionada,
             aprendiz: aprendizSeleccionado,
-            pendientes_tecnicos: pendientesTecnicos,
-            pendientes_transversales: pendientesTransversales,
+            pendiente_tecnicos: pendientesTecnicos,
+            pendiente_transversales: pendientesTransversales,
             pendiente_ingles: pendienteIngles
         };
 
@@ -102,11 +99,12 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                     <h2 className="text-lg font-semibold">Selecciona un Estado</h2>
                 )}
                 <select
-                    name="estado"
-                    value={estado}
-                    onChange={(e) => setEstado(e.target.value)}
                     className={`my-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.estado ? 'border-red-500' : ''}`}
+                    value={estado}
                     style={{ width: '385px' }}
+                    onChange={(e) => setEstado(e.target.value)}
+                    required
+
                 >
                     <option value="Selecciona">Selecciona un Estado</option>
                     <option value="Induccion">Induccion</option>
@@ -151,23 +149,23 @@ function FormMatriculas({ initialData, fichaSeleccionada, onSuccess }) {
                     <>
                         <input
                             type="number"
-                            name="pendientes_tecnicos"
+                            name="pendiente_tecnicos"
                             value={pendientesTecnicos}
                             onChange={(e) => setPendientesTecnicos(e.target.value)}
                             placeholder="Pendientes Técnicos"
-                            className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.pendientes_tecnicos ? 'border-red-500' : ''}`}
+                            className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.pendiente_tecnicos ? 'border-red-500' : ''}`}
                         />
-                        {errors.pendientes_tecnicos && <p className="text-red-500">{errors.pendientes_tecnicos}</p>}
+                        {errors.pendientes_tecnicos && <p className="text-red-500">{errors.pendiente_tecnicos}</p>}
 
                         <input
                             type="number"
-                            name="pendientes_transversales"
+                            name="pendiente_transversales"
                             value={pendientesTransversales}
                             onChange={(e) => setPendientesTransversales(e.target.value)}
                             placeholder="Pendientes Transversales"
-                            className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.pendientes_transversales ? 'border-red-500' : ''}`}
+                            className={`mt-4 h-14 rounded-xl bg-[#f4f4f5] p-2 ${errors.pendiente_transversales ? 'border-red-500' : ''}`}
                         />
-                        {errors.pendientes_transversales && <p className="text-red-500">{errors.pendientes_transversales}</p>}
+                        {errors.pendientes_transversales && <p className="text-red-500">{errors.pendiente_transversales}</p>}
 
                         <input
                             type="number"

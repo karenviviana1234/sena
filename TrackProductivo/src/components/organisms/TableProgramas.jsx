@@ -109,20 +109,22 @@ function TableProgramas() {
 
     const filteredItems = useMemo(() => {
         let filteredProgramas = programas;
-
+    
         if (hasSearchFilter) {
-            filteredProgramas = filteredProgramas.filter((seg) =>
-                seg.sigla.toLowerCase().includes(filterValue.toLowerCase())
+            filteredProgramas = filteredProgramas.filter((prog) =>
+                prog.sigla.toLowerCase().includes(filterValue.toLowerCase()) ||
+                prog.nombre_programa.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
-
+    
         return filteredProgramas;
     }, [programas, filterValue]);
-
+    
     const pages = useMemo(() => Math.ceil(filteredItems.length / rowsPerPage), [
         filteredItems.length,
         rowsPerPage,
     ]);
+    
 
     const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -285,7 +287,6 @@ function TableProgramas() {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     bodyContent={bodyContent}
-                    title={initialData ? "Actualizar Programa" : "Registrar Programa"}
                 />
             </div>
         </div>

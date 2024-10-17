@@ -13,7 +13,6 @@ import {
     Input,
     Pagination,
 } from "@nextui-org/react";
-import { PlusIcon } from "../NextIU/atoms/plusicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import { SearchIcon } from '../NextIU/atoms/searchicons.jsx';
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
@@ -144,7 +143,7 @@ export default function TableAmbiente() {
         if (result.isConfirmed) {
             try {
                 const response = await axiosClient.put(`/ambientes/inactivar/${id_ambiente}`, {
-                    activo: 0, // Desactivar el ambiente
+                    activo: 0,
                 });
                 Swal.fire({
                     icon: 'success',
@@ -152,7 +151,6 @@ export default function TableAmbiente() {
                     text: 'Ambiente desactivado',
                   });
     
-                // Actualizar el estado eliminando el ambiente desactivado de la lista
                 setAmbientes((prevAmbientes) =>
                     prevAmbientes.filter((ambiente) => ambiente.id_ambiente !== id_ambiente)
                 );

@@ -26,6 +26,8 @@ function FormProgramas({ initialData, onSuccess }) {
 
         const formData = { nombre_programa, sigla, nivel };
 
+        console.log("FormData:", formData);
+
         try {
             if (isEditing) {
                 await axiosClient.put(`/programa/actualizar/${idPrograma}`, formData);
@@ -43,6 +45,9 @@ function FormProgramas({ initialData, onSuccess }) {
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col">
+             <h1 className="text-xl font-bold mb-4">
+                {isEditing ? "Actualizar Programa" : "Registro de Programas"}
+            </h1>
             <Input
                 type="text"
                 label="Nombre Programa"

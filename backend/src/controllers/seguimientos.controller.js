@@ -173,7 +173,7 @@ export const listarSeguimientoAprendices = async (req, res) => {
                     personasMap[row.identificacion] = {
                         identificacion: row.identificacion,
                         nombres: row.nombres,
-                        correo: row.correo,  // Agrega el correo al objeto
+                        correo: row.correo, 
                         codigo: row.codigo,
                         sigla: row.sigla,
                         razon_social: row.razon_social,

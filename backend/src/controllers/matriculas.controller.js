@@ -124,11 +124,13 @@ export const listarMatriculas = async (req, res) => {
 };
 export const listar = async (req, res) => {
     try {
-        // Consulta para listar las matriculas junto con los nombres de los aprendices
+        // Consulta para listar las matriculas junto con los nombres de los aprendices que no tienen productivas registradas
         let sql = `
             SELECT matriculas.*, personas.nombres AS nombre_aprendiz 
             FROM matriculas 
             JOIN personas ON matriculas.aprendiz = personas.id_persona
+            LEFT JOIN productivas ON matriculas.id_matricula = productivas.matricula
+            WHERE productivas.matricula IS NULL
         `;
 
         const [results] = await pool.query(sql);
@@ -137,7 +139,7 @@ export const listar = async (req, res) => {
             res.status(200).json(results);
         } else {
             res.status(404).json({
-                message: 'No hay matrículas registradas'
+                message: 'No hay matrículas sin productivas registradas'
             });
         }
     } catch (error) {
@@ -194,61 +196,36 @@ export const registrarMatriculas = async (req, res) => {
         });
     }
 };
-
-
 export const actualizarMatriculas = async (req, res) => {
     try {
         const { id_matricula } = req.params;
         const { estado, pendiente_tecnicos, pendiente_transversales, pendiente_ingles } = req.body;
 
-        // Asegúrate de que el valor de estado sea una cadena y esté en el formato esperado
-        const estadoValido = ['Induccion', 'Formacion', 'Condicionado', 'Cancelado', 'Retiro Voluntario', 'Por Certificar', 'Certificado'];
-        if (estado && !estadoValido.includes(estado)) {
-            return res.status(400).json({
-                message: 'Estado no válido'
-            });
-        }
+        // Prepara los valores de actualización usando COALESCE para mantener valores existentes si son undefined
+        const sql = `
+            UPDATE matriculas SET
+                estado = COALESCE(?, estado),
+                pendiente_tecnicos = COALESCE(?, pendiente_tecnicos),
+                pendiente_transversales = COALESCE(?, pendiente_transversales),
+                pendiente_ingles = COALESCE(?, pendiente_ingles)
+            WHERE id_matricula = ?
+        `;
 
-        // Crea un array para los valores de actualización
-        const valoresActualizar = [];
-
-        // Agrega el estado si está definido
-        if (estado) {
-            valoresActualizar.push(estado);
-        } else {
-            valoresActualizar.push(null); // Si no hay estado, mantén el valor actual
-        }
-
-        // Agrega los pendientes, asegurando que 0 se envíe como valor
-        valoresActualizar.push(pendiente_tecnicos !== undefined ? pendiente_tecnicos : null);
-        valoresActualizar.push(pendiente_transversales !== undefined ? pendiente_transversales : null);
-        valoresActualizar.push(pendiente_ingles !== undefined ? pendiente_ingles : null);
-        valoresActualizar.push(id_matricula); // Agrega el id al final
-
-        // Crea la consulta
-        let sql = `UPDATE matriculas SET
-                    estado = COALESCE(?, estado),
-                    pendiente_tecnicos = COALESCE(?, pendiente_tecnicos),
-                    pendiente_transversales = COALESCE(?, pendiente_transversales),
-                    pendiente_ingles = COALESCE(?, pendiente_ingles)
-                    WHERE id_matricula = ?`;
-
-        const [rows] = await pool.query(sql, valoresActualizar);
+        const [rows] = await pool.query(sql, [
+            estado || null, 
+            pendiente_tecnicos || null, 
+            pendiente_transversales || null, 
+            pendiente_ingles || null, 
+            id_matricula
+        ]);
 
         if (rows.affectedRows > 0) {
-            res.status(200).json({
-                message: 'Matrícula actualizada correctamente'
-            });
+            return res.status(200).json({ message: 'Matrícula actualizada correctamente' });
         } else {
-            res.status(404).json({
-                message: 'Matrícula no encontrada o no se realizaron cambios'
-            });
+            return res.status(404).json({ message: 'Matrícula no encontrada o no se realizaron cambios' });
         }
-
     } catch (error) {
-        res.status(500).json({
-            message: 'Error del servidor: ' + error.message
-        });
+        return res.status(500).json({ message: 'Error del servidor: ' + error.message });
     }
 };
 

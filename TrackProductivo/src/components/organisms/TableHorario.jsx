@@ -20,7 +20,6 @@ import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 import RegistroHorario from '../molecules/Horarios/FormHorario.jsx';
 import ActualizarHorario from '../molecules/Horarios/ActualizarHorarios.jsx';
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import ButtonDesactivar from '../atoms/ButtonDesactivar.jsx';
 
 
@@ -46,7 +45,7 @@ function TableHorario() {
   useEffect(() => {
     const fetchFichas = async () => {
       try {
-        const response = await axiosClient.get('/fichas/listarC');
+        const response = await axiosClient.get('/fichas/listarN');
         if (response.data.length > 0) {
           setFichas(response.data);
         } else {
@@ -71,9 +70,7 @@ function TableHorario() {
     fetchFichas();
   }, []);
 
-  // Fetch para obtener las horarios de la ficha seleccionada
   const fetchHorarios = useCallback(async () => {
-    // Restablecer el estado de horarios antes de la nueva carga
     setHorarios([]);
 
     if (selectedFicha) {
@@ -100,10 +97,9 @@ function TableHorario() {
   }, [selectedFicha, page, rowsPerPage, fetchHorarios]);
 
   const handleDesactivar = async (id_horario) => {
-    // Mostrar una alerta de confirmación
     const result = await Swal.fire({
       title: "¿Estás seguro?",
-      text: "¿Quieres eliminar este Horario? Si lo haces, se borrarán todos los registros asociados, incluida la etapa productiva y los seguimientos si existen.",
+      text: "¿Quieres desactivar este Horario?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Sí, Eliminar",
@@ -115,13 +111,10 @@ function TableHorario() {
       },
     });
 
-    // Si el usuario confirma, proceder con la desactivación
     if (result.isConfirmed) {
       try {
         const response = await axiosClient.post(`/horarios/desactivar/${id_horario}`);
         Swal.fire("Eliminada", response.data.message, "success");
-
-        // Actualizar el estado para eliminar el instructor desactivado
         setHorarios((prevHorario) =>
           prevHorario.filter((horario) => horario.id_horario !== id_horario)
         );
@@ -253,15 +246,15 @@ function TableHorario() {
         />
         <div className="flex items-center gap-3">
           <Select
-            value={selectedFicha} // Verifica que selectedFicha tenga el valor correcto
-            onChange={handleFichaChange} // Asegúrate de que el estado cambia correctamente
+            value={selectedFicha} 
+            onChange={handleFichaChange}
             placeholder="Seleccione una Ficha"
             className="w-48"
           >
-            <SelectItem value="">Seleccione una ficha</SelectItem> {/* Opción por defecto */}
+            <SelectItem value="">Seleccione una ficha</SelectItem> 
             {fichas.map((ficha) => (
               <SelectItem key={ficha.codigo} value={ficha.codigo}>
-                {`${ficha.codigo} `}
+                {`${ficha.codigo} - ${ficha.sigla}`}
               </SelectItem>
             ))}
           </Select>
@@ -296,8 +289,8 @@ function TableHorario() {
 
   const columns = [
     { key: "id_horario", label: "ID" },
-    { key: "nombre_amb", label: "Ambiente" },
     { key: "dia", label: "Día" },
+    { key: "nombre_amb", label: "Ambiente" },
     { key: "hora_inicio", label: "Hora de Inicio" },
     { key: "hora_fin", label: "Hora de Fin" },
     { key: "horas", label: "Horas" },

@@ -64,10 +64,10 @@ function BasicLineChart() {
           outerRadius: 80,
           data: filteredPieData,
         }]}
-        width={450}
-        height={310}
+        width={260}
+        height={200}
         colors={['#ffa500', '#33FF57', '#ff0000']}
-        margin={{ top: 80 }}
+        margin={{ top: 80, left: 50}}
         slotProps={{
           legend: { hidden: true },
         }}

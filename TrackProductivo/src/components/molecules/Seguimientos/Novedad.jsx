@@ -54,7 +54,7 @@ const Novedades = () => {
                 setNovedades([]); // Limpia el estado si no hay novedades
                 setNoNovedadesMessage('No hay novedades registradas para este seguimiento.');
                 console.log('No hay novedades registradas.'); // Log para ver si se ejecuta
-            }            
+            }
         } catch (error) {
             console.error('Error al obtener las novedades:', error);
         } finally {
@@ -124,7 +124,7 @@ const Novedades = () => {
         setSelectedSeguimientos(event.target.value);
         console.log(event.target.value); // Agrega este log para verificar el valor
     };
-    
+
 
     const desactivarNovedad = async (id_novedad) => {
         try {
@@ -141,7 +141,7 @@ const Novedades = () => {
         }
     };
 
-    
+
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -161,12 +161,13 @@ const Novedades = () => {
                     required
                 >
                     <SelectItem value="">Selecciona un Seguimiento</SelectItem>
-                    {seguimientos.map((seguimiento, index) => (
+                    {seguimientos.slice(0, 3).map((seguimiento, index) => (
                         <SelectItem key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
-                            {`${index + 1} `}
+                            {index + 1} {/* Esto mostrará 1, 2, 3 */}
                         </SelectItem>
                     ))}
                 </Select>
+
 
                 {(userRole !== 'Aprendiz') && (
                     <ButtonRegistrarActividad
@@ -182,7 +183,7 @@ const Novedades = () => {
                         <div key={novedad.id_novedad} className="bg-white shadow-md rounded-lg p-4 w-60 relative">
                             <h4 className="text-xl font-semibold mb-2">{novedad.instructor}</h4>
                             <p className="text-sm text-gray-600">Descripción: {novedad.descripcion}</p>
-                            <p className="text-sm text-gray-600">Seguimiento: {novedad.numero_seguimiento}</p>
+                            <p className="text-sm text-gray-600">Seguimiento: {novedad.seguimiento}</p>
 
                             {novedad.foto && (
                                 <img

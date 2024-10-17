@@ -45,7 +45,7 @@ function TableMatriculas() {
     useEffect(() => {
         const fetchFichas = async () => {
             try {
-                const response = await axiosClient.get('/fichas/listarC');
+                const response = await axiosClient.get('/fichas/listarN');
                 if (response.data.length > 0) {
                     setFichas(response.data);
                 } else {
@@ -152,6 +152,8 @@ function TableMatriculas() {
                 confirmButtonText: 'OK'
             });
 
+            fetchMatriculas();
+
         } catch (error) {
             console.error("Error al cargar archivo:", error);
             Swal.fire({
@@ -198,41 +200,41 @@ function TableMatriculas() {
         setSelectedFicha(key);
     };
 
-    
+
     const hasSearchFilter = Boolean(filterValue);
 
     const filteredItems = useMemo(() => {
-      let filteredMatriculas = matriculas;
+        let filteredMatriculas = matriculas;
 
-    if (hasSearchFilter) {
-        filteredMatriculas = filteredMatriculas.filter((seg) =>
-        seg.aprendiz.toLowerCase().includes(filterValue.toLowerCase())
-      );
-    }
+        if (hasSearchFilter) {
+            filteredMatriculas = filteredMatriculas.filter((seg) =>
+                seg.aprendiz.toLowerCase().includes(filterValue.toLowerCase())
+            );
+        }
 
-    return filteredMatriculas;
-  }, [matriculas, filterValue]);
+        return filteredMatriculas;
+    }, [matriculas, filterValue]);
 
-  const pages = useMemo(() => Math.ceil(filteredItems.length / rowsPerPage), [
-    filteredItems.length,
-    rowsPerPage,
-  ]);
+    const pages = useMemo(() => Math.ceil(filteredItems.length / rowsPerPage), [
+        filteredItems.length,
+        rowsPerPage,
+    ]);
 
-  const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
+    const items = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
 
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
+        return filteredItems.slice(start, end);
+    }, [page, filteredItems, rowsPerPage]);
 
-  const sortedItems = useMemo(() => {
-    return [...items].sort((a, b) => {
-      const first = a[sortDescriptor.column];
-      const second = b[sortDescriptor.column];
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [sortDescriptor, items]);
+    const sortedItems = useMemo(() => {
+        return [...items].sort((a, b) => {
+            const first = a[sortDescriptor.column];
+            const second = b[sortDescriptor.column];
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [sortDescriptor, items]);
 
     const renderCell = useCallback(
         (item, columnKey) => {
@@ -292,18 +294,18 @@ function TableMatriculas() {
     const handleFichaChange = (event) => {
         console.log("Ficha seleccionada:", event.target.value);
         setSelectedFicha(event.target.value);
-      };
-      
+    };
 
-      const onRowsPerPageChange = useCallback((e) => {
+
+    const onRowsPerPageChange = useCallback((e) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
-      }, []);
-    
-      const onSearchChange = useCallback((value) => {
+    }, []);
+
+    const onSearchChange = useCallback((value) => {
         setFilterValue(value || "");
         setPage(1);
-      }, []);
+    }, []);
 
 
     const topContent = (
@@ -319,7 +321,7 @@ function TableMatriculas() {
                     onValueChange={setFilterValue}
                 />
                 <div className="flex items-center gap-3">
-                <Select
+                    <Select
                         value={selectedFicha} // Verifica que selectedFicha tenga el valor correcto
                         onChange={handleFichaChange} // Asegúrate de que el estado cambia correctamente
                         placeholder="Seleccione una Ficha"
@@ -328,7 +330,7 @@ function TableMatriculas() {
                         <SelectItem value="">Seleccione una ficha</SelectItem> {/* Opción por defecto */}
                         {fichas.map((ficha) => (
                             <SelectItem key={ficha.codigo} value={ficha.codigo}>
-                                 {`${ficha.codigo} `}
+                                {`${ficha.codigo} - ${ficha.sigla} `}
                             </SelectItem>
                         ))}
                     </Select>
@@ -440,7 +442,7 @@ function TableMatriculas() {
                 color="success"
                 aria-label="Paginación de la tabla"
                 showControls
-              />
+            />
             <ModalAcciones
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}

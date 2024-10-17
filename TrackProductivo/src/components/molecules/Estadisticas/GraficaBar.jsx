@@ -12,6 +12,9 @@ export default function GraficaBar() {
     Terminado: 0,
   });
   const [highlightedItem, setHighLightedItem] = React.useState(null);
+  const [chartHeight, setChartHeight] = useState(350); // Altura por defecto
+  const [chartWidthBar, setChartWidthBar] = useState('500%'); // Ancho por defecto
+  const [chartWidthPie, setChartWidthPie] = useState('100%'); // Ancho por defecto
 
   useEffect(() => {
     // Función para obtener los datos del backend
@@ -28,6 +31,28 @@ export default function GraficaBar() {
     };
 
     fetchData();
+  }, []);
+
+  // Establecer la altura y el ancho de la gráfica según el tamaño de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) { // Pantallas pequeñas (móviles)
+        setChartHeight(200);
+        setChartWidthBar('500%'); // Ancho completo para móviles
+        setChartWidthPie('50%'); // Ancho completo para móviles☻
+      } else { // Pantallas grandes (PC)
+        setChartHeight(350);
+        setChartWidthBar('80%'); // Ancho por defecto para PC
+        setChartWidthPie('50%'); // Ancho por defecto para PC
+      }
+    };
+
+    handleResize(); // Llamar la función al montar el componente
+    window.addEventListener('resize', handleResize); // Escuchar cambios de tamaño
+
+    return () => {
+      window.removeEventListener('resize', handleResize); // Limpiar el listener al desmontar
+    };
   }, []);
 
   // Calcular el total
@@ -53,7 +78,7 @@ export default function GraficaBar() {
         highlightScope: { highlight: 'item', fade: 'global' }, // Resaltado
       },
     ],
-    height: 350, // Ajustamos la altura de la gráfica de barras
+    height: chartHeight, // Usar la altura dinámica
     slotProps: {
       legend: {
         hidden: true,
@@ -86,18 +111,18 @@ export default function GraficaBar() {
     <Stack
       direction="row"
       spacing={2}
-      sx={{ width: '110%', justifyContent: 'space-between', alignItems: 'flex-start' }} 
+      sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }} 
       // Alineamos la gráfica de pastel en la parte superior derecha
     >
-      <div style={{ width: '80%' }}> {/* Gráfica de barras ocupando el 70% del espacio */}
+      <div style={{ width: chartWidthBar }}> {/* Gráfica de barras con ancho dinámico */}
         <BarChart
           {...barChartProps}
           highlightedItem={highlightedItem}
           onHighlightChange={setHighLightedItem}
-          colors={[ '#33FF57']}
+          colors={['#33FF57']}
         />
       </div>
-      <div style={{ width: '50%' }}> {/* Gráfica de pastel ocupando el 30% del espacio */}
+      <div style={{ width: chartWidthPie }}> {/* Gráfica de pastel con ancho dinámico */}
         <PieChart
           {...pieChartProps}
           highlightedItem={highlightedItem}

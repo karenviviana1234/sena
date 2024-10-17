@@ -17,7 +17,6 @@ import SeguimientoPage from './components/pages/SeguimientoPage.jsx';
 import EtapaPracticaPage from './components/pages/EtapaPracticaPage.jsx';
 import HomePage from './components/pages/HomePage.jsx';
 import ReportesPage from './components/pages/ReportesPage.jsx';
-import AsignacionPage from './components/pages/AsignacionPage.jsx';
 import Registro from './components/pages/RegistroPage.jsx';
 
 export const App = () => {
@@ -67,13 +66,7 @@ export const App = () => {
           } />
 
 
-          <Route path="/asignaciones" element={
-            <ProtectedRoute>
-              <WithSidebar>
-                <AsignacionPage />
-              </WithSidebar>
-            </ProtectedRoute>
-          } />
+       
 
           <Route path="/etapapractica" element={
             <ProtectedRoute>
@@ -127,21 +120,19 @@ export function WithSidebar({ children }) {
 
 
   return (
-    <div className="flex">
+    <div className="flex ">
       <Sidebar>
-        <SidebarItem nav="/home" icon={<Home size={20} />} text="Inicio" />
+        <SidebarItem nav="/home" icon={<Home size={20}/>} text="Inicio" />
         {(userRole !== 'Instructor' && userRole !== 'Aprendiz') && (
           <SidebarItem nav="/nomina" icon={<Users size={20} />} text="Instructores" />
+        )}
+         {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
+          <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Aprendices" />
         )}
         {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
           <SidebarItem nav="/fichas" icon={<BookMarked size={20} />} text="Fichas" />
         )}
-        {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
-          <SidebarItem nav="/matriculas" icon={<BookUser size={20} />} text="Matriculas" />
-        )}
-        {/*  {(userRole !== 'Aprendiz' && userRol !== 'Instructor') && (
-        <SidebarItem nav="/empresa" icon={<Building2 size={20} />} text="Empresa" />
-        )} */}
+       
         {(userRole !== 'Aprendiz' && userRole !== 'Instructor') && (
           <SidebarItem nav="/etapapractica" icon={<GraduationCap size={20} />} text="Productivas" />
         )}

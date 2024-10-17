@@ -190,19 +190,19 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
         {/* Select para Fichas de la base de datos*/}
 
         <div className="py-2">
-          <select
-            className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-gray-500"
+          <Select
             value={fichaSeleccionada}
             onChange={handleFichaChange}
             required
+            placeholder="Selecciona una Ficha"
           >
-            <option value="">Seleccionar Ficha</option>
+            <SelectItem value="">Seleccionar Ficha</SelectItem>
             {fichas.map((ficha) => (
-              <option key={ficha.codigo} value={ficha.codigo}>
+              <SelectItem key={ficha.codigo} value={ficha.codigo}>
                 {ficha.codigo}
-              </option>
+              </SelectItem>
             ))}
-          </select>
+          </Select>
         </div>
 
         {/* Mostrar horarios si existen, sino mostrar un mensaje */}
@@ -228,7 +228,7 @@ function FormActividades({ selectedInstructor, actividadSeleccionada, onClose })
         )}
 
         <div className="flex justify-end gap-5 mt-5">
-          <Button type="submit" className="bg-[#92d22e] text-white" color="success">
+          <Button type="submit" className="bg-[#0d324c] text-white" color="success">
             Registrar
           </Button>
         </div>

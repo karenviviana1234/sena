@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import FormEtapaPractica from "./FormEtapaPractica.jsx";
 import ModalAcciones from "./ModalAcciones.jsx";
 import FormAprendices from "./FormUsuarios.jsx";
-import FormUsuarios from "./FormUsuarios.jsx";
 import axiosClient from "../../configs/axiosClient.jsx";
 import {
   Table,
@@ -13,15 +12,9 @@ import {
   TableCell,
   Input,
   Button,
-  Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   User,
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
-import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
 
 function TableAprendices() {
   const [personas, setPersonas] = useState([]);
@@ -29,14 +22,14 @@ function TableAprendices() {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [modalOpen, setModalOpen] = useState(false);
-  const [formMode, setFormMode] = useState(""); // Modo del formulario: 'formAprendices' o 'formEtapaPractica'
-  const [modalEtapaOpen, setModalEtapaOpen] = useState(false); // Estado para el modal de etapa práctica
+  const [formMode, setFormMode] = useState(""); 
+  const [modalEtapaOpen, setModalEtapaOpen] = useState(false); 
   const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosClient.get("/personas/listarA"); // Ajusta la ruta del endpoint
+        const response = await axiosClient.get("/personas/listarA"); 
         setPersonas(response.data);
       } catch (error) {
         console.error("Error", error);
@@ -68,12 +61,12 @@ function TableAprendices() {
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    setModalEtapaOpen(false); // Cerrar ambos modales
+    setModalEtapaOpen(false); 
   };
 
   const handleFormAprendicesSubmit = () => {
-    handleCloseModal(); // Cerrar modal de FormAprendices
-    setModalEtapaOpen(true); // Abrir modal de FormEtapaPractica
+    handleCloseModal(); 
+    setModalEtapaOpen(true);
   };
 
   const columns = [

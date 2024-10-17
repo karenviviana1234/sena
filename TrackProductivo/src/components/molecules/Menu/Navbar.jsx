@@ -19,30 +19,36 @@ export const Navbar2 = ({ title }) => {
 
   return (
     <nav className="sticky top-0 z-20 w-full bg-white shadow-md dark:bg-neutral-800">
-    <Navbar>
-      <NavbarContent>
-        <NavbarBrand>
-          <p className="font-bold text-xl text-gray-800 dark:text-white ml-80">
-            TrackProductivo
-          </p>
-        </NavbarBrand>
-      </NavbarContent>
-  
-      <NavbarContent as="div" className="items-center px-4" justify="center">
-        <div className="ml-4">
-          <User
-            name={userData.nombres}
-            description={userData.cargo}
-            avatarSrc="https://via.placeholder.com/150"
-            bordered
-            as="button"
-            size="sm"
-            color="primary"
-          />
-        </div>
-      </NavbarContent>
-    </Navbar>
-  </nav>
-  
+      <Navbar>
+        <NavbarContent className="flex justify-between items-center px-4">
+          <NavbarBrand>
+            <p className="font-bold text-base sm:text-xl text-gray-800 dark:text-white">
+              TrackProductivo
+            </p>
+          </NavbarBrand>
+          <div className="flex items-center">
+            <div className="flex items-center">
+              <div className="hidden md:block mr-2">
+                <User
+                  avatarSrc="https://via.placeholder.com/150"
+                  bordered
+                  as="button"
+                  size="xs"
+                  color="primary"
+                />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-sm font-semibold md:text-base text-gray-800 dark:text-white">
+                  {userData.nombres}
+                </span>
+                <span className="text-xs md:text-sm text-gray-500 dark:text-gray-300">
+                  {userData.cargo}
+                </span>
+              </div>
+            </div>
+          </div>
+        </NavbarContent>
+      </Navbar>
+    </nav>
   );
 };
