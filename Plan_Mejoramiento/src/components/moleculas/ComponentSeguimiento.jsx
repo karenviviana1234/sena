@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useContext } from 'react';
 import SeguimientosContext from '../../Context/ContextSeguimiento.jsx';
+import axiosClient from '../../axiosClient.js';
+import RNFS from 'react-native-fs';
 
 const ComponentSeguimiento = ({ id_seguimiento, numero }) => {
-  const { seguimientos, getSeguimiento } = useContext(SeguimientosContext);
+  const { getSeguimiento } = useContext(SeguimientosContext);
   const [seguimientoData, setSeguimientoData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,8 +27,43 @@ const ComponentSeguimiento = ({ id_seguimiento, numero }) => {
     fetchSeguimientoData();
   }, [id_seguimiento, getSeguimiento]);
 
-  const handleDocumentAction = (document, action) => {
-    console.log(`Acción ${action} en documento:`, document);
+  const arrayBufferToBase64 = (buffer) => {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  };
+
+  const downloadFile = async (id_seguimiento) => {
+    console.log("ID de seguimiento:", id_seguimiento);
+    try {
+      const response = await axiosClient.get(`/seguimientos/descargarPdf/${id_seguimiento}`, {
+        responseType: 'arraybuffer',
+      });
+
+      // Verificar que la respuesta contiene datos
+      if (response.data) {
+        // Crear un nombre para el archivo
+        const filePath = `${RNFS.DocumentDirectoryPath}/acta_seguimiento_${id_seguimiento}.pdf`;
+
+        // Convertir el arraybuffer a base64
+        const base64Data = arrayBufferToBase64(response.data);
+
+        // Escribir el archivo en el sistema de archivos
+        await RNFS.writeFile(filePath, base64Data, 'base64');
+
+        // Opcional: Puedes mostrar una alerta al usuario
+        Alert.alert('Éxito', 'El archivo se ha descargado correctamente.', [{ text: 'OK' }]);
+      } else {
+        throw new Error("No se recibió ningún dato.");
+      }
+    } catch (error) {
+      console.error('Error al descargar el archivo:', error);
+      Alert.alert("Error", "No se pudo descargar el archivo.");
+    }
   };
 
   if (loading) {
@@ -50,7 +86,7 @@ const ComponentSeguimiento = ({ id_seguimiento, numero }) => {
             <Text>Estado: {bitacora.estado}</Text>
             <Text>Fecha: {bitacora.fecha}</Text>
             <View style={styles.actionContainer}>
-              <TouchableOpacity onPress={() => handleDocumentAction(bitacora, 'descargar')}>
+              <TouchableOpacity onPress={() => downloadFile(id_seguimiento)}>
                 <Icon name="download" size={20} color="#2196F3" />
               </TouchableOpacity>
             </View>
@@ -65,7 +101,7 @@ const ComponentSeguimiento = ({ id_seguimiento, numero }) => {
           <Text>Estado: {seguimientoData.acta.estado}</Text>
           <Text>Fecha: {seguimientoData.acta.fecha}</Text>
           <View style={styles.actionContainer}>
-            <TouchableOpacity onPress={() => handleDocumentAction(seguimientoData.acta, 'descargar')}>
+            <TouchableOpacity onPress={() => downloadFile(id_seguimiento)}>
               <Icon name="download" size={20} color="#2196F3" />
             </TouchableOpacity>
           </View>
@@ -77,37 +113,37 @@ const ComponentSeguimiento = ({ id_seguimiento, numero }) => {
 
 const styles = StyleSheet.create({
   container: {
-      flex: 1,
-      padding: 16,
+    flex: 1,
+    padding: 16,
   },
   title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      marginBottom: 16,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
   section: {
-      marginBottom: 24,
+    marginBottom: 24,
   },
   sectionTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      marginBottom: 12,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 12,
   },
   documentItem: {
-      backgroundColor: '#f0f0f0',
-      padding: 16,
-      borderRadius: 8,
-      marginBottom: 12,
+    backgroundColor: '#f0f0f0',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
   },
   documentTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 8,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
   actionContainer: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      marginTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 8,
   },
 });
 

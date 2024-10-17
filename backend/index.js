@@ -23,7 +23,12 @@ import rutaImportarExcel from './src/routes/importExcel.route.js'
 
 const servidor = express()
 
-servidor.use(cors())
+// servidor.use(cors())
+servidor.use(cors({
+    origin: '*', // Permite todos los orígenes
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Permite todos los métodos HTTP
+    allowedHeaders: ['Content-Type', 'Authorization'] // Encabezados permitidos
+}));
 
 servidor.use(body_parser.json())
 servidor.use(body_parser.urlencoded({ extended: false }))
