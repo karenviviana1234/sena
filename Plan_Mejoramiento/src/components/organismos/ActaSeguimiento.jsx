@@ -4,14 +4,14 @@ import DocumentPicker from 'react-native-document-picker';
 import axiosClient from '../../axiosClient';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import RNFS from 'react-native-fs';
+import RNBlobUtil from 'react-native-blob-util';
 
-const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
+ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
   const [seguimientoPdf, setSeguimientoPdf] = useState(null);
   const [idPersona, setIdPersona] = useState("");
   const [userRole, setUserRole] = useState(null);
   const [estado, setEstado] = useState(null);
-  const [pdfName, setPdfName] = useState(null);
+  const [pdfName, setPdfName] = useState(null);                                                                                                     
   const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10));
   
   const seguimientoNumeros = {
@@ -135,29 +135,22 @@ const ActaSeguimiento = ({ handleSubmit, id_seguimiento, onIdSend }) => {
     }
   }, [seguimientoPdf, id_seguimiento, handleSubmit]);
 
-  const downloadFile = async (id_seguimiento) => {
-    try {
-      const response = await axiosClient.get(`/seguimientos/descargarPdf/${id_seguimiento}`, {
-        responseType: 'blob',
-      });
+  const downloadFile = (url, filename) => {
+    const { config, fs } = RNBlobUtil;
+    let DownloadDir = fs.dirs.DownloadDir;
   
-      if (response.status === 200) {
-        const pdfFileName = `archivo-${id_seguimiento}.pdf`; // O usa el nombre que necesites
-        const path = `${RNFS.DocumentDirectoryPath}/${pdfFileName}`;
-        
-        // Guardar el archivo
-        await RNFS.writeFile(path, response.data, 'base64'); // Asegúrate de que la respuesta sea base64
-        Alert.alert("Éxito", "Archivo descargado correctamente.");
-        
-        // O puedes usar Linking para abrir el archivo
-        // Linking.openURL(path); // Si quieres abrir el archivo después de descargarlo
-      } else {
-        Alert.alert("Error", "No se pudo descargar el archivo.");
-      }
-    } catch (error) {
-      console.error("Error al descargar el archivo:", error);
-      Alert.alert("Error", `No se pudo descargar el archivo: ${error.message}`);
-    }
+    config({
+      fileCache: true,
+      appendExt: 'pdf',
+      path: `${DownloadDir}/${filename}`,
+    })
+      .fetch('GET', url)
+      .then((res) => {
+        console.log('Archivo descargado en: ', res.path());
+      })
+      .catch((error) => {
+        console.error('Error al descargar el archivo: ', error);
+      });
   };
   
 

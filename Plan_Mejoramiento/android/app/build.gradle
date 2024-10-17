@@ -104,6 +104,16 @@ android {
         }
     }
 }
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+        maven { url 'https://jcenter.bintray.com/' }
+        maven { url 'https://repo.maven.apache.org/maven2' }
+    }
+}
+
+
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
