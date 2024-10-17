@@ -88,7 +88,7 @@ export const LoginPage = () => {
 
   return (
     <div className="flex w-full h-screen overflow-hidden bg-gray-50">
-      <div className='bg-gradient-to-b from-lime-300 to-[#0c8652] w-[100%] h-auto flex justify-center items-center'>
+      <div className='hidden md:flex bg-gradient-to-b from-lime-300 to-[#0c8652] w-[100%] h-auto justify-center items-center'>
         <img className='w-[95%] pt-31' src="index.svg" alt="estadisticas" />
       </div>
       <div className="flex flex-col justify-center w-full px-6 py-12 sm:py-24">
@@ -163,5 +163,5 @@ export const LoginPage = () => {
         </div>
       </div>
     </div>
-  );
+  );  
 };

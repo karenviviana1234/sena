@@ -62,12 +62,12 @@ function Grafica() {
           cy: 150,
         }]}
         width={450}  // Ancho reducido
-        height={310} // Alto reducido
+        height={350} // Alto reducido
         colors={['#359d61', '#33FF57', '#aee18e', '#0d324c', '#6e9493', '#108953', '#abd7b6']}
       >
         <Tooltip 
           render={({ datum }) => (
-            <div style={{ padding: '8px', background: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}>
+            <div style={{  background: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}>
               <strong>{datum.label}</strong>: {Math.round(datum.value)}%
             </div>
           )}

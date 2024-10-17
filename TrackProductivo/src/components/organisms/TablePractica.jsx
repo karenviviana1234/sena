@@ -221,11 +221,12 @@ function TableProductiva() {
     const filteredItems = useMemo(() => {
         if (hasSearchFilter) {
             return productivas.filter((seg) =>
-                seg.aprendiz_nombre.toLowerCase().includes(filterValue.toLowerCase())
+                seg.aprendiz_nombre?.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
         return productivas;
     }, [productivas, filterValue]);
+    
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 

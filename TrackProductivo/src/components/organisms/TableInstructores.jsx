@@ -3,7 +3,6 @@ import FormUsuarios from "../molecules/Instructores/FormUsuarios.jsx";
 import ModalAcciones from "../molecules/ComponentsGlobals/ModalAcciones.jsx";
 import Swal from "sweetalert2";
 import axiosClient from "../../configs/axiosClient.jsx";
-import { format } from "date-fns";
 import {
   Table,
   TableHeader,
@@ -18,7 +17,6 @@ import {
 } from "@nextui-org/react";
 import { SearchIcon } from "../NextIU/atoms/searchicons.jsx";
 import ButtonActualizar from "../atoms/ButtonActualizar.jsx";
-/* import FormActividades from "./FormActividades.jsx"; */
 import ButtonDesactivar from "../atoms/ButtonDesactivar.jsx";
 import ButtonListarActividad from "../atoms/ButtonListarActividad.jsx";
 import ListActividad from "../molecules/Instructores/ListActividad.jsx";
@@ -54,11 +52,7 @@ function TableInstructores() {
       setBodyContent(
         <FormUsuarios initialData={data} onSuccess={handleUpdateData} />
       );
-    } /* else if (formType === "formActividades") {
-      setBodyContent(
-        <FormActividades selectedInstructor={data} onClose={handleCloseModal} />
-      ); 
-    }*/ else if (formType === "ListActividades") {
+    } else if (formType === "ListActividades") {
       setBodyContent(
         <ListActividad selectedInstructor={data} onClose={handleCloseModal} />
       );
@@ -88,7 +82,6 @@ function TableInstructores() {
   }, []);
 
   const handleDesactivar = async (id_persona) => {
-    // Mostrar una alerta de confirmación
     const result = await Swal.fire({
       title: "¿Estás seguro?",
       text: "¿Quieres desactivar este usuario?",
@@ -103,14 +96,11 @@ function TableInstructores() {
       },
     });
   
-    // Si el usuario confirma, proceder con la desactivación
     if (result.isConfirmed) {
       try {
         const response = await axiosClient.post(`/personas/desactivar/${id_persona}`);
         Swal.fire("Desactivado", response.data.message, "success");
-  
-        // Actualizar el estado para eliminar el instructor desactivado
-        setPersonas((prevPersonas) =>
+          setPersonas((prevPersonas) =>
           prevPersonas.filter((persona) => persona.id_persona !== id_persona)
         );
       } catch (error) {
@@ -162,7 +152,6 @@ function TableInstructores() {
 
       switch (columnKey) {
         case "area":
-          // Busca el nombre del área utilizando el id_area
           const area = areas.find((area) => area.id_area === item.area);
           return area ? area.nombre_area : "";
 
@@ -175,9 +164,6 @@ function TableInstructores() {
               <ButtonDesactivar
                 onClick={() => handleDesactivar(item.id_persona)}
               />
-{/*               <ButtonRegistrarActividad
-                onClick={() => handleOpenModal("formActividades", item)}
-              /> */}
               <ButtonListarActividad
                 onClick={() => handleOpenModal("ListActividades", item)}
               />

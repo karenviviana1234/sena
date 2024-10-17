@@ -7,19 +7,29 @@ import { ModalLogout } from "../../../configs/ModalLogout";
 const SidebarContext = createContext();
 
 export default function Sidebar({ children }) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(window.innerWidth >= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Si la ventana es menor a 768px (típico de un dispositivo móvil), colapsa el menú.
+      setExpanded(window.innerWidth >= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    
+    // Limpia el listener al desmontar el componente.
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <aside className="h-screen bg-white text-black shadow-md border-r-1">
       <nav className="h-full flex flex-col justify-between">
         <div>
-          <div className="px-4 py-3 flex justify-between items-center bg-gradient-to-r from-lime-200 to-[#0c8652]">
+          <div className="px-4 py-3 hidden md:flex justify-between items-center bg-gradient-to-r from-lime-200 to-[#0c8652]">
             <div className="flex items-center gap-2">
               <img
                 src={logo}
-                className={`overflow-hidden duration-500 ease-out rounded-full ${
-                  expanded ? "w-20" : "w-0"
-                }`}
+                className={`overflow-hidden duration-500 ease-out rounded-full ${expanded ? "w-20" : "w-0"}`}
                 alt="Logo"
               />
             </div>
@@ -30,7 +40,8 @@ export default function Sidebar({ children }) {
               {expanded ? <ChevronFirst /> : <ChevronLast />}
             </button>
           </div>
-          <div className="mt-4 pt-3 ">
+
+          <div className="mt-4 pt-3">
             <span className="ml-3 h-8 flex items-center text-[#0d324c] font-semibold">MENÚ</span>
             <SidebarContext.Provider value={{ expanded, setExpanded }}>
               <ul className="flex-1 px-2 mt-4 py-24">
@@ -42,9 +53,7 @@ export default function Sidebar({ children }) {
         <div className="flex p-3 bottom-5 w-full cursor-pointer border-t-[1px] border-opacity-45 border-gray-200">
           <LogOut className="ml-1 text-gray-600" size={20} />
           <div
-            className={`flex justify-between items-center overflow-hidden transition-all ${
-              expanded ? "w-48 ml-3" : "w-0"
-            }`}
+            className={`flex justify-between items-center overflow-hidden transition-all ${expanded ? "w-48 ml-3" : "w-0"}`}
           >
             <ModalLogout />
           </div>
@@ -63,27 +72,17 @@ export function SidebarItem({ nav, icon, text, alert }) {
   return (
     <Link to={nav}>
       <li
-        className={`relative flex items-center py-2 ${
-          expanded ? "px-5" : "pl-4"
-        } my-1 font-medium rounded-md cursor-pointer group ${
-          isActive
-            ? "bg-gradient-to-r from-[#87cb7f] to-[#0c8652] text-white"
-            : "hover:bg-[#66b77c] hover:text-white text-gray-700"
-        }`}
+        className={`relative flex items-center py-2 ${expanded ? "px-5" : "pl-3"} my-1 font-medium rounded-md cursor-pointer group ${isActive ? "bg-gradient-to-r from-[#87cb7f] to-[#0c8652] text-white" : "hover:bg-[#66b77c] hover:text-white text-gray-700"}`}
       >
         {icon}
         <span
-          className={`overflow-hidden transition-all duration-300 ${
-            expanded ? "w-48 ml-3" : "w-0"
-          }`}
+          className={`overflow-hidden transition-all duration-300 ${expanded ? "w-48 ml-3" : "w-0"}`}
         >
           {text}
         </span>
         {alert && (
           <div
-            className={`absolute right-2 w-2 h-2 rounded-full bg-[#0c8652] z-40 ${
-              expanded ? "" : "top-2"
-            }`}
+            className={`absolute right-2 w-2 h-2 rounded-full bg-[#0c8652] z-40 ${expanded ? "" : "top-2"}`}
           ></div>
         )}
         {!expanded && (
@@ -97,6 +96,7 @@ export function SidebarItem({ nav, icon, text, alert }) {
     </Link>
   );
 }
+
 
 export function SidebarAccordion({ icon, text, children }) {
   const { expanded, setExpanded } = useContext(SidebarContext);
@@ -114,9 +114,7 @@ export function SidebarAccordion({ icon, text, children }) {
     <div className="w-full">
       <div
         onClick={handleAccordionClick}
-        className={`flex items-center justify-between cursor-pointer py-2 ${
-          expanded ? "px-5" : "pl-4"
-        } my-1 font-medium rounded-md bg-lime-100 hover:bg-lime-200 text-gray-700`}
+        className={`flex items-center justify-between cursor-pointer py-2 my-1 font-medium rounded-md bg-lime-100 hover:bg-lime-200 text-gray-700`}
       >
         <div className="flex items-center">
           {icon}
@@ -125,9 +123,8 @@ export function SidebarAccordion({ icon, text, children }) {
         {expanded && (isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />)}
       </div>
       <div
-        className={`pl-8 overflow-hidden transition-max-height duration-300 ease-in-out ${
-          isOpen ? "max-h-96" : "max-h-0"
-        }`}
+        className={`pl-8 overflow-hidden transition-max-height duration-300 ease-in-out ${isOpen ? "max-h-96" : "max-h-0"
+          }`}
       >
         {children}
       </div>

@@ -86,15 +86,16 @@ function FormProductiva({ initialData, onSuccess }) {
     const handleFileChange = (e) => {
         const { name, files } = e.target;
         const file = files[0];
-        if (file && file.type === "application/pdf") {
+        if (file) {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: file,
             }));
         } else {
-            Swal.fire("Error", "Por favor, selecciona un archivo PDF válido", "error");
+            Swal.fire("Error", "Por favor, selecciona un archivo válido", "error");
         }
     };
+    
 
     const handleSubmit = async (event) => {
         event.preventDefault();
