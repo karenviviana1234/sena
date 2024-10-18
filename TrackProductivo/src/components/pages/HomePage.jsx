@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import Grafica from '../molecules/Estadisticas/Grafica';
+import Grafica from '../molecules/Estadisticas/GraficaMatriculas';
 import axiosClient from '../../configs/axiosClient';
-import GraficaBar from '../molecules/Estadisticas/GraficaBar';
-import BasicLineChart from '../molecules/Estadisticas/GraficaLine';
+import GraficaBar from '../molecules/Estadisticas/GraficaPractica';
+import BasicLineChart from '../molecules/Estadisticas/GraficaBitacoras';
 
 function HomePage() {
   const [personas, setPersonas] = useState([]);
 
   const fetchData = async () => {
     try {
-      const response = await axiosClient.get("/personas/listar"); // Ajusta la ruta del endpoint
+      const response = await axiosClient.get("/personas/listar"); 
       setPersonas(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -23,11 +23,11 @@ function HomePage() {
   return (
     <div className='m-4 sm:m-10'>
       <div className='flex flex-col sm:flex-row justify-between gap-4 sm:gap-10'>
-        <div className='bg-gradient-to-b from-lime-300 to-[#0c8652] h-24 p-3 mb-2 sm:mb-10 w-full sm:w-2/3 sm:h-28 rounded-lg sm:p-5'>
+        <div className='bg-gradient-to-b bg-[#219162] h-24 p-3 mb-2 sm:mb-10 w-full sm:w-2/3 sm:h-28 rounded-lg sm:p-5'>
           <h1 className='text-white text-lg sm:text-2xl font-semibold mb-2 sm:mb-3'>Bienvenido a TrackProductivo</h1>
           <p className='text-white text-xs sm:text-lg'>Eficiencia en Cada Paso: Monitorea, Evalúa, Mejora.</p>
         </div>
-        <div className='bg-gradient-to-b from-lime-300 to-[#0c8652] h-20 mb-4 sm:mb-10 w-full sm:w-96 sm:h-28 rounded-lg pt-5 text-center'>
+        <div className='bg-gradient-to-b bg-[#219162] h-20 mb-4 sm:mb-10 w-full sm:w-96 sm:h-28 rounded-lg pt-5 text-center'>
           <h1 className='text-white text-lg sm:text-xl font-semibold'>Más de {personas.total} personas</h1>
           <p className='text-white text-xs sm:text-lg'>usan nuestro sistema</p>
         </div>

@@ -91,16 +91,24 @@ export const contarMatriculasPorEstado = async (req, res) => {
     }
 };
 
-
 export const listarMatriculas = async (req, res) => {
     const { codigo } = req.params; // Obtener el parámetro id_ficha de la URL
 
     try {
-        // Realizar un JOIN entre matriculas y personas para obtener el nombre y la identificación del aprendiz,
+        // Realizar un JOIN entre matriculas y personas para obtener el nombre, identificación, correo y teléfono del aprendiz,
         // y filtrar por id_ficha recibido en la ruta
         let sql = `
-            SELECT m.id_matricula, p.identificacion, p.nombres AS nombre_aprendiz, m.ficha, m.estado, 
-                   m.pendiente_tecnicos, m.pendiente_transversales, m.pendiente_ingles
+            SELECT 
+                m.id_matricula, 
+                p.identificacion, 
+                p.nombres AS nombre_aprendiz, 
+                p.correo, 
+                p.telefono, 
+                m.ficha, 
+                m.estado, 
+                m.pendiente_tecnicos, 
+                m.pendiente_transversales, 
+                m.pendiente_ingles
             FROM matriculas m
             JOIN personas p ON m.aprendiz = p.id_persona
             WHERE m.ficha = ?
@@ -122,6 +130,7 @@ export const listarMatriculas = async (req, res) => {
         });
     }
 };
+
 export const listar = async (req, res) => {
     try {
         // Consulta para listar las matriculas junto con los nombres de los aprendices que no tienen productivas registradas

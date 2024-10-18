@@ -386,6 +386,8 @@ function TableMatriculas() {
         { key: "id_matricula", label: "ID" },
         { key: "identificacion", label: "Identificación" },
         { key: "nombre_aprendiz", label: "Aprendiz" },
+        { key: "correo", label: "Correo" },
+        { key: "telefono", label: "Telefono" },
         { key: "ficha", label: "Ficha" },
         { key: "estado", label: "Estado" },
         { key: "pendiente_tecnicos", label: "Pendientes Técnicos" },

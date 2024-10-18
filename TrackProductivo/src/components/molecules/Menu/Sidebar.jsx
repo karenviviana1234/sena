@@ -25,7 +25,7 @@ export default function Sidebar({ children }) {
     <aside className="h-screen bg-white text-black shadow-md border-r-1">
       <nav className="h-full flex flex-col justify-between">
         <div>
-          <div className="px-4 py-3 hidden md:flex justify-between items-center bg-gradient-to-r from-lime-200 to-[#0c8652]">
+          <div className="px-4 py-3 hidden md:flex justify-between items-center bg-gradient-to-r bg-[#33ae7b]">
             <div className="flex items-center gap-2">
               <img
                 src={logo}
@@ -72,7 +72,7 @@ export function SidebarItem({ nav, icon, text, alert }) {
   return (
     <Link to={nav}>
       <li
-        className={`relative flex items-center py-2 ${expanded ? "px-5" : "pl-3"} my-1 font-medium rounded-md cursor-pointer group ${isActive ? "bg-gradient-to-r from-[#87cb7f] to-[#0c8652] text-white" : "hover:bg-[#66b77c] hover:text-white text-gray-700"}`}
+        className={`relative flex items-center py-2 ${expanded ? "px-5" : "pl-3"} my-1 font-medium rounded-md cursor-pointer group ${isActive ? "bg-gradient-to-r bg-[#219162] text-white" : "hover:bg-[#66b77c] hover:text-white text-gray-700"}`}
       >
         {icon}
         <span
@@ -82,7 +82,7 @@ export function SidebarItem({ nav, icon, text, alert }) {
         </span>
         {alert && (
           <div
-            className={`absolute right-2 w-2 h-2 rounded-full bg-[#0c8652] z-40 ${expanded ? "" : "top-2"}`}
+            className={`absolute right-2 w-2 h-2 rounded-full bg-[#4be0a0] z-40 ${expanded ? "" : "top-2"}`}
           ></div>
         )}
         {!expanded && (

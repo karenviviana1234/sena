@@ -252,6 +252,43 @@ export const registrarProductiva = async (req, res) => {
     }
 };
 
+//* Listar los horarios de las fichas  */
+export const listarAprendicezPorFicha = async (req, res) => {
+    const { codigo } = req.params; // Recibimos el ID de la ficha como parámetro
+  
+    if (!codigo) {
+      return res.status(400).json({
+        message: 'El código de la ficha es obligatorio.',
+      });
+    }
+  
+    try {
+      // Consulta SQL para obtener los aprendices asociados a la ficha especificada
+      const sql = `
+        SELECT p.id_persona, p.nombres, p.identificacion, p.correo, p.telefono, f.codigo AS codigo_ficha
+        FROM personas p
+        INNER JOIN matriculas m ON p.id_persona = m.aprendiz
+        INNER JOIN fichas f ON m.ficha = f.codigo
+        WHERE f.codigo = ? AND p.estado = 1
+      `;
+  
+      const [results] = await pool.query(sql, [codigo]);
+  
+      if (results.length > 0) {
+        res.status(200).json(results);
+      } else {
+        res.status(404).json({
+          message: 'No se encontraron aprendices asociados a esta ficha.',
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error del servidor: ' + error.message,
+      });
+    }
+  };
+  /* fin */
+  
 
 
 export const actualizarProductiva = async (req, res) => {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import Swal from "sweetalert2";
 import axiosClient from "../../../configs/axiosClient";
+import { parseISO, format } from 'date-fns'; 
+
 
 function FormProductiva({ initialData, onSuccess }) {
     const [formData, setFormData] = useState({
@@ -49,8 +51,8 @@ function FormProductiva({ initialData, onSuccess }) {
             setFormData({
                 matricula: initialData.matricula || "",
                 empresa: initialData.empresa || "",
-                fecha_inicio: initialData.fecha_inicio || "",
-                fecha_fin: initialData.fecha_fin || "",
+                fecha_inicio: initialData.fecha_inicio ? format(parseISO(initialData.fecha_inicio), 'yyyy-MM-dd') : "",
+                fecha_fin: initialData.fecha_fin ? format(parseISO(initialData.fecha_fin), 'yyyy-MM-dd') : "",
                 alternativa: initialData.alternativa || "Selecciona",
                 estado: initialData.estado || "Selecciona",
                 acuerdoFile: null,
@@ -74,7 +76,7 @@ function FormProductiva({ initialData, onSuccess }) {
             });
         }
     }, [initialData]);
-
+    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
