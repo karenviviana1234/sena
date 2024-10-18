@@ -390,9 +390,9 @@ function TableMatriculas() {
         { key: "telefono", label: "Telefono" },
         { key: "ficha", label: "Ficha" },
         { key: "estado", label: "Estado" },
-        { key: "pendiente_tecnicos", label: "Pendientes Técnicos" },
-        { key: "pendiente_transversales", label: "Pendientes Transversales" },
-        { key: "pendiente_ingles", label: "Pendientes Inglés" },
+        { key: "pendiente_tecnicos", label: "Rap P. Técnicos" },
+        { key: "pendiente_transversales", label: "Rap P. Transversales" },
+        { key: "pendiente_ingles", label: "Rap P. Inglés" },
         { key: "acciones", label: "Acciones" },
     ];
 
@@ -405,7 +405,6 @@ function TableMatriculas() {
                         <Table
                             aria-label="Matriculas Table"
                             css={{ minWidth: "100%", height: "auto" }}
-                            className="p-4"
                         >
                             <TableHeader>
                                 {columns.map((column) => (

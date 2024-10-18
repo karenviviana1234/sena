@@ -252,9 +252,9 @@ export const registrarProductiva = async (req, res) => {
     }
 };
 
-//* Listar los horarios de las fichas  */
+// Controlador para listar aprendices por ficha, pero solo si están matriculados y no tienen etapa productiva registrada
 export const listarAprendicezPorFicha = async (req, res) => {
-    const { codigo } = req.params; // Recibimos el ID de la ficha como parámetro
+    const { codigo } = req.params; // Recibimos el código de la ficha como parámetro
   
     if (!codigo) {
       return res.status(400).json({
@@ -263,22 +263,25 @@ export const listarAprendicezPorFicha = async (req, res) => {
     }
   
     try {
-      // Consulta SQL para obtener los aprendices asociados a la ficha especificada
+      // Consulta SQL para obtener los aprendices asociados a la ficha y que estén matriculados, pero sin etapa productiva registrada
       const sql = `
-        SELECT p.id_persona, p.nombres, p.identificacion, p.correo, p.telefono, f.codigo AS codigo_ficha
+        SELECT p.id_persona, p.nombres, p.identificacion, p.correo, p.telefono, f.codigo AS codigo_ficha, m.id_matricula
         FROM personas p
         INNER JOIN matriculas m ON p.id_persona = m.aprendiz
         INNER JOIN fichas f ON m.ficha = f.codigo
-        WHERE f.codigo = ? AND p.estado = 1
+        LEFT JOIN productivas prod ON p.id_persona = prod.aprendiz
+        WHERE f.codigo = ? AND p.estado = 1 AND prod.id_productiva IS NULL
       `;
   
+      // Ejecutamos la consulta y obtenemos los resultados
       const [results] = await pool.query(sql, [codigo]);
   
+      // Verificamos si hay resultados
       if (results.length > 0) {
         res.status(200).json(results);
       } else {
         res.status(404).json({
-          message: 'No se encontraron aprendices asociados a esta ficha.',
+          message: 'No se encontraron aprendices sin etapa productiva registrada en esta ficha.',
         });
       }
     } catch (error) {
@@ -287,9 +290,7 @@ export const listarAprendicezPorFicha = async (req, res) => {
       });
     }
   };
-  /* fin */
   
-
 
 export const actualizarProductiva = async (req, res) => {
     try {
