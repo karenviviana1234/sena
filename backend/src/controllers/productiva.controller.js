@@ -234,7 +234,7 @@ export const registrarProductiva = async (req, res) => {
     }
 };
 
-
+/* Funciona para actualizar las etapas productivas */
 
 export const actualizarProductiva = async (req, res) => {
     try {
