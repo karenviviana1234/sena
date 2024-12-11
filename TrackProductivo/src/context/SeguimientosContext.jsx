@@ -7,6 +7,9 @@ export const SeguimientosProvider = ({ children }) => {
     const [seguimientos, setSeguimientos] = useState([]);
     const [seguimiento, setSeguimiento] = useState([]);
     const [idSeguimiento, setSeguimientoId] = useState([]);
+    const [productiva, setProductiva] = useState(null);  // Agregar estado para productiva
+    const [identificacion, setIdentificacion] = useState(null);  // Agregar estado para identificacion
+
 
     // Memoriza la función para evitar cambios innecesarios de referencia
     const getSeguimientos = useCallback(() => {
@@ -14,6 +17,8 @@ export const SeguimientosProvider = ({ children }) => {
             axiosClient.get('/seguimientos/listarA').then((response) => {
                 console.log(response.data);
                 setSeguimientos(response.data);
+                setProductiva(response.data[0].productiva);  // Asume que el campo 'productiva' está en la respuesta
+                setIdentificacion(response.data[0].identificacion);
             });
         } catch (error) {
             console.log('Error del servidor' + error);
@@ -42,7 +47,9 @@ export const SeguimientosProvider = ({ children }) => {
                 setSeguimiento,
                 setSeguimientoId,
                 getSeguimientos,
-                getSeguimiento
+                getSeguimiento,
+                productiva,
+                identificacion
             }}
         >
             {children}

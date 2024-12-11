@@ -127,7 +127,7 @@ function Bitacoras({
     formData.append('bitacoraPdf', bitacoraPdf);
 
     try {
-      const response = await axiosClient.post(`/bitacoras/cargarpdf/${bitacora}`, formData, {
+      const response = await axiosClient.post(`/bitacoras/cargarpdf/${id_bitacora}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

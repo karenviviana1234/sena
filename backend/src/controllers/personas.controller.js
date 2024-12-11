@@ -615,3 +615,41 @@ export const cambiarInstructor = async (req, res) => {
     });
   }
 };
+
+export const listarAprendicesPorInstructor = async (req, res) => {
+  const { id_persona } = req.params; // Obtener el ID del instructor de la ruta
+
+  const sql = `
+      SELECT
+          p.identificacion AS identificacion,
+          p.nombres AS nombres,
+          p.correo AS correo,
+          f.codigo AS codigo,
+          prg.sigla AS sigla,
+          e.razon_social AS razon_social,
+          instr.identificacion AS instructor_identificacion,
+          instr.nombres AS nombre_instructor
+      FROM
+          productivas pr
+          LEFT JOIN matriculas m ON pr.matricula = m.id_matricula
+          LEFT JOIN personas p ON m.aprendiz = p.id_persona
+          LEFT JOIN empresas e ON pr.empresa = e.id_empresa
+          LEFT JOIN fichas f ON m.ficha = f.codigo
+          LEFT JOIN programas prg ON f.programa = prg.id_programa
+          LEFT JOIN asignaciones asg ON asg.productiva = pr.id_productiva
+          LEFT JOIN actividades a ON asg.actividad = a.id_actividad
+          LEFT JOIN personas instr ON a.instructor = instr.id_persona
+      WHERE
+          instr.id_persona = ? 
+      ORDER BY
+          p.identificacion;
+  `;
+
+  try {
+      const [results] = await pool.query(sql, [id_persona]); // Usar el ID del instructor en la consulta
+      res.status(200).json(results);
+  } catch (error) {
+      console.error("Error al listar aprendices asignados al instructor:", error);
+      res.status(500).json({ message: "Error al obtener los aprendices asignados al instructor" });
+  }
+};

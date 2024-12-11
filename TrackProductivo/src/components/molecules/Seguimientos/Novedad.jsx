@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axiosClient from '../../../configs/axiosClient';
 import ModalAcciones from '../ComponentsGlobals/ModalAcciones';
 import FormNovedades from './FormNovedades';
@@ -6,8 +6,11 @@ import ButtonRegistrarActividad from '../../atoms/ButtonRegistrarActividad';
 import ButtonDesactivar from '../../atoms/ButtonDesactivar';
 import Swal from 'sweetalert2';
 import { Select, SelectItem } from '@nextui-org/react';
+import SeguimientosContext from '../../../context/SeguimientosContext';
+
 
 const Novedades = () => {
+    const { getSeguimientos, productiva, identificacion } = useContext(SeguimientosContext);
     const [novedades, setNovedades] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [bodyContent, setBodyContent] = useState(null);
@@ -17,6 +20,16 @@ const Novedades = () => {
     const [seguimientos, setSeguimientos] = useState([]);
     const [userRole, setUserRole] = useState(null);
     const [noNovedadesMessage, setNoNovedadesMessage] = useState('');
+
+    useEffect(() => {
+        getSeguimientos(); // Cargar los seguimientos desde el contexto
+    }, [getSeguimientos]);
+
+    useEffect(() => {
+        console.log('Productiva:', productiva);
+        console.log('Identificacion:', identificacion);
+    }, [productiva, identificacion]);
+
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -30,30 +43,30 @@ const Novedades = () => {
         }
     }, []);
 
+
+    useEffect(() => {
+        fetchSeguimientos(); // Obtener los seguimientos al cargar la página
+    }, [productiva]);
+
+    useEffect(() => {
+        listarN(); // Actualizar novedades cuando cambia el seguimiento
+    }, [selectedSeguimientos]);
+
     const listarN = async () => {
         setIsLoading(true);
         try {
-            const response = await axiosClient.get(`/novedades/listarN`);
-            setNovedades(response.data || []);
-        } catch (error) {
-            console.error('Error al obtener las novedades:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+            const endpoint = selectedSeguimientos
+                ? `/novedades/listarN/${selectedSeguimientos}`
+                : `/novedades/listar/${identificacion}`;
 
-    const fetchData = async () => {
-        if (!selectedSeguimientos) return; // No hacer nada si no hay seguimiento seleccionado
-        setIsLoading(true);
-        try {
-            const response = await axiosClient.get(`/novedades/listar/${selectedSeguimientos}`);
+            const response = await axiosClient.get(endpoint);
+
             if (response.data && response.data.length > 0) {
                 setNovedades(response.data);
                 setNoNovedadesMessage('');
             } else {
-                setNovedades([]); // Limpia el estado si no hay novedades
+                setNovedades([]);
                 setNoNovedadesMessage('No hay novedades registradas para este seguimiento.');
-                console.log('No hay novedades registradas.'); // Log para ver si se ejecuta
             }
         } catch (error) {
             console.error('Error al obtener las novedades:', error);
@@ -62,25 +75,49 @@ const Novedades = () => {
         }
     };
 
-    useEffect(() => {
-        listarN(); // Cargar todas las novedades al inicio
-        fetchSeguimientos(); // Obtener seguimientos al inicio
-    }, []);
-
-    useEffect(() => {
-        if (selectedSeguimientos) {
-            fetchData(); // Solo llamarlo si hay un seguimiento seleccionado
-        }
-    }, [selectedSeguimientos]);
-
     const fetchSeguimientos = async () => {
+        if (!productiva) return;
         try {
-            const response = await axiosClient.get("/seguimientos/listar");
-            setSeguimientos(response.data);
+            const response = await axiosClient.get(`/seguimientos/listarSeguimientoP/${productiva}`);
+            const seguimientosData = Object.entries(response.data[productiva]).map(([key, value]) => ({
+                id_seguimiento: value,
+                nombre_seguimiento: key,
+            }));
+            setSeguimientos(seguimientosData);
         } catch (error) {
-            console.error("Error al obtener seguimientos", error);
+            console.error('Error al obtener seguimientos:', error);
         }
     };
+
+    /*     const handleSeguimientoChange = (value) => {
+            setSelectedSeguimientos(value);
+        }; */
+
+    /*  const fetchSeguimientos = async () => {
+         if (!productiva) return;
+         try {
+             const response = await axiosClient.get(`/seguimientos/listarSeguimientoP/${productiva}`);
+ 
+             // Mostrar la respuesta completa de la API para inspeccionarla
+             console.log("Respuesta de la API:", response.data);
+ 
+             // La respuesta es un objeto con claves como "seguimiento 1", "seguimiento 2", etc.
+             const seguimientosData = Object.entries(response.data[productiva]).map(([key, value]) => ({
+                 id_seguimiento: value,
+                 nombre_seguimiento: key, // Ahora usamos el nombre del seguimiento como la clave
+             }));
+ 
+             // Mostrar los seguimientos procesados
+             console.log("Seguimientos procesados:", seguimientosData);
+ 
+             setSeguimientos(seguimientosData);
+         } catch (error) {
+             console.error("Error al obtener seguimientos", error);
+         }
+     }; */
+
+
+
 
     const handleOpenModal = (formType, novedad = null) => {
         if (formType === 'formNovedades') {
@@ -121,10 +158,11 @@ const Novedades = () => {
     };
 
     const handleSeguimientoChange = (event) => {
-        setSelectedSeguimientos(event.target.value);
-        console.log(event.target.value); // Agrega este log para verificar el valor
+        const selectedValue = event.target.value;
+        setSelectedSeguimientos(selectedValue);
+        console.log("Seleccionado el seguimiento con ID:", selectedValue);
+        listarN(); // Llamamos a listarN cuando se cambie el seguimiento
     };
-
 
     const desactivarNovedad = async (id_novedad) => {
         try {
@@ -155,15 +193,17 @@ const Novedades = () => {
                     className="w-60 mt-5"
                     id="seguimientos"
                     name="Seguimiento"
-                    value={selectedSeguimientos}
-                    placeholder='Selecciona un Seguimiento'
-                    onChange={handleSeguimientoChange}
+                    value={selectedSeguimientos} // Asegúrate de que este valor corresponda
+                    placeholder="Selecciona un Seguimiento"
+                    onChange={(e) => {
+                        handleSeguimientoChange(e);
+                    }}
                     required
                 >
                     <SelectItem value="">Selecciona un Seguimiento</SelectItem>
-                    {seguimientos.slice(0, 3).map((seguimiento, index) => (
+                    {seguimientos.map((seguimiento) => (
                         <SelectItem key={seguimiento.id_seguimiento} value={seguimiento.id_seguimiento}>
-                            {index + 1} {/* Esto mostrará 1, 2, 3 */}
+                            {seguimiento.nombre_seguimiento}
                         </SelectItem>
                     ))}
                 </Select>
@@ -181,7 +221,7 @@ const Novedades = () => {
                 {novedades.length > 0 ? (
                     novedades.map((novedad) => (
                         <div key={novedad.id_novedad} className="bg-white shadow-md rounded-lg p-4 w-60 relative">
-                            <h4 className="text-xl font-semibold mb-2">{novedad.instructor}</h4>
+                            <h4 className="text-base font-semibold mb-2">{novedad.instructor}</h4>
                             <p className="text-sm text-gray-600">Descripción: {novedad.descripcion}</p>
                             <p className="text-sm text-gray-600">Seguimiento: {novedad.seguimiento}</p>
 
@@ -217,5 +257,6 @@ const Novedades = () => {
         </div>
     );
 };
+
 
 export default Novedades;

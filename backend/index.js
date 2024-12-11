@@ -57,6 +57,6 @@ servidor.get('/document', (req,res) => {
     res.render('document.ejs')
 })
 
-servidor.listen(3000, () => {
+servidor.listen(3012, '0.0.0.0', () => {
     console.log('Servidor funcionando en el puerto 3000');
-})
+});
